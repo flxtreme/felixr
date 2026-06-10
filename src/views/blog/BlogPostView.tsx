@@ -13,7 +13,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    const res = await fetch(`${API_URL}/public/post/${slug}`, {
+    const res = await fetch(`${API_URL}/api/public/post/${slug}`, {
       cache: "no-store",
     });
 

@@ -16,15 +16,19 @@ async function getPage(slug: string): Promise<Post | null> {
   if (reservedSlugs.includes(slug)) return null;
 
   try {
-    const res = await fetch(`${API_URL}/public/post/page/${slug}`, {
+    const res = await fetch(`${API_URL}/api/public/post/page/${slug}`, {
       cache: "no-store",
     });
 
+    console.log(res);
+
     if (!res.ok) return null;
+
     const post: Post = await res.json();
-    if (post.postType !== "PAGE") return null;
+    
     return post;
-  } catch {
+  } catch(err) {
+    console.error(err);
     return null;
   }
 }
