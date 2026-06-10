@@ -16,16 +16,12 @@ async function getProject(slug: string): Promise<Post | null> {
   if (reservedSlugs.includes(slug)) return null;
 
   try {
-    const res = await fetch(`${API_URL}/public/post/page/${slug}`, {
+    const res = await fetch(`${API_URL}/api/public/post/page/${slug}`, {
       cache: "no-store",
     });
 
     if (!res.ok) return null;
     const post: Post = await res.json();
-
-    const tags = (post.metadata?.tags as string[]) || [];
-
-    console.log(tags);
 
     return post;
   } catch {
@@ -64,7 +60,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       header={
         <div className="space-y-4">
           <span className="text-sm text-foreground/40 font-mono block">
-            {project.publishedAt ? new Date(project.publishedAt).getFullYear() : 'Ongoing'}
+            {project.publishedAt ?? project?.createdAt ?? "-"}
           </span>
           <h1 className="text-4xl font-bold text-primary">
             {project.title || project.slug.replace(/-/g, ' ')}

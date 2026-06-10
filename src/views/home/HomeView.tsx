@@ -19,7 +19,7 @@ export default function HomeView() {
   const { posts: featuredProjects, isLoading: projectsLoading } = usePosts({
     postType: "PAGE",
     status: "PUBLISHED",
-    tags: ["project"],
+    tags: ["project", "projects"],
     limit: 3,
   });
 
