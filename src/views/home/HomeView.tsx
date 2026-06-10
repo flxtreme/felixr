@@ -71,26 +71,31 @@ export default function HomeView() {
           {postsLoading ? (
             <p className="text-sm font-mono text-foreground/40 animate-pulse">Loading latest posts...</p>
           ) : latestPosts.length > 0 ? (
-            latestPosts.map((post, idx) => (
-            <article key={`${post.id}-${idx}}`} className="group relative flex flex-col items-start">
-              <time 
-                className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono" 
-                dateTime={post.publishedAt || undefined}
-              >
-                {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-US', {
-                  month: 'long', day: 'numeric', year: 'numeric'
-                }) : 'Draft'}
-              </time>
-              <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                <Link href={`/blog/${post.slug}`}>
-                  {post.title || post.slug.replace(/-/g, ' ')}
-                </Link>
-              </h3>
-              <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
-                {post.content.replace(/[#*`]/g, '').substring(0, 180)}...
-              </p>
-            </article>
-            ))
+            latestPosts.map((post, idx) => {
+
+              const publishedAt = post?.publishedAt ?? post?.createdAt ?? post?.updatedAt;
+
+              return(
+                <article key={`${post.id}-${idx}}`} className="group relative flex flex-col items-start">
+                  <time 
+                    className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono" 
+                    dateTime={post.publishedAt || undefined}
+                  >
+                    {publishedAt ? new Date(publishedAt).toLocaleDateString('en-US', {
+                      month: 'long', day: 'numeric', year: 'numeric'
+                    }) : '-'}
+                  </time>
+                  <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                    <Link href={`/blog/${post.slug}`}>
+                      {post.title || post.slug.replace(/-/g, ' ')}
+                    </Link>
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
+                    {post.content.replace(/[#*`]/g, '').substring(0, 180)}...
+                  </p>
+                </article>
+              )
+            })
           ) : (
             <p className="text-sm font-medium text-foreground/40 italic">No posts published yet.</p>
           )}
@@ -108,21 +113,26 @@ export default function HomeView() {
           {projectsLoading ? (
             <p className="text-sm font-mono text-foreground/40 animate-pulse">Loading featured projects...</p>
           ) : featuredProjects.length > 0 ? (
-            featuredProjects.map((project, idx) => (
-            <article key={`${project.id}-${idx}`} className="group relative flex flex-col items-start">
-              <span className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono">
-                {new Date(project.publishedAt || 0).getFullYear()}
-              </span>
-              <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                <Link href={`/projects/${project.slug}`}>
-                  {project.title}
-                </Link>
-              </h3>
-              <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
-                {project.content.replace(/[#*`]/g, '').substring(0, 180)}...
-              </p> 
-            </article>
-            ))
+            featuredProjects.map((project, idx) => {
+
+              const publishedAt = project?.publishedAt ?? project?.createdAt ?? project?.updatedAt;
+
+              return(
+                <article key={`${project.id}-${idx}`} className="group relative flex flex-col items-start">
+                  <span className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono">
+                    { publishedAt? new Date(publishedAt).getFullYear() : ""}
+                  </span>
+                  <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                    <Link href={`/projects/${project.slug}`}>
+                      {project.title}
+                    </Link>
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
+                    {project.content.replace(/[#*`]/g, '').substring(0, 180)}...
+                  </p> 
+                </article>
+              )
+            })
           ) : (
             <p className="text-sm font-medium text-foreground/40 italic">No featured projects yet.</p>
           )}
