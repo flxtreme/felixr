@@ -55,7 +55,7 @@ export default function BlogListView({
                     </Link>
                   </h2>
                   <p className="mt-3 text-sm font-medium text-foreground/60 leading-relaxed line-clamp-3">
-                    {post.content.replace(/[#*`]/g, '').substring(0, 200)}...
+                    { post.excerpt && post.excerpt.replace(/[#*`]/g, '').substring(0, 200) }...
                   </p>
                 </article>
               ))

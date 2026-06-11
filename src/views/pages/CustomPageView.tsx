@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { Post } from "@/src/features/admin/posts/types";
+import { Post } from "@/src/features/public/posts/types";
 import PostRender from "@/src/components/PostRenderer";
 import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { PageLayout } from "@/src/layouts/PageLayout";
+import * as service from "@/src/features/public/posts/services";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -13,35 +14,48 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function getPage(slug: string): Promise<Post | null> {
   const reservedSlugs = ["projects", "blog"];
-  if (reservedSlugs.includes(slug)) return null;
+
+  if (reservedSlugs.includes(slug)) {
+    return null;
+  }
 
   try {
-    const res = await fetch(`${API_URL}/api/public/post/page/${slug}`, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${API_URL}/api/public/post/page/${slug}`,
+      {
+        cache: "no-store",
+      }
+    );
 
-    console.log(res);
+    if (!res.ok) {
+      return null;
+    }
 
-    if (!res.ok) return null;
-
-    const post: Post = await res.json();
-    
-    return post;
-  } catch(err) {
+    return await res.json();
+  } catch (err) {
     console.error(err);
     return null;
   }
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
   const { slug } = await params;
-  const page = await getPage(slug);
 
-  if (!page) return {};
+  const [page, metadata, content] = await Promise.all([
+    getPage(slug),
+    service.getPostMetadataBySlug(slug),
+    service.getPostContentBySlug(slug)
+  ]);
+
+  if (!page) {
+    return {};
+  }
 
   const description =
-    ((page.metadata as unknown as Record<string, string>)?.description) ??
-    page.content.substring(0, 160);
+    metadata?.description ||
+    content.substring(0, 160);
 
   return {
     title: page.title ?? slug,
@@ -53,11 +67,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function StaticPage({ params }: Props) {
+export default async function StaticPage({
+  params,
+}: Props) {
   const { slug } = await params;
-  const page = await getPage(slug);
 
-  if (!page) notFound();
+  const [page, content] = await Promise.all([
+    getPage(slug),
+    service.getPostContentBySlug(slug)
+  ]);
+
+  if (!page) {
+    notFound();
+  }
 
   return (
     <PageLayout
@@ -66,11 +88,20 @@ export default async function StaticPage({ params }: Props) {
           <h1 className="text-4xl font-bold tracking-tight">
             {page.title || page.slug.replace(/-/g, " ")}
           </h1>
-          <Breadcrumbs items={[{ label: (page.title || page.slug).toLowerCase() }]} />
+
+          <Breadcrumbs
+            items={[
+              {
+                label: (
+                  page.title || page.slug
+                ).toLowerCase(),
+              },
+            ]}
+          />
         </div>
       }
     >
-      <PostRender content={page.content} />
+      <PostRender content={content} />
     </PageLayout>
   );
 }

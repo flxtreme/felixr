@@ -4,6 +4,7 @@ import { Post } from "@/src/features/admin/posts/types";
 import PostRender from "@/src/components/PostRenderer";
 import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { SinglePageLayout } from "@/src/layouts/SinglePageLayout";
+import * as service from "@/src/features/public/posts/services";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -13,44 +14,71 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    const res = await fetch(`${API_URL}/api/public/post/${slug}`, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${API_URL}/api/public/post/${slug}`,
+      {
+        cache: "no-store",
+      }
+    );
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      return null;
+    }
+
     const post: Post = await res.json();
-    if (post.postType !== "POST") return null;
+
+    if (post.postType !== "POST") {
+      return null;
+    }
+
     return post;
   } catch {
     return null;
   }
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPost(slug);
 
-  if (!post) return {};
+  const [post, metadata, content] = await Promise.all([
+    getPost(slug),
+    service.getPostMetadataBySlug(slug),
+    service.getPostContentBySlug(slug),
+  ]);
+
+  if (!post) {
+    return {};
+  }
 
   const description =
-    ((post.metadata as unknown as Record<string, string>)?.description) ??
-    post.content.substring(0, 160);
+    metadata?.description ||
+    content.substring(0, 160);
 
   return {
     title: post.title ?? slug,
     description,
     openGraph: {
       title: post.title,
-      description
+      description,
     },
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({
+  params,
+}: Props) {
   const { slug } = await params;
-  const post = await getPost(slug);
 
-  if (!post) notFound();
+  const [post, content] = await Promise.all([
+    getPost(slug),
+    service.getPostContentBySlug(slug),
+  ]);
+
+  if (!post) {
+    notFound();
+  }
 
   return (
     <SinglePageLayout
@@ -59,14 +87,24 @@ export default async function BlogPostPage({ params }: Props) {
           <h1 className="text-5xl font-bold">
             {post.title || post.slug.replace(/-/g, " ")}
           </h1>
-          <Breadcrumbs items={[
-            { label: "posts", href: "/blog" },
-            { label: (post.title || post.slug).toLowerCase() }
-          ]} />
+
+          <Breadcrumbs
+            items={[
+              {
+                label: "posts",
+                href: "/blog",
+              },
+              {
+                label: (
+                  post.title || post.slug
+                ).toLowerCase(),
+              },
+            ]}
+          />
         </div>
       }
     >
-      <PostRender content={post.content} />
+      <PostRender content={content} />
     </SinglePageLayout>
   );
 }

@@ -91,7 +91,7 @@ export default function HomeView() {
                     </Link>
                   </h3>
                   <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
-                    {post.content.replace(/[#*`]/g, '').substring(0, 180)}...
+                    { post.excerpt && post.excerpt.replace(/[#*`]/g, '').substring(0, 180)}...
                   </p>
                 </article>
               )
@@ -128,7 +128,7 @@ export default function HomeView() {
                     </Link>
                   </h3>
                   <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
-                    {project.content.replace(/[#*`]/g, '').substring(0, 180)}...
+                    {project.excerpt && project.excerpt.replace(/[#*`]/g, '').substring(0, 180)}...
                   </p> 
                 </article>
               )

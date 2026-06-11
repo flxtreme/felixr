@@ -4,51 +4,88 @@ interface FetcherOptions extends RequestInit {
   headers?: HeadersInit;
 }
 
-export const fetcher = async <T = any>(url: string, options?: FetcherOptions): Promise<T> => {
-  // Initialize Headers object with existing headers from options
+export const fetcher = async <T = any>(
+  url: string,
+  options?: FetcherOptions
+): Promise<T> => {
   const headers = new Headers(options?.headers);
 
-  // Set default Content-Type if not already present
-  if (!headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
+  if (!headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
   }
 
-  const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
+  const cleanUrl = url.startsWith("/") ? url.slice(1) : url;
 
-  // Correctly retrieve token using the session utility (handles prefixing)
-  const accessToken = getSession('accessToken');
+  const accessToken = getSession("accessToken");
 
-  // Ensure we don't send "undefined" or "null" as a string in the header
-  if (accessToken && accessToken !== 'undefined' && accessToken !== 'null') {
-    headers.set('Authorization', `Bearer ${accessToken}`);
+  if (
+    accessToken &&
+    accessToken !== "undefined" &&
+    accessToken !== "null"
+  ) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
-  // Align URL with proxy: /api/proxy + backend resource path
   const response = await fetch(`/api/proxy/${cleanUrl}`, {
     ...options,
-    headers: headers, // Pass the Headers object to fetch
+    headers,
   });
 
   if (!response.ok) {
     let errorDetail = `HTTP error! status: ${response.status}`;
-    let errorJson: any = null;
 
     try {
-      errorJson = await response.json();
-      errorDetail += ` - ${JSON.stringify(errorJson)}`;
+      const contentType = response.headers.get("content-type");
 
-      // Capture token expiration and clear session
-      if (response.status === 403 && errorJson?.message === 'Your session has expired. Please log in again.') {
-        removeSession('accessToken');
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+      if (contentType?.includes("application/json")) {
+        const errorJson = await response.json();
+
+        errorDetail += ` - ${JSON.stringify(errorJson)}`;
+
+        if (
+          response.status === 403 &&
+          errorJson?.message ===
+            "Your session has expired. Please log in again."
+        ) {
+          removeSession("accessToken");
+
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+        }
+      } else {
+        const errorText = await response.text();
+
+        if (errorText) {
+          errorDetail += ` - ${errorText}`;
         }
       }
-    } catch (e) {
-      const errorText = await response.text().catch(() => "");
-      if (errorText) errorDetail += ` - ${errorText}`;
+    } catch {
     }
+
     throw new Error(errorDetail);
   }
-  return response.json() as T;
+
+  const contentType = response.headers.get("content-type");
+
+  if (!contentType) {
+    return undefined as T;
+  }
+
+  if (
+    contentType.includes("application/json") ||
+    contentType.includes("application/problem+json")
+  ) {
+    return (await response.json()) as T;
+  }
+
+  if (
+    contentType.includes("text/plain") ||
+    contentType.includes("text/html") ||
+    contentType.includes("text/markdown")
+  ) {
+    return (await response.text()) as T;
+  }
+
+  return (await response.text()) as T;
 };

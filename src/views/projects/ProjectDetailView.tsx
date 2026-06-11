@@ -4,6 +4,7 @@ import { Post } from "@/src/features/admin/posts/types";
 import PostRender from "@/src/components/PostRenderer";
 import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { SinglePageLayout } from "@/src/layouts/SinglePageLayout";
+import * as service from "@/src/features/public/posts/services";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -13,31 +14,47 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function getProject(slug: string): Promise<Post | null> {
   const reservedSlugs = ["blog", "projects", "home"];
-  if (reservedSlugs.includes(slug)) return null;
+
+  if (reservedSlugs.includes(slug)) {
+    return null;
+  }
 
   try {
-    const res = await fetch(`${API_URL}/api/public/post/page/${slug}`, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${API_URL}/api/public/post/page/${slug}`,
+      {
+        cache: "no-store",
+      }
+    );
 
-    if (!res.ok) return null;
-    const post: Post = await res.json();
+    if (!res.ok) {
+      return null;
+    }
 
-    return post;
+    return await res.json();
   } catch {
     return null;
   }
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = await getProject(slug);
 
-  if (!project) return {};
+  const [project, metadata, content] = await Promise.all([
+    getProject(slug),
+    service.getPostMetadataBySlug(slug),
+    service.getPostContentBySlug(slug),
+  ]);
+
+  if (!project) {
+    return {};
+  }
 
   const description =
-    ((project.metadata as unknown as Record<string, string>)?.description) ??
-    project.content.replace(/[#*`]/g, '').substring(0, 160);
+    metadata?.description ||
+    content.replace(/[#*`]/g, "").substring(0, 160);
 
   return {
     title: project.title ?? slug,
@@ -49,30 +66,49 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ProjectDetailPage({ params }: Props) {
+export default async function ProjectDetailPage({
+  params,
+}: Props) {
   const { slug } = await params;
-  const project = await getProject(slug);
 
-  if (!project) notFound();
+  const [project, content] = await Promise.all([
+    getProject(slug),
+    service.getPostContentBySlug(slug),
+  ]);
+
+  if (!project) {
+    notFound();
+  }
 
   return (
     <SinglePageLayout
       header={
         <div className="space-y-4">
           <span className="text-sm text-foreground/40 font-mono block">
-            {project.publishedAt ?? project?.createdAt ?? "-"}
+            {project.publishedAt ?? project.createdAt ?? "-"}
           </span>
+
           <h1 className="text-4xl font-bold text-primary">
-            {project.title || project.slug.replace(/-/g, ' ')}
+            {project.title || project.slug.replace(/-/g, " ")}
           </h1>
-          <Breadcrumbs items={[
-            { label: "projects", href: "/projects" },
-            { label: (project.title || project.slug).toLowerCase() }
-          ]} />
+
+          <Breadcrumbs
+            items={[
+              {
+                label: "projects",
+                href: "/projects",
+              },
+              {
+                label: (
+                  project.title || project.slug
+                ).toLowerCase(),
+              },
+            ]}
+          />
         </div>
       }
     >
-      <PostRender content={project.content} />
+      <PostRender content={content} />
     </SinglePageLayout>
   );
 }

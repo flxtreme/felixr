@@ -1,9 +1,18 @@
 "use client";
 
 import { ManagePostLayout } from "@/src/layouts/ManagePostLayout";
-import { PostContentEditor, PostMetaFields, PostStatusSelector, PostTagsInput } from "@/src/features/admin/components/post";
+import {
+  PostContentEditor,
+  PostMetaFields,
+  PostStatusSelector,
+  PostTagsInput,
+} from "@/src/features/admin/components/post";
 import PostMetaEditor from "@/src/features/admin/components/post/PostMetadataEditor";
-import { usePost } from "@/src/features/admin/posts/hooks";
+import {
+  usePost,
+  usePostContent,
+  usePostMetadata,
+} from "@/src/features/admin/posts/hooks";
 import { usePostContext } from "@/src/features/admin/posts/PostsContext";
 import { UpdatePostPayload, Post } from "@/src/features/admin/posts/types";
 import type { Metadata } from "next";
@@ -13,6 +22,7 @@ import { useEffect, useState } from "react";
 export default function PostEditView() {
   const { id } = useParams();
   const router = useRouter();
+
   const {
     updatePost,
     tagInput,
@@ -23,7 +33,13 @@ export default function PostEditView() {
     isSearching,
   } = usePostContext();
 
-  const { post: fetchedPost, isLoading: isFetching } = usePost(id as string);
+  const { post: fetchedPost, isLoading: isFetchingPost } = usePost(
+    id as string
+  );
+
+  const { content: fetchedContent } = usePostContent(id as string);
+
+  const { metadata: fetchedMetadata } = usePostMetadata(id as string);
 
   const [post, setPost] = useState<Partial<Post>>({
     title: "",
@@ -31,12 +47,40 @@ export default function PostEditView() {
     content: "",
     status: "DRAFT",
     postType: "POST",
-    metadata: { tags: [] },
+    metadata: {
+      tags: [],
+    },
   });
 
   useEffect(() => {
-    if (fetchedPost) setPost(fetchedPost);
+    if (!fetchedPost) return;
+
+    setPost((prev) => ({
+      ...prev,
+      ...fetchedPost,
+    }));
   }, [fetchedPost]);
+
+  useEffect(() => {
+    if (typeof fetchedContent === "undefined") return;
+
+    setPost((prev) => ({
+      ...prev,
+      content: fetchedContent,
+    }));
+  }, [fetchedContent]);
+
+  useEffect(() => {
+    if (!fetchedMetadata) return;
+
+    setPost((prev) => ({
+      ...prev,
+      metadata: {
+        ...(prev.metadata || {}),
+        ...(fetchedMetadata as any),
+      },
+    }));
+  }, [fetchedMetadata]);
 
   const savePost = async () => {
     try {
@@ -47,7 +91,13 @@ export default function PostEditView() {
     }
   };
 
-  if (isFetching) return <div className="p-8 font-mono text-sm opacity-40">Loading...</div>;
+  if (isFetchingPost) {
+    return (
+      <div className="p-8 font-mono text-sm opacity-40">
+        Loading post...
+      </div>
+    );
+  }
 
   return (
     <ManagePostLayout
@@ -58,11 +108,22 @@ export default function PostEditView() {
       editor={
         <PostContentEditor
           content={post.content || ""}
-          onContentChange={(value) => setPost((p) => ({ ...p, content: value }))}
+          onContentChange={(value) =>
+            setPost((prev) => ({
+              ...prev,
+              content: value,
+            }))
+          }
           onFileUpload={(file) => {
             const reader = new FileReader();
-            reader.onload = (e) =>
-              setPost((p) => ({ ...p, content: e.target?.result as string }));
+
+            reader.onload = (e) => {
+              setPost((prev) => ({
+                ...prev,
+                content: e.target?.result as string,
+              }));
+            };
+
             reader.readAsText(file);
           }}
         />
@@ -73,33 +134,70 @@ export default function PostEditView() {
             <h2 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-foreground/30">
               Post Details
             </h2>
+
             <PostMetaFields
               title={post.title || ""}
-              onTitleChange={(value) => setPost((p) => ({ ...p, title: value }))}
+              onTitleChange={(value) =>
+                setPost((prev) => ({
+                  ...prev,
+                  title: value,
+                }))
+              }
               slug={post.slug || ""}
-              onSlugChange={(value) => setPost((p) => ({ ...p, slug: value }))}
+              onSlugChange={(value) =>
+                setPost((prev) => ({
+                  ...prev,
+                  slug: value,
+                }))
+              }
               excerpt={post.excerpt || ""}
-              onExcerptChange={(value) => setPost((p) => ({ ...p, excerpt: value }))}
+              onExcerptChange={(value) =>
+                setPost((prev) => ({
+                  ...prev,
+                  excerpt: value,
+                }))
+              }
             />
+
             <PostStatusSelector
               status={post.status || "DRAFT"}
-              onStatusChange={(value) => setPost((p) => ({ ...p, status: value }))}
+              onStatusChange={(value) =>
+                setPost((prev) => ({
+                  ...prev,
+                  status: value,
+                }))
+              }
             />
+
             <PostTagsInput
               tags={(post.metadata?.tags as string[]) || []}
               onAddTag={(tag) =>
-                setPost((p) => {
-                  const tags = (p.metadata?.tags as string[]) || [];
-                  if (tags.includes(tag)) return p;
-                  return { ...p, metadata: { ...p.metadata, tags: [...tags, tag] } };
+                setPost((prev) => {
+                  const tags =
+                    (prev.metadata?.tags as string[]) || [];
+
+                  if (tags.includes(tag)) {
+                    return prev;
+                  }
+
+                  return {
+                    ...prev,
+                    metadata: {
+                      ...(prev.metadata || {}),
+                      tags: [...tags, tag],
+                    },
+                  };
                 })
               }
               onRemoveTag={(tag) =>
-                setPost((p) => ({
-                  ...p,
+                setPost((prev) => ({
+                  ...prev,
                   metadata: {
-                    ...p.metadata,
-                    tags: ((p.metadata?.tags as string[]) || []).filter((t) => t !== tag),
+                    ...(prev.metadata || {}),
+                    tags:
+                      ((prev.metadata?.tags as string[]) || []).filter(
+                        (t) => t !== tag
+                      ),
                   },
                 }))
               }
@@ -116,9 +214,18 @@ export default function PostEditView() {
             <h2 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-foreground/30">
               SEO Metadata
             </h2>
+
             <PostMetaEditor
               metadata={post.metadata?.seo as Metadata}
-              onChange={(seo) => setPost((p) => ({ ...p, metadata: { ...p.metadata, seo } }))}
+              onChange={(seo) =>
+                setPost((prev) => ({
+                  ...prev,
+                  metadata: {
+                    ...(prev.metadata || {}),
+                    seo,
+                  },
+                }))
+              }
             />
           </section>
         </div>

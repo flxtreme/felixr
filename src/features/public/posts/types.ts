@@ -7,12 +7,10 @@ export interface Post {
   slug: string;
   title: string;
   excerpt: string | null;
-  content: string;
   status: PostStatus;
   postType: PostType;
   publishedAt: string | null;
   featureImages: string[];
-  metadata?: Record<string, unknown> | null;
   userId: string;
   isDeleted: boolean;
   deletedAt: string | null;

@@ -1,9 +1,18 @@
 "use client";
 
 import { ManagePostLayout } from "@/src/layouts/ManagePostLayout";
-import { PostContentEditor, PostMetaFields, PostStatusSelector, PostTagsInput } from "@/src/features/admin/components/post";
+import {
+  PostContentEditor,
+  PostMetaFields,
+  PostStatusSelector,
+  PostTagsInput,
+} from "@/src/features/admin/components/post";
 import PostMetaEditor from "@/src/features/admin/components/post/PostMetadataEditor";
-import { usePost } from "@/src/features/admin/posts/hooks";
+import {
+  usePost,
+  usePostContent,
+  usePostMetadata,
+} from "@/src/features/admin/posts/hooks";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { UpdatePostPayload, Post } from "@/src/features/admin/posts/types";
 import type { Metadata } from "next";
@@ -13,6 +22,7 @@ import { useEffect, useState } from "react";
 export default function PageEditView() {
   const { id } = useParams();
   const router = useRouter();
+
   const {
     updatePage,
     tagInput,
@@ -23,7 +33,13 @@ export default function PageEditView() {
     isSearching,
   } = usePagesContext();
 
-  const { post: fetchedPage, isLoading: isFetching } = usePost(id as string);
+  const { post: fetchedPage, isLoading: isFetchingPage } = usePost(
+    id as string
+  );
+
+  const { content: fetchedContent } = usePostContent(id as string);
+
+  const { metadata: fetchedMetadata } = usePostMetadata(id as string);
 
   const [pageData, setPageData] = useState<Partial<Post>>({
     title: "",
@@ -31,23 +47,57 @@ export default function PageEditView() {
     content: "",
     status: "DRAFT",
     postType: "PAGE",
-    metadata: { tags: [] },
+    metadata: {
+      tags: [],
+    },
   });
 
   useEffect(() => {
-    if (fetchedPage) setPageData(fetchedPage);
+    if (!fetchedPage) return;
+
+    setPageData((prev) => ({
+      ...prev,
+      ...fetchedPage,
+    }));
   }, [fetchedPage]);
+
+  useEffect(() => {
+    if (typeof fetchedContent !== "undefined") {
+      setPageData((prev) => ({
+        ...prev,
+        content: fetchedContent,
+      }));
+    }
+  }, [fetchedContent]);
+
+  useEffect(() => {
+    if (!fetchedMetadata) return;
+
+    setPageData((prev) => ({
+      ...prev,
+      metadata: {
+        ...(prev.metadata || {}),
+        ...(fetchedMetadata as any),
+      },
+    }));
+  }, [fetchedMetadata]);
 
   const savePage = async () => {
     try {
       await updatePage(id as string, pageData as UpdatePostPayload);
       router.push("/admin/pages");
-    } catch (err) {
-      console.error("Failed to update page", err);
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  if (isFetching) return <div className="p-8 font-mono text-sm opacity-40">Loading...</div>;
+  if (isFetchingPage) {
+    return (
+      <div className="p-8 font-mono text-sm opacity-40">
+        Loading page...
+      </div>
+    );
+  }
 
   return (
     <ManagePostLayout
@@ -58,11 +108,22 @@ export default function PageEditView() {
       editor={
         <PostContentEditor
           content={pageData.content || ""}
-          onContentChange={(value) => setPageData((p) => ({ ...p, content: value }))}
+          onContentChange={(value) =>
+            setPageData((prev) => ({
+              ...prev,
+              content: value,
+            }))
+          }
           onFileUpload={(file) => {
             const reader = new FileReader();
-            reader.onload = (e) =>
-              setPageData((p) => ({ ...p, content: e.target?.result as string }));
+
+            reader.onload = (e) => {
+              setPageData((prev) => ({
+                ...prev,
+                content: e.target?.result as string,
+              }));
+            };
+
             reader.readAsText(file);
           }}
         />
@@ -73,33 +134,68 @@ export default function PageEditView() {
             <h2 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-foreground/30">
               Page Details
             </h2>
+
             <PostMetaFields
               title={pageData.title || ""}
-              onTitleChange={(value) => setPageData((p) => ({ ...p, title: value }))}
+              onTitleChange={(value) =>
+                setPageData((prev) => ({
+                  ...prev,
+                  title: value,
+                }))
+              }
               slug={pageData.slug || ""}
-              onSlugChange={(value) => setPageData((p) => ({ ...p, slug: value }))}
+              onSlugChange={(value) =>
+                setPageData((prev) => ({
+                  ...prev,
+                  slug: value,
+                }))
+              }
               excerpt={pageData.excerpt || ""}
-              onExcerptChange={(value) => setPageData((p) => ({ ...p, excerpt: value }))}
+              onExcerptChange={(value) =>
+                setPageData((prev) => ({
+                  ...prev,
+                  excerpt: value,
+                }))
+              }
             />
+
             <PostStatusSelector
               status={pageData.status || "DRAFT"}
-              onStatusChange={(value) => setPageData((p) => ({ ...p, status: value }))}
+              onStatusChange={(value) =>
+                setPageData((prev) => ({
+                  ...prev,
+                  status: value,
+                }))
+              }
             />
+
             <PostTagsInput
               tags={(pageData.metadata?.tags as string[]) || []}
               onAddTag={(tag) =>
-                setPageData((p) => {
-                  const tags = (p.metadata?.tags as string[]) || [];
-                  if (tags.includes(tag)) return p;
-                  return { ...p, metadata: { ...p.metadata, tags: [...tags, tag] } };
+                setPageData((prev) => {
+                  const tags =
+                    (prev.metadata?.tags as string[]) || [];
+
+                  if (tags.includes(tag)) return prev;
+
+                  return {
+                    ...prev,
+                    metadata: {
+                      ...(prev.metadata || {}),
+                      tags: [...tags, tag],
+                    },
+                  };
                 })
               }
               onRemoveTag={(tag) =>
-                setPageData((p) => ({
-                  ...p,
+                setPageData((prev) => ({
+                  ...prev,
                   metadata: {
-                    ...p.metadata,
-                    tags: ((p.metadata?.tags as string[]) || []).filter((t) => t !== tag),
+                    ...(prev.metadata || {}),
+                    tags:
+                      ((prev.metadata?.tags as string[]) || []).filter(
+                        (t) => t !== tag
+                      ),
                   },
                 }))
               }
@@ -116,9 +212,18 @@ export default function PageEditView() {
             <h2 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-foreground/30">
               SEO Metadata
             </h2>
+
             <PostMetaEditor
               metadata={pageData.metadata?.seo as Metadata}
-              onChange={(seo) => setPageData((p) => ({ ...p, metadata: { ...p.metadata, seo } }))}
+              onChange={(seo) =>
+                setPageData((prev) => ({
+                  ...prev,
+                  metadata: {
+                    ...(prev.metadata || {}),
+                    seo,
+                  },
+                }))
+              }
             />
           </section>
         </div>

@@ -9,6 +9,7 @@ import {
 import {
     PaginatedResponse,
 } from '@/src/common/types';
+import { Metadata } from 'next';
 
 const API_PREFIX = '/admin/post';
 
@@ -50,6 +51,14 @@ export const getPosts = async (
 
 export const getPostById = async (id: string): Promise<Post> => {
   return fetcher(`${API_PREFIX}/${id}`);
+};
+
+export const getPostContentById = async (id: string): Promise<string> => {
+  return fetcher(`${API_PREFIX}/${id}/content`);
+};
+
+export const getPostMetadataById = async (id: string): Promise<Metadata> => {
+  return fetcher(`${API_PREFIX}/${id}/metadata`);
 };
 
 export const getPostBySlug = async (slug: string): Promise<Post> => {

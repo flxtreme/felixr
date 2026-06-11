@@ -61,7 +61,7 @@ export default function ProjectsListView({
                   </Link>
                 </h2>
                 <p className="mt-3 text-sm font-medium text-foreground/60 leading-relaxed line-clamp-3">
-                  {project.content.replace(/[#*`]/g, '').substring(0, 200)}...
+                  { project.excerpt && project.excerpt.replace(/[#*`]/g, '').substring(0, 200) }...
                 </p>
               </article>
             )

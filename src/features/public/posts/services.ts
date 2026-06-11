@@ -6,8 +6,10 @@ import {
 import {
     PaginatedResponse,
 } from '@/src/common/types';
+import { Metadata } from 'next/types';
 
 const API_PREFIX = '/public/post';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const buildQuery = (params?: GetPostsQuery) => {
   if (!params) return '';
@@ -55,4 +57,38 @@ export const getPosts = async (
 
 export const getPostBySlug = async (slug: string): Promise<Post> => {
   return fetcher(`${API_PREFIX}/slug/${slug}`);
+};
+
+export const getPostContentBySlug = async (
+  slug: string
+): Promise<string> => {
+  const res = await fetch(
+    `${API_URL}/api/public/post/${slug}/content`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    return "";
+  }
+
+  return res.text();
+};
+
+export const getPostMetadataBySlug = async (
+  slug: string
+): Promise<Metadata> => {
+  const res = await fetch(
+    `${API_URL}/api/public/post/${slug}/metadata`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    return {};
+  }
+
+  return res.json();
 };
