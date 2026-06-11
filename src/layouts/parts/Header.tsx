@@ -69,10 +69,7 @@ export const Header = () => {
           </nav>
           <button
             onClick={toggleTheme}
-            className={cln(
-              "p-2 transition-colors hover:text-primary",
-              theme === 'light' ? 'text-primary' : 'text-amber-500'
-            )}
+            className="p-2 transition-colors text-foreground/40 hover:text-primary"
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
             {theme === 'light' ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}

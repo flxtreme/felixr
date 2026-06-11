@@ -395,10 +395,6 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
 
   return (
     <section className="space-y-8">
-      <h3 className="text-2xl font-medium text-foreground/50">
-        Metadata
-      </h3>
-      {/* Tabs */}
       <div className="flex gap-6 border-b border-border">
         {TABS.map((tab) => (
           <button

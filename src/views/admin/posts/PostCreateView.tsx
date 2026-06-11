@@ -1,26 +1,27 @@
 "use client";
 
-import { PostContentEditor, PostMetaFields, PostStatusSelector, PostTagsInput } from "@/src/features/admin/components/post";
-import MetadataBuilder from "@/src/features/admin/components/post/PostMetadataEditor";
-import { CreatePostPayload } from "@/src/features/admin/posts/types";
-import { Post } from "@/src/features/admin/posts/types";
-import { ArrowLeft, Save } from "lucide-react";
+import { ManagePostLayout } from "@/src/layouts/ManagePostLayout";
+import { PostContentEditor } from "@/src/features/admin/components/post/PostContentEditor";
+import { PostMetaFields } from "@/src/features/admin/components/post/PostMetaFields";
+import PostMetadataEditor from "@/src/features/admin/components/post/PostMetadataEditor";
+import { PostStatusSelector } from "@/src/features/admin/components/post/PostStatusSelector";
+import { PostTagsInput } from "@/src/features/admin/components/post/PostTagsInput";
+import { usePostContext } from "@/src/features/admin/posts/PostsContext";
+import { CreatePostPayload, Post } from "@/src/features/admin/posts/types";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { usePostContext } from "@/src/features/admin/posts/PostsContext";
 
 export default function PostCreateView() {
   const router = useRouter();
-  const { 
+  const {
     createPost,
     tagInput,
     setTagInput,
     showSuggestions,
     setShowSuggestions,
     searchResults,
-    isSearching
+    isSearching,
   } = usePostContext();
 
   const [post, setPost] = useState<Partial<Post>>({
@@ -43,66 +44,59 @@ export default function PostCreateView() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Toolbar */}
-      <header className="h-12 border-b border-border flex items-center justify-between px-8 shrink-0">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/posts" className="hover:text-primary transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-          <h1 className="text-sm font-bold">New Post</h1>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button
-            onClick={savePost}
-            className="text-xs font-mono font-medium text-primary hover:underline flex items-center gap-1.5 transition-all"
-          >
-            <Save className="w-3.5 h-3.5" />
-            Create Post
-          </button>
-        </div>
-      </header>
-
-      <div className="flex-1 overflow-y-auto p-8 space-y-12 pb-32">
-        {/* Meta Fields */}
-        <PostMetaFields
-          title={post.title || ""}
-          onTitleChange={(value) => setPost(p => ({ ...p, title: value }))}
-          slug={post.slug || ""}
-          onSlugChange={(value) => setPost((p) => ({ ...p, slug: value }))}
-          excerpt={post.excerpt || ""}
-          onExcerptChange={(value) => setPost(p => ({ ...p, excerpt: value }))}
+    <ManagePostLayout
+      pageTitle="New Post"
+      backHref="/admin/posts"
+      saveLabel="Create Post"
+      onSave={savePost}
+      editor={
+        <PostContentEditor
+          content={post.content || ""}
+          onContentChange={(value) => setPost((p) => ({ ...p, content: value }))}
+          onFileUpload={(file) => {
+            const reader = new FileReader();
+            reader.onload = (e) =>
+              setPost((p) => ({ ...p, content: e.target?.result as string }));
+            reader.readAsText(file);
+          }}
         />
+      }
+      sidebar={
+        <div className="space-y-7">
+          <section className="space-y-4">
+            <h2 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-foreground/30">
+              Post Details
+            </h2>
 
-        {/* Status & Tags */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="space-y-6">
+            <PostMetaFields
+              title={post.title || ""}
+              onTitleChange={(value) => setPost((p) => ({ ...p, title: value }))}
+              slug={post.slug || ""}
+              onSlugChange={(value) => setPost((p) => ({ ...p, slug: value }))}
+              excerpt={post.excerpt || ""}
+              onExcerptChange={(value) => setPost((p) => ({ ...p, excerpt: value }))}
+            />
+
             <PostStatusSelector
               status={post.status || "DRAFT"}
               onStatusChange={(value) => setPost((p) => ({ ...p, status: value }))}
             />
-          </div>
 
-          <div className="md:col-span-2">
             <PostTagsInput
               tags={(post.metadata?.tags as string[]) || []}
               onAddTag={(tag) =>
                 setPost((p) => {
-                  const metadata = p.metadata || {};
-                  const tags = (metadata.tags as string[]) || [];
+                  const meta = p.metadata || {};
+                  const tags = (meta.tags as string[]) || [];
                   if (tags.includes(tag)) return p;
-                  return { ...p, metadata: { ...metadata, tags: [...tags, tag] } };
+                  return { ...p, metadata: { ...meta, tags: [...tags, tag] } };
                 })
               }
               onRemoveTag={(tag) =>
                 setPost((p) => {
-                  const metadata = p.metadata || {};
-                  const tags = (metadata.tags as string[]) || [];
-                  return {
-                    ...p,
-                    metadata: { ...metadata, tags: tags.filter((t) => t !== tag) },
-                  };
+                  const meta = p.metadata || {};
+                  const tags = (meta.tags as string[]) || [];
+                  return { ...p, metadata: { ...meta, tags: tags.filter((t) => t !== tag) } };
                 })
               }
               tagInput={tagInput}
@@ -112,29 +106,22 @@ export default function PostCreateView() {
               searchResults={searchResults}
               isSearching={isSearching}
             />
-          </div>
-        </section>
+          </section>
 
-        {/* Content Editor */}
-        <PostContentEditor
-          content={post.content || ""}
-          onContentChange={(value) => setPost((p) => ({ ...p, content: value }))}
-          onFileUpload={(file) => {
-            const reader = new FileReader();
-            reader.onload = (e) => setPost(p => ({ ...p, content: e.target?.result as string }));
-            reader.readAsText(file);
-          }}
-        />
+          <section className="space-y-4">
+            <h2 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-foreground/30">
+              SEO Metadata
+            </h2>
 
-        {/* SEO Metadata Builder */}
-        <MetadataBuilder 
-          metadata={post.metadata?.seo as Metadata}
-          onChange={(seo) => setPost(p => ({
-            ...p,
-            metadata: { ...p.metadata, seo }
-          }))}
-        />
-      </div>
-    </div>
+            <PostMetadataEditor
+              metadata={post.metadata?.seo as Metadata}
+              onChange={(seo) =>
+                setPost((p) => ({ ...p, metadata: { ...p.metadata, seo } }))
+              }
+            />
+          </section>
+        </div>
+      }
+    />
   );
 }

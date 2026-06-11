@@ -15,7 +15,7 @@ export default function DashboardView() {
   const { user } = useDashboard();
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-8 space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-bold">Overview</h1>
         <p className="text-sm font-mono font-medium text-foreground/40">
@@ -23,17 +23,16 @@ export default function DashboardView() {
         </p>
       </header>
 
-      {/* Stats Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
           const content = (
-            <div className="border border-border border-r-6 p-6 rounded-lg hover:border-primary transition-all group shadow">
+            <div className="bg-surface shadow-sm rounded-lg p-6 hover:shadow-md transition-all group">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-mono font-medium text-foreground/40">
                   {stat.label}
                 </span>
-                <Icon className="w-3.5 h-3.5 text-foreground/20 group-hover:text-primary transition-colors" />
+                <Icon className="w-4 h-4 text-foreground/20 group-hover:text-primary transition-colors" />
               </div>
               <div className="text-3xl font-bold">
                 {stat.value}
@@ -51,9 +50,8 @@ export default function DashboardView() {
         })}
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-8 border-t border-border">
-        {/* Recent Activity Mockup */}
-        <section className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <section className="bg-surface shadow-sm rounded-lg p-6 space-y-4">
           <h2 className="text-sm font-mono font-bold text-foreground/40">Recent Posts</h2>
           <div className="divide-y divide-border">
             {[1, 2, 3].map((i) => (
@@ -68,8 +66,7 @@ export default function DashboardView() {
           </div>
         </section>
 
-        {/* Quick Actions */}
-        <section className="space-y-6">
+        <section className="bg-surface shadow-sm rounded-lg p-6 space-y-4">
           <h2 className="text-sm font-mono font-bold text-foreground/40">Quick Actions</h2>
           <div className="grid grid-cols-1 gap-3">
             <Link href="/admin/posts/new" className="flex items-center justify-between p-4 border border-dashed border-border rounded-lg text-sm font-mono font-medium text-foreground/40 hover:border-primary hover:text-primary transition-all">

@@ -1,24 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #14b8a6;
-  --border: #e5e7eb;
+  --background: #f8f8fa;
+  --foreground: #1a1a2e;
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
+  --border: #e2e2ea;
+  --surface: #ffffff;
+  --muted: #f0f0f5;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --primary: #2dd4bf;
-  --border: #27272a;
+  --background: #131520;
+  --foreground: #e8e8ef;
+  --primary: #a78bfa;
+  --primary-hover: #c4b5fd;
+  --border: #252538;
+  --surface: #1a1c2e;
+  --muted: #1e2035;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-border: var(--border);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -30,17 +39,15 @@ body {
 }
 
 select {
-  background: var(--background);
+  background: var(--surface);
   color: var(--foreground);
 }
 
-/* Global Scrollbar Styling */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--primary) transparent;
 }
 
-/* Webkit browsers (Chrome, Safari, Edge) */
 *::-webkit-scrollbar {
   width: 5px;
   height: 5px;

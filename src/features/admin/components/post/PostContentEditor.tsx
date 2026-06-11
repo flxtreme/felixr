@@ -230,9 +230,8 @@ export const PostContentEditor = ({
   );
 
   return (
-    <section className="space-y-4">
-      {/* Header row */}
-      <div className="flex items-center justify-between">
+    <section className="flex flex-col flex-1 h-full">
+      <div className="flex items-center justify-between px-6 pt-5 pb-4">
         <label className="text-2xl font-medium text-foreground/50">
           Content (Markdown)
         </label>
@@ -267,8 +266,7 @@ export const PostContentEditor = ({
         </div>
       </div>
 
-      {/* Editor frame */}
-      <div className="border border-border">
+      <div className="flex flex-col flex-1 border-t border-border overflow-hidden">
         {/* Toolbar */}
         <div
           className={`flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-border transition-opacity ${
@@ -373,13 +371,13 @@ export const PostContentEditor = ({
         </div>
 
         {/* Content area */}
-        <div className="min-h-[500px]">
+        <div className="flex-1 overflow-hidden">
           {isPreview ? (
-            <div className="p-8 overflow-auto max-h-[700px] bg-zinc-50/30 dark:bg-zinc-950/10">
+            <div className="p-8 overflow-auto h-full bg-zinc-50/30 dark:bg-zinc-950/10">
               <PostRender content={content || ""} />
             </div>
           ) : (
-            <div className="relative w-full h-[600px] overflow-hidden">
+            <div className="relative w-full h-full overflow-hidden">
               {/*
                 Overlay — must mirror the textarea's scroll position on BOTH axes.
                 - overflow: scroll (not auto) so scrollbar gutter is always reserved,
