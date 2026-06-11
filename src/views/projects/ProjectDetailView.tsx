@@ -5,6 +5,7 @@ import PostRender from "@/src/components/PostRenderer";
 import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { SinglePageLayout } from "@/src/layouts/SinglePageLayout";
 import * as service from "@/src/features/public/posts/services";
+import { trimContent } from "@/src/utils/trim";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -52,12 +53,16 @@ export async function generateMetadata({
     return {};
   }
 
-  const description =
-    metadata?.description ||
-    content.replace(/[#*`]/g, "").substring(0, 160);
+  const seo = metadata?.seo;
 
+  const description =
+    project?.excerpt ||
+    seo?.description ||
+    trimContent(content);
+  
   return {
-    title: project.title ?? slug,
+    ...seo,
+    title: seo?.title ?? project.title ?? slug,
     description,
     openGraph: {
       title: project.title,

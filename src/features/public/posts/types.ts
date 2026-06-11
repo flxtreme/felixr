@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+
 export type PostStatus = 'DRAFT' | 'PUBLISHED' | 'TRASHED';
 
 export type PostType = 'POST' | 'PAGE';
@@ -27,4 +29,9 @@ export interface GetPostsQuery {
   tags?: string[];
   isActive?: boolean;
   search?: string;
+}
+
+export interface FelixrMetadata {
+  tags: string[];
+  seo: Metadata;
 }

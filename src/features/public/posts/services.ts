@@ -2,11 +2,11 @@ import { fetcher } from '@/src/utils/fetcher';
 import {
   GetPostsQuery,
   Post,
+  FelixrMetadata as Metadata
 } from '@/src/features/public/posts/types';
 import {
     PaginatedResponse,
 } from '@/src/common/types';
-import { Metadata } from 'next/types';
 
 const API_PREFIX = '/public/post';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -87,7 +87,10 @@ export const getPostMetadataBySlug = async (
   );
 
   if (!res.ok) {
-    return {};
+    return {
+      tags: [],
+      seo: {}
+    };
   }
 
   return res.json();
