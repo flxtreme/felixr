@@ -29,7 +29,7 @@ export const PostMetaFields = ({
         .replace(/-+/g, "-");
       onSlugChange(generated);
     }
-  }, [title, isSlugEditable, onSlugChange]);
+  }, [title, isSlugEditable]);
 
   return (
     <section className="space-y-8">

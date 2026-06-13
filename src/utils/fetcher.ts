@@ -1,4 +1,5 @@
 import { getSession, removeSession } from "@/src/utils/session";
+import errorEmitter from "./errorEmitter";
 
 interface FetcherOptions extends RequestInit {
   headers?: HeadersInit;
@@ -54,6 +55,7 @@ export const fetcher = async <T = any>(url: string, options?: FetcherOptions): P
       }
     } catch {}
 
+    errorEmitter.emit(new Error(errorDetail));
     throw new Error(errorDetail);
   }
 

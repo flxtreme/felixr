@@ -72,12 +72,9 @@ export default function PageEditView() {
     }
   };
 
-  if (isFetchingPage) {
-    return <div className="p-8 font-mono text-sm opacity-40">Loading page...</div>;
-  }
-
   return (
     <ManagePostLayout
+      isLoading={isFetchingPage}
       pageTitle={pageData.title || pageData.slug || "Edit Page"}
       backHref="/admin/pages"
       saveLabel="Save Changes"

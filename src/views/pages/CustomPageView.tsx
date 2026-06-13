@@ -66,13 +66,13 @@ export default async function StaticPage({ params }: Props) {
       title={
         <div className="space-y-4">
           <h1 className="text-4xl font-bold tracking-tight">
-            {page.title || page.slug.replace(/-/g, " ")}
+            {page.title || page.slug?.replace(/-/g, " ")}
           </h1>
 
           <Breadcrumbs
             items={[
               {
-                label: (page.title || page.slug).toLowerCase(),
+                label: (page.title || page.slug)?.toLowerCase(),
               },
             ]}
           />

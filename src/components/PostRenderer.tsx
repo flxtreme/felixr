@@ -70,7 +70,7 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
     } else if (m[4] !== undefined) {
       // [text](href "title")
       nodes.push(
-        <a key={k} href={m[5]} title={m[6]} className="pr-link">
+        <a key={k} href={m[5]} title={m[6]} className="pr-link" target="_blank" rel="noopener noreferrer">
           {m[4]}
         </a>
       );

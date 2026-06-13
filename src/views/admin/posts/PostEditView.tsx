@@ -72,12 +72,9 @@ export default function PostEditView() {
     }
   };
 
-  if (isFetchingPost) {
-    return <div className="p-8 font-mono text-sm opacity-40">Loading post...</div>;
-  }
-
   return (
     <ManagePostLayout
+      isLoading={isFetchingPost}
       pageTitle={post.title || post.slug || "Edit Post"}
       backHref="/admin/posts"
       saveLabel="Save Changes"

@@ -1,15 +1,20 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/src/contexts/ThemeContext";
+import { ModalProvider } from "@/src/contexts/ModalContext";
+import { ErrorBoundary } from "@/src/contexts/ErrorBoundary";
+import { GlobalErrorHandler } from "../contexts/GlobalErrorHandler";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  axes: ["opsz"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmMono = DM_Mono({
+  variable: "--font-dm-mono",
   subsets: ["latin"],
+  weight: ["300", "400", "500"],
 });
 
 export default function RootLayout({
@@ -20,11 +25,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${dmMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ModalProvider>
+            <GlobalErrorHandler />
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
+          </ModalProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

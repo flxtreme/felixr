@@ -1,6 +1,8 @@
 "use client";
 
+import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import PostRender from "@/src/components/PostRenderer";
+import SinglePageLayout from "@/src/layouts/SinglePageLayout";
 import {
   Bold,
   CheckSquare,
@@ -48,6 +50,29 @@ const TbBtn = ({
 );
 
 const Sep = () => <span className="w-px h-4 bg-border mx-1 self-center shrink-0" />;
+
+// Shared style applied to BOTH overlay and textarea — must be identical
+const EDITOR_STYLE: React.CSSProperties = {
+  fontFamily: "var(--font-dm-mono), ui-monospace, monospace",
+  fontSize: "14px",
+  fontWeight: 500,
+  lineHeight: "1.625",
+  letterSpacing: "normal",
+  padding: "2rem",
+  paddingBottom: "8rem",
+  whiteSpace: "pre",
+  wordBreak: "normal",
+  overflowWrap: "normal",
+  boxSizing: "border-box",
+  overflow: "scroll",
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  margin: 0,
+  border: "none",
+  tabSize: 2,
+};
 
 export const PostContentEditor = ({
   content,
@@ -137,7 +162,6 @@ export const PostContentEditor = ({
     }
   };
 
-  // Sync both scroll axes from textarea → overlay
   const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
     if (overlayRef.current) {
       overlayRef.current.scrollTop = e.currentTarget.scrollTop;
@@ -151,7 +175,7 @@ export const PostContentEditor = ({
       if (line.trim().startsWith("```")) {
         inCodeBlock = !inCodeBlock;
         return (
-          <div key={i} className="text-emerald-500 font-mono bg-emerald-500/5 whitespace-pre">
+          <div key={i} style={{ whiteSpace: "pre", minHeight: "1.625em", color: "#10b981", background: "rgba(16,185,129,0.05)" }}>
             {line || " "}
           </div>
         );
@@ -159,7 +183,7 @@ export const PostContentEditor = ({
 
       if (inCodeBlock) {
         return (
-          <div key={i} className="text-emerald-500 font-mono bg-emerald-500/5 whitespace-pre">
+          <div key={i} style={{ whiteSpace: "pre", minHeight: "1.625em", color: "#10b981", background: "rgba(16,185,129,0.05)" }}>
             {line || " "}
           </div>
         );
@@ -167,7 +191,7 @@ export const PostContentEditor = ({
 
       if (line.match(/^#{1,6}\s/)) {
         return (
-          <div key={i} className="text-blue-500 font-bold whitespace-pre">
+          <div key={i} style={{ whiteSpace: "pre", minHeight: "1.625em", color: "#3b82f6", fontWeight: 700 }}>
             {line || " "}
           </div>
         );
@@ -175,25 +199,25 @@ export const PostContentEditor = ({
 
       const parts = line.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`)/g);
       return (
-        <div key={i} className="min-h-[1.5rem] whitespace-pre">
+        <div key={i} style={{ whiteSpace: "pre", minHeight: "1.625em" }}>
           {parts.map((part, j) => {
-            if (part.startsWith("`")) {
+            if (part.startsWith("`") && part.endsWith("`")) {
               return (
-                <span key={j} className="text-emerald-500 font-mono bg-emerald-500/10 px-1 rounded">
+                <span key={j} style={{ color: "#10b981", background: "rgba(16,185,129,0.1)", borderRadius: "3px", padding: "0 3px" }}>
                   {part}
                 </span>
               );
             }
-            if (part.startsWith("**")) {
+            if (part.startsWith("**") && part.endsWith("**")) {
               return (
-                <span key={j} className="font-bold">
+                <span key={j} style={{ fontWeight: 700 }}>
                   {part}
                 </span>
               );
             }
-            if (part.startsWith("*")) {
+            if (part.startsWith("*") && part.endsWith("*")) {
               return (
-                <span key={j} className="text-amber-500 font-medium">
+                <span key={j} style={{ color: "#f59e0b", fontWeight: 500 }}>
                   {part}
                 </span>
               );
@@ -254,7 +278,6 @@ export const PostContentEditor = ({
             </TbBtn>
           ))}
           <Sep />
-
           <TbBtn title="Bold (⌘B)" onClick={() => wrap("**", "**", "bold text")}>
             <Bold className="w-3.5 h-3.5" />
           </TbBtn>
@@ -268,7 +291,6 @@ export const PostContentEditor = ({
             <Underline className="w-3.5 h-3.5" />
           </TbBtn>
           <Sep />
-
           <TbBtn title="Bullet list" onClick={() => prependLine("- ")}>
             <List className="w-3.5 h-3.5" />
           </TbBtn>
@@ -279,7 +301,6 @@ export const PostContentEditor = ({
             <CheckSquare className="w-3.5 h-3.5" />
           </TbBtn>
           <Sep />
-
           <TbBtn title="Blockquote" onClick={() => prependLine("> ")}>
             <Quote className="w-3.5 h-3.5" />
           </TbBtn>
@@ -290,12 +311,11 @@ export const PostContentEditor = ({
             <FileCode2 className="w-3.5 h-3.5" />
           </TbBtn>
           <Sep />
-
           <TbBtn title="Link (⌘K)" onClick={() => wrap("[", "](url)", "link text")}>
             <Link className="w-3.5 h-3.5" />
           </TbBtn>
           <TbBtn title="Image" onClick={() => wrap("![", "](image-url)", "alt text")}>
-            <Image className="w-3.5 h-3.5" />
+            <Image className="w-3.5 h-3.5" aria-label="Insert image" />
           </TbBtn>
           <TbBtn
             title="Table"
@@ -316,65 +336,55 @@ export const PostContentEditor = ({
         <div className="flex-1 overflow-hidden">
           {isPreview ? (
             <div className="p-8 overflow-auto h-full bg-zinc-50/30 dark:bg-zinc-950/10">
-              <PostRender content={content || ""} />
+              <SinglePageLayout
+                header={
+                  <div className="space-y-4">
+                    <h1 className="text-4xl font-bold tracking-tight">
+                      Preview
+                    </h1>
+          
+                    <Breadcrumbs
+                      items={[{ label: "preview", href: "#" }]}
+                    />
+                  </div>
+                }
+              >
+                <PostRender content={content} />
+              </SinglePageLayout>
             </div>
           ) : (
             <div className="relative w-full h-full overflow-hidden">
-              {/*
-                Overlay — must mirror the textarea's scroll position on BOTH axes.
-                - overflow: scroll (not auto) so scrollbar gutter is always reserved,
-                  keeping the width identical to the textarea at all times.
-                - scrollbar-width: none hides the overlay's own scrollbars; only the
-                  textarea's scrollbars are shown to the user.
-                - whitespace-pre on every line keeps long lines from wrapping, enabling
-                  horizontal scroll to work properly.
-              */}
+              {/* Overlay */}
               <div
                 ref={overlayRef}
                 aria-hidden="true"
-                className="absolute inset-0 p-8 text-sm font-mono font-medium leading-relaxed pointer-events-none"
                 style={{
-                  overflow: "scroll",
+                  ...EDITOR_STYLE,
                   scrollbarWidth: "none",
-                  // Precise match with textarea's box model so text layers stay aligned
-                  boxSizing: "border-box",
-                  wordBreak: "normal",
-                  overflowWrap: "normal",
-                  whiteSpace: "pre",
+                  pointerEvents: "none",
+                  color: "var(--foreground)",
                 }}
               >
                 {renderHighlighted(content)}
-                {/* Spacer prevents the last line from being clipped at scroll bottom */}
                 <div style={{ height: "8rem" }} />
               </div>
 
-              {/*
-                Textarea — the real input layer.
-                - text-transparent + caret-foreground: text is invisible (overlay shows it),
-                  but the cursor is still visible.
-                - white-space: pre + overflow: scroll: enables both X and Y scrolling to
-                  match what the overlay can scroll.
-                - scrollbar-width: none: hides the textarea's scrollbar; we only want the
-                  scrollbar from… wait, actually we DO want the user to see one scrollbar.
-                  Since overlay's scrollbars are hidden, we show the textarea's scrollbar
-                  here by NOT hiding it. The overlay width = textarea width because both
-                  have overflow:scroll reserving the same gutter.
-              */}
+              {/* Textarea */}
               <textarea
                 ref={taRef}
                 value={content}
                 onChange={(e) => onContentChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onScroll={handleScroll}
-                className="absolute inset-0 w-full h-full bg-transparent p-8 text-transparent caret-foreground text-sm font-mono font-medium leading-relaxed focus:outline-none resize-none placeholder:text-foreground/10"
                 style={{
-                  overflow: "scroll",
-                  whiteSpace: "pre",
-                  wordBreak: "normal",
-                  overflowWrap: "normal",
-                  boxSizing: "border-box",
-                  paddingBottom: "8rem",
+                  ...EDITOR_STYLE,
+                  background: "transparent",
+                  color: "transparent",
+                  caretColor: "var(--foreground)",
+                  resize: "none",
+                  outline: "none",
                 }}
+                className="placeholder:text-foreground/10"
                 placeholder="Write your story in markdown..."
                 spellCheck={false}
               />

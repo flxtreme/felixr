@@ -15,10 +15,10 @@ export default function PostsListView({
   searchParams: Promise<{ page?: string; status?: string }>;
 }) {
   const { removePost } = usePostContext();
-  const { page, status } = React.use(searchParams);
+  const { page, status = "PUBLISHED" } = React.use(searchParams);
   const currentPage = Math.max(1, Number(page) || 1);
   const pageSize = 10;
-  const currentStatus = (status || "ALL").toUpperCase();
+  const currentStatus = status?.toUpperCase();
 
   const {
     posts: paginatedPosts,
@@ -26,7 +26,7 @@ export default function PostsListView({
     meta,
   } = usePosts({
     postType: "POST",
-    status: currentStatus === "ALL" ? undefined : (currentStatus as any),
+    status: currentStatus as Post["status"] | undefined,
     offset: (currentPage - 1) * pageSize,
     limit: pageSize,
   });
@@ -122,12 +122,12 @@ export default function PostsListView({
       </header>
 
       <div className="flex items-center gap-6 border-b border-border">
-        {["ALL", "PUBLISHED", "DRAFT", "TRASHED"].map((s) => (
+        {["PUBLISHED", "DRAFT", "TRASHED"].map((s) => (
           <Link
             key={s}
             href={{
               pathname: "/admin/posts",
-              query: s === "ALL" ? {} : { status: s.toLowerCase() },
+              query: { status: s.toLowerCase() },
             }}
             className={`pb-4 text-xs font-mono font-bold uppercase tracking-wider transition-colors border-b-2 -mb-px ${
               currentStatus === s
@@ -150,7 +150,7 @@ export default function PostsListView({
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        basePath={`/admin/posts${currentStatus !== "ALL" ? `?status=${currentStatus.toLowerCase()}` : ""}`}
+        basePath={`/admin/posts?status=${currentStatus.toLowerCase()}`}
       />
     </div>
   );
