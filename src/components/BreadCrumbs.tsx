@@ -11,10 +11,15 @@ interface BreadcrumbsProps {
 
 export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
   return (
-    <nav aria-label="Breadcrumb" className="flex text-xs font-mono font-medium text-foreground/40 uppercase">
+    <nav
+      aria-label="Breadcrumb"
+      className="flex text-xs font-mono font-medium text-foreground/40 uppercase"
+    >
       <ol className="flex items-center gap-2">
         <li>
-          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+          <Link href="/" className="hover:text-primary transition-colors">
+            Home
+          </Link>
         </li>
         {items.map((item, i) => (
           <li key={i} className="flex items-center gap-2">

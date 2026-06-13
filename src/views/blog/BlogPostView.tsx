@@ -5,7 +5,7 @@ import PostRender from "@/src/components/PostRenderer";
 import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { SinglePageLayout } from "@/src/layouts/SinglePageLayout";
 import * as service from "@/src/features/public/posts/services";
-import { trimContent } from "@/src/utils/trim";
+import parseMetadata from "@/src/utils/parseMetadata";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -15,12 +15,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    const res = await fetch(
-      `${API_URL}/api/public/post/${slug}`,
-      {
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`${API_URL}/api/public/post/${slug}`, {
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       return null;
@@ -38,9 +35,7 @@ async function getPost(slug: string): Promise<Post | null> {
   }
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
 
   const [post, metadata, content] = await Promise.all([
@@ -53,33 +48,13 @@ export async function generateMetadata({
     return {};
   }
 
-  const seo = metadata?.seo;
-
-  const description =
-    post?.excerpt ||
-    seo?.description ||
-    trimContent(content);
-  
-  return {
-    ...seo,
-    title: seo?.title ?? post.title ?? slug,
-    description,
-    openGraph: {
-      title: post.title,
-      description,
-    },
-  };
+  return parseMetadata(post, slug, content, metadata);
 }
 
-export default async function BlogPostPage({
-  params,
-}: Props) {
+export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
 
-  const [post, content] = await Promise.all([
-    getPost(slug),
-    service.getPostContentBySlug(slug),
-  ]);
+  const [post, content] = await Promise.all([getPost(slug), service.getPostContentBySlug(slug)]);
 
   if (!post) {
     notFound();
@@ -89,9 +64,7 @@ export default async function BlogPostPage({
     <SinglePageLayout
       header={
         <div className="space-y-4">
-          <h1 className="text-5xl font-bold">
-            {post.title || post.slug.replace(/-/g, " ")}
-          </h1>
+          <h1 className="text-5xl font-bold">{post.title || post.slug.replace(/-/g, " ")}</h1>
 
           <Breadcrumbs
             items={[
@@ -100,9 +73,7 @@ export default async function BlogPostPage({
                 href: "/blog",
               },
               {
-                label: (
-                  post.title || post.slug
-                ).toLowerCase(),
+                label: (post.title || post.slug).toLowerCase(),
               },
             ]}
           />

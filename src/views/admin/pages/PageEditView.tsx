@@ -8,16 +8,12 @@ import {
   PostTagsInput,
 } from "@/src/features/admin/components/post";
 import PostMetaEditor from "@/src/features/admin/components/post/PostMetadataEditor";
-import {
-  usePost,
-  usePostContent,
-  usePostMetadata,
-} from "@/src/features/admin/posts/hooks";
+import { usePost, usePostContent, usePostMetadata } from "@/src/features/admin/posts/hooks";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { UpdatePostPayload, Post } from "@/src/features/admin/posts/types";
 import type { Metadata } from "next";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 
 export default function PageEditView() {
   const { id } = useParams();
@@ -33,54 +29,39 @@ export default function PageEditView() {
     isSearching,
   } = usePagesContext();
 
-  const { post: fetchedPage, isLoading: isFetchingPage } = usePost(
-    id as string
-  );
-
+  const { post: fetchedPage, isLoading: isFetchingPage } = usePost(id as string);
   const { content: fetchedContent } = usePostContent(id as string);
-
   const { metadata: fetchedMetadata } = usePostMetadata(id as string);
 
-  const [pageData, setPageData] = useState<Partial<Post>>({
-    title: "",
-    slug: "",
-    content: "",
-    status: "DRAFT",
-    postType: "PAGE",
-    metadata: {
-      tags: [],
-    },
-  });
+  const basePage = useMemo<Partial<Post>>(
+    () => ({
+      title: "",
+      slug: "",
+      content: "",
+      status: "DRAFT",
+      postType: "PAGE",
+      metadata: { tags: [] },
+      ...(fetchedPage ?? {}),
+      ...(typeof fetchedContent !== "undefined" ? { content: fetchedContent } : {}),
+      ...(fetchedMetadata
+        ? {
+            metadata: {
+              ...(fetchedPage?.metadata ?? {}),
+              ...(fetchedMetadata as Record<string, unknown>),
+            },
+          }
+        : {}),
+    }),
+    [fetchedPage, fetchedContent, fetchedMetadata]
+  );
 
-  useEffect(() => {
-    if (!fetchedPage) return;
+  const [overrides, setOverrides] = useState<Partial<Post>>({});
 
-    setPageData((prev) => ({
-      ...prev,
-      ...fetchedPage,
-    }));
-  }, [fetchedPage]);
+  const pageData = useMemo(() => ({ ...basePage, ...overrides }), [basePage, overrides]);
 
-  useEffect(() => {
-    if (typeof fetchedContent !== "undefined") {
-      setPageData((prev) => ({
-        ...prev,
-        content: fetchedContent,
-      }));
-    }
-  }, [fetchedContent]);
-
-  useEffect(() => {
-    if (!fetchedMetadata) return;
-
-    setPageData((prev) => ({
-      ...prev,
-      metadata: {
-        ...(prev.metadata || {}),
-        ...(fetchedMetadata as any),
-      },
-    }));
-  }, [fetchedMetadata]);
+  const setPageData = (updater: (prev: Partial<Post>) => Partial<Post>) => {
+    setOverrides((prev) => updater({ ...basePage, ...prev }));
+  };
 
   const savePage = async () => {
     try {
@@ -92,11 +73,7 @@ export default function PageEditView() {
   };
 
   if (isFetchingPage) {
-    return (
-      <div className="p-8 font-mono text-sm opacity-40">
-        Loading page...
-      </div>
-    );
+    return <div className="p-8 font-mono text-sm opacity-40">Loading page...</div>;
   }
 
   return (
@@ -116,14 +93,12 @@ export default function PageEditView() {
           }
           onFileUpload={(file) => {
             const reader = new FileReader();
-
             reader.onload = (e) => {
               setPageData((prev) => ({
                 ...prev,
                 content: e.target?.result as string,
               }));
             };
-
             reader.readAsText(file);
           }}
         />
@@ -173,11 +148,8 @@ export default function PageEditView() {
               tags={(pageData.metadata?.tags as string[]) || []}
               onAddTag={(tag) =>
                 setPageData((prev) => {
-                  const tags =
-                    (prev.metadata?.tags as string[]) || [];
-
+                  const tags = (prev.metadata?.tags as string[]) || [];
                   if (tags.includes(tag)) return prev;
-
                   return {
                     ...prev,
                     metadata: {
@@ -192,10 +164,7 @@ export default function PageEditView() {
                   ...prev,
                   metadata: {
                     ...(prev.metadata || {}),
-                    tags:
-                      ((prev.metadata?.tags as string[]) || []).filter(
-                        (t) => t !== tag
-                      ),
+                    tags: ((prev.metadata?.tags as string[]) || []).filter((t) => t !== tag),
                   },
                 }))
               }

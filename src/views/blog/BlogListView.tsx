@@ -16,7 +16,11 @@ export default function BlogListView({
   const currentPage = Math.max(1, Number(page) || 1);
   const pageSize = 5;
 
-  const { posts: paginatedPosts, meta, isLoading } = usePosts({
+  const {
+    posts: paginatedPosts,
+    meta,
+    isLoading,
+  } = usePosts({
     postType: "POST",
     status: "PUBLISHED",
     offset: (currentPage - 1) * pageSize,
@@ -34,41 +38,37 @@ export default function BlogListView({
         </div>
       }
     >
-          <div className="flex flex-col gap-12">
-            {isLoading && (
-              <div className="flex items-center justify-center py-12">
-                <p className="text-sm font-mono text-foreground/40 animate-pulse">Loading posts...</p>
-              </div>
-            )}
-
-            {paginatedPosts.length > 0 ? (
-              paginatedPosts.map((post, idx) => (
-                <article key={`${post.slug}-${idx}`} className="group flex flex-col items-start">
-                  <time className="text-sm font-medium text-foreground/40 mb-2 font-mono">
-                    {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-US', {
-                      month: 'long', day: 'numeric', year: 'numeric'
-                    }) : 'Draft'}
-                  </time>
-                  <h2 className="text-xl font-bold hover:text-primary transition-colors">
-                    <Link href={`/blog/${post.slug}`}>
-                      {post.slug.replace(/-/g, ' ')}
-                    </Link>
-                  </h2>
-                  <p className="mt-3 text-sm font-medium text-foreground/60 leading-relaxed line-clamp-3">
-                    { post.excerpt && post.excerpt.replace(/[#*`]/g, '').substring(0, 200) }...
-                  </p>
-                </article>
-              ))
-            ) : !isLoading && (
-              <p className="text-foreground/40 italic">No posts found.</p>
-            )}
+      <div className="flex flex-col gap-12">
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <p className="text-sm font-mono text-foreground/40 animate-pulse">Loading posts...</p>
           </div>
+        )}
 
-          <Pagination 
-            currentPage={currentPage} 
-            totalPages={totalPages} 
-            basePath="/blog"
-          />
+        {paginatedPosts.length > 0
+          ? paginatedPosts.map((post, idx) => (
+              <article key={`${post.slug}-${idx}`} className="group flex flex-col items-start">
+                <time className="text-sm font-medium text-foreground/40 mb-2 font-mono">
+                  {post.publishedAt
+                    ? new Date(post.publishedAt).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "Draft"}
+                </time>
+                <h2 className="text-xl font-bold hover:text-primary transition-colors">
+                  <Link href={`/blog/${post.slug}`}>{post.slug.replace(/-/g, " ")}</Link>
+                </h2>
+                <p className="mt-3 text-sm font-medium text-foreground/60 leading-relaxed line-clamp-3">
+                  {post.excerpt && post.excerpt.replace(/[#*`]/g, "").substring(0, 200)}...
+                </p>
+              </article>
+            ))
+          : !isLoading && <p className="text-foreground/40 italic">No posts found.</p>}
+      </div>
+
+      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/blog" />
     </PageLayout>
   );
 }

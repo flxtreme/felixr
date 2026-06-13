@@ -5,7 +5,7 @@ import PostRender from "@/src/components/PostRenderer";
 import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { PageLayout } from "@/src/layouts/PageLayout";
 import * as service from "@/src/features/public/posts/services";
-import { trimContent } from "@/src/utils/trim";
+import parseMetadata from "@/src/utils/parseMetadata";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -21,12 +21,9 @@ async function getPage(slug: string): Promise<Post | null> {
   }
 
   try {
-    const res = await fetch(
-      `${API_URL}/api/public/post/page/${slug}`,
-      {
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`${API_URL}/api/public/post/page/${slug}`, {
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       return null;
@@ -39,48 +36,26 @@ async function getPage(slug: string): Promise<Post | null> {
   }
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
 
   const [page, metadata, content] = await Promise.all([
     getPage(slug),
     service.getPostMetadataBySlug(slug),
-    service.getPostContentBySlug(slug)
+    service.getPostContentBySlug(slug),
   ]);
 
   if (!page) {
     return {};
   }
 
-  const seo = metadata?.seo;
-
-  const description =
-    page?.excerpt ||
-    seo?.description ||
-    trimContent(content);
-  
-  return {
-    ...seo,
-    title: seo?.title ?? page.title ?? slug,
-    description,
-    openGraph: {
-      title: page.title,
-      description,
-    },
-  };
+  return parseMetadata(page, slug, content, metadata);
 }
 
-export default async function StaticPage({
-  params,
-}: Props) {
+export default async function StaticPage({ params }: Props) {
   const { slug } = await params;
 
-  const [page, content] = await Promise.all([
-    getPage(slug),
-    service.getPostContentBySlug(slug)
-  ]);
+  const [page, content] = await Promise.all([getPage(slug), service.getPostContentBySlug(slug)]);
 
   if (!page) {
     notFound();
@@ -97,9 +72,7 @@ export default async function StaticPage({
           <Breadcrumbs
             items={[
               {
-                label: (
-                  page.title || page.slug
-                ).toLowerCase(),
+                label: (page.title || page.slug).toLowerCase(),
               },
             ]}
           />

@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuthActions } from "@/src/features/auth/hooks";
 import { useTheme } from "@/src/contexts/ThemeContext";
-import { Sun, Moon } from 'lucide-react';
-import { cln } from '@/src/utils/cln';
+import { Sun, Moon } from "lucide-react";
+import { cln } from "@/src/utils/cln";
 import { setSession } from "@/src/utils/session";
 
-export const LoginPage = () => { 
+export const LoginPage = () => {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const { signIn } = useAuthActions();
@@ -27,7 +27,8 @@ export const LoginPage = () => {
       const response = await signIn({ username, password });
       setSession("accessToken", response.data.token);
       router.push("/admin");
-    } catch (err: any) {
+    } catch (err) {
+      console.log(err);
       setError("Invalid username or password");
     } finally {
       setIsLoading(false);
@@ -42,11 +43,11 @@ export const LoginPage = () => {
           onClick={toggleTheme}
           className={cln(
             "p-2 transition-colors hover:text-primary",
-            theme === 'light' ? 'text-primary' : 'text-amber-500'
+            theme === "light" ? "text-primary" : "text-amber-500"
           )}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
         >
-          {theme === 'light' ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
+          {theme === "light" ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
         </button>
       </div>
 
@@ -60,7 +61,10 @@ export const LoginPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1" htmlFor="username">
+            <label
+              className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1"
+              htmlFor="username"
+            >
               Username
             </label>
             <input
@@ -75,7 +79,10 @@ export const LoginPage = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1" htmlFor="password">
+            <label
+              className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1"
+              htmlFor="password"
+            >
               Password
             </label>
             <input

@@ -4,10 +4,7 @@ interface FetcherOptions extends RequestInit {
   headers?: HeadersInit;
 }
 
-export const fetcher = async <T = any>(
-  url: string,
-  options?: FetcherOptions
-): Promise<T> => {
+export const fetcher = async <T = any>(url: string, options?: FetcherOptions): Promise<T> => {
   const headers = new Headers(options?.headers);
 
   if (!headers.has("Content-Type")) {
@@ -18,11 +15,7 @@ export const fetcher = async <T = any>(
 
   const accessToken = getSession("accessToken");
 
-  if (
-    accessToken &&
-    accessToken !== "undefined" &&
-    accessToken !== "null"
-  ) {
+  if (accessToken && accessToken !== "undefined" && accessToken !== "null") {
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
@@ -44,8 +37,7 @@ export const fetcher = async <T = any>(
 
         if (
           response.status === 403 &&
-          errorJson?.message ===
-            "Your session has expired. Please log in again."
+          errorJson?.message === "Your session has expired. Please log in again."
         ) {
           removeSession("accessToken");
 
@@ -60,8 +52,7 @@ export const fetcher = async <T = any>(
           errorDetail += ` - ${errorText}`;
         }
       }
-    } catch {
-    }
+    } catch {}
 
     throw new Error(errorDetail);
   }

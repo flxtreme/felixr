@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function TagCreateView() {
   const router = useRouter();
   const { createTag } = useTagsContext();
-  
+
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [excludeFromPages, setExcludeFromPages] = useState(false);
@@ -35,18 +35,20 @@ export default function TagCreateView() {
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setName(val);
-    setSlug(val.toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]+/g, '')
-      .replace(/--+/g, '-')
-      .trim()
+    setSlug(
+      val
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "")
+        .replace(/--+/g, "-")
+        .trim()
     );
   };
 
   return (
     <div className="p-8 max-w-2xl space-y-6">
       <header className="space-y-4">
-        <Link 
+        <Link
           href="/admin/tags"
           className="text-xs font-mono font-medium text-foreground/40 hover:text-primary flex items-center gap-1 transition-colors w-fit"
         >
@@ -64,7 +66,10 @@ export default function TagCreateView() {
       <form onSubmit={handleSubmit} className="space-y-6 border border-border p-6">
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1" htmlFor="name">
+            <label
+              className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1"
+              htmlFor="name"
+            >
               Tag Name
             </label>
             <input
@@ -79,7 +84,10 @@ export default function TagCreateView() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1" htmlFor="slug">
+            <label
+              className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1"
+              htmlFor="slug"
+            >
               Slug
             </label>
             <input
@@ -101,7 +109,10 @@ export default function TagCreateView() {
               onChange={(e) => setExcludeFromPages(e.target.checked)}
               className="w-4 h-4 bg-transparent border border-border rounded focus:ring-offset-0 focus:ring-1 focus:ring-primary text-primary transition-all cursor-pointer"
             />
-            <label className="text-xs font-mono font-medium text-foreground/40 cursor-pointer select-none" htmlFor="excludeFromPages">
+            <label
+              className="text-xs font-mono font-medium text-foreground/40 cursor-pointer select-none"
+              htmlFor="excludeFromPages"
+            >
               Exclude this tag from public pages list
             </label>
           </div>

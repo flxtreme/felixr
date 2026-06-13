@@ -13,5 +13,5 @@ export default function AdminLayout({
         <DashboardLayout>{children}</DashboardLayout>
       </DashboardContextProvider>
     </AuthGuard>
-  )
+  );
 }

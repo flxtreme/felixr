@@ -4,7 +4,17 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useDashboard } from "@/src/features/admin/DashboardContext";
 import { useAuthActions } from "@/src/features/auth/hooks";
-import { Plus, LayoutPanelLeft, FileText, LogOut, Sun, Moon, LayoutDashboard, Tag, ChevronDown } from "lucide-react";
+import {
+  Plus,
+  LayoutPanelLeft,
+  FileText,
+  LogOut,
+  Sun,
+  Moon,
+  LayoutDashboard,
+  Tag,
+  ChevronDown,
+} from "lucide-react";
 import { cln } from "@/src/utils/cln";
 import { useTheme } from "@/src/contexts/ThemeContext";
 import { usePathname } from "next/navigation";
@@ -50,7 +60,10 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                 className="text-sm font-mono font-medium text-foreground/40 hover:text-primary flex items-center gap-1 transition-colors"
               >
                 <Plus className="w-3 h-3" />
-                New <ChevronDown className={cln("w-3 h-3 transition-transform", isDropdownOpen && "rotate-180")} />
+                New{" "}
+                <ChevronDown
+                  className={cln("w-3 h-3 transition-transform", isDropdownOpen && "rotate-180")}
+                />
               </button>
               {isDropdownOpen && (
                 <div className="absolute top-full left-0 mt-2 w-36 bg-surface border border-border rounded-lg shadow-sm z-10">
@@ -86,7 +99,11 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
               className="p-1.5 transition-colors text-foreground/40 hover:text-primary"
               aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             >
-              {theme === "light" ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+              {theme === "light" ? (
+                <Moon className="w-3.5 h-3.5" />
+              ) : (
+                <Sun className="w-3.5 h-3.5" />
+              )}
             </button>
             <span className="text-sm font-mono font-medium text-foreground/60">{user?.name}</span>
             <button
@@ -157,13 +174,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
         )}
 
         <main className="flex-1 overflow-y-auto bg-background">
-          {isFullScreen ? (
-            children
-          ) : (
-            <div className="max-w-7xl mx-auto">
-              {children}
-            </div>
-          )}
+          {isFullScreen ? children : <div className="max-w-7xl mx-auto">{children}</div>}
         </main>
       </div>
     </div>

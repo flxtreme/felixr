@@ -8,16 +8,12 @@ import {
   PostTagsInput,
 } from "@/src/features/admin/components/post";
 import PostMetaEditor from "@/src/features/admin/components/post/PostMetadataEditor";
-import {
-  usePost,
-  usePostContent,
-  usePostMetadata,
-} from "@/src/features/admin/posts/hooks";
+import { usePost, usePostContent, usePostMetadata } from "@/src/features/admin/posts/hooks";
 import { usePostContext } from "@/src/features/admin/posts/PostsContext";
 import { UpdatePostPayload, Post } from "@/src/features/admin/posts/types";
 import type { Metadata } from "next";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 
 export default function PostEditView() {
   const { id } = useParams();
@@ -33,54 +29,39 @@ export default function PostEditView() {
     isSearching,
   } = usePostContext();
 
-  const { post: fetchedPost, isLoading: isFetchingPost } = usePost(
-    id as string
-  );
-
+  const { post: fetchedPost, isLoading: isFetchingPost } = usePost(id as string);
   const { content: fetchedContent } = usePostContent(id as string);
-
   const { metadata: fetchedMetadata } = usePostMetadata(id as string);
 
-  const [post, setPost] = useState<Partial<Post>>({
-    title: "",
-    slug: "",
-    content: "",
-    status: "DRAFT",
-    postType: "POST",
-    metadata: {
-      tags: [],
-    },
-  });
+  const basePost = useMemo<Partial<Post>>(
+    () => ({
+      title: "",
+      slug: "",
+      content: "",
+      status: "DRAFT",
+      postType: "POST",
+      metadata: { tags: [] },
+      ...(fetchedPost ?? {}),
+      ...(typeof fetchedContent !== "undefined" ? { content: fetchedContent } : {}),
+      ...(fetchedMetadata
+        ? {
+            metadata: {
+              ...(fetchedPost?.metadata ?? {}),
+              ...(fetchedMetadata as Record<string, unknown>),
+            },
+          }
+        : {}),
+    }),
+    [fetchedPost, fetchedContent, fetchedMetadata]
+  );
 
-  useEffect(() => {
-    if (!fetchedPost) return;
+  const [overrides, setOverrides] = useState<Partial<Post>>({});
 
-    setPost((prev) => ({
-      ...prev,
-      ...fetchedPost,
-    }));
-  }, [fetchedPost]);
+  const post = useMemo(() => ({ ...basePost, ...overrides }), [basePost, overrides]);
 
-  useEffect(() => {
-    if (typeof fetchedContent === "undefined") return;
-
-    setPost((prev) => ({
-      ...prev,
-      content: fetchedContent,
-    }));
-  }, [fetchedContent]);
-
-  useEffect(() => {
-    if (!fetchedMetadata) return;
-
-    setPost((prev) => ({
-      ...prev,
-      metadata: {
-        ...(prev.metadata || {}),
-        ...(fetchedMetadata as any),
-      },
-    }));
-  }, [fetchedMetadata]);
+  const setPost = (updater: (prev: Partial<Post>) => Partial<Post>) => {
+    setOverrides((prev) => updater({ ...basePost, ...prev }));
+  };
 
   const savePost = async () => {
     try {
@@ -92,11 +73,7 @@ export default function PostEditView() {
   };
 
   if (isFetchingPost) {
-    return (
-      <div className="p-8 font-mono text-sm opacity-40">
-        Loading post...
-      </div>
-    );
+    return <div className="p-8 font-mono text-sm opacity-40">Loading post...</div>;
   }
 
   return (
@@ -116,14 +93,12 @@ export default function PostEditView() {
           }
           onFileUpload={(file) => {
             const reader = new FileReader();
-
             reader.onload = (e) => {
               setPost((prev) => ({
                 ...prev,
                 content: e.target?.result as string,
               }));
             };
-
             reader.readAsText(file);
           }}
         />
@@ -173,13 +148,8 @@ export default function PostEditView() {
               tags={(post.metadata?.tags as string[]) || []}
               onAddTag={(tag) =>
                 setPost((prev) => {
-                  const tags =
-                    (prev.metadata?.tags as string[]) || [];
-
-                  if (tags.includes(tag)) {
-                    return prev;
-                  }
-
+                  const tags = (prev.metadata?.tags as string[]) || [];
+                  if (tags.includes(tag)) return prev;
                   return {
                     ...prev,
                     metadata: {
@@ -194,10 +164,7 @@ export default function PostEditView() {
                   ...prev,
                   metadata: {
                     ...(prev.metadata || {}),
-                    tags:
-                      ((prev.metadata?.tags as string[]) || []).filter(
-                        (t) => t !== tag
-                      ),
+                    tags: ((prev.metadata?.tags as string[]) || []).filter((t) => t !== tag),
                   },
                 }))
               }

@@ -1,14 +1,12 @@
 "use client";
 
 import React from "react";
-import { use } from "react";
 import Link from "next/link";
 import { Edit2, Trash2, Plus, Tag } from "lucide-react";
 import { Pagination } from "@/src/components/Pagination";
 import { usePosts } from "@/src/features/admin/posts/hooks";
 import { usePostContext } from "@/src/features/admin/posts/PostsContext";
 import { Post } from "@/src/features/admin/posts/types";
-import { NoItemsFound } from "@/src/features/admin/components/NoItemsFound";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
 
 export default function PostsListView({
@@ -22,11 +20,15 @@ export default function PostsListView({
   const pageSize = 10;
   const currentStatus = (status || "ALL").toUpperCase();
 
-  const { posts: paginatedPosts, isLoading, meta } = usePosts({ 
-    postType: "POST", 
+  const {
+    posts: paginatedPosts,
+    isLoading,
+    meta,
+  } = usePosts({
+    postType: "POST",
     status: currentStatus === "ALL" ? undefined : (currentStatus as any),
     offset: (currentPage - 1) * pageSize,
-    limit: pageSize 
+    limit: pageSize,
   });
 
   const totalPages = Math.ceil((meta?.total || 0) / pageSize) || 1;
@@ -37,11 +39,11 @@ export default function PostsListView({
       skeletonWidth: "w-48",
       cell: (post) => (
         <div className="space-y-1">
-          <Link 
+          <Link
             href={`/admin/posts/${post.id}`}
             className="text-sm font-bold text-foreground hover:text-primary transition-colors block"
           >
-            {post.title || post.slug.replace(/-/g, ' ')}
+            {post.title || post.slug.replace(/-/g, " ")}
           </Link>
           <div className="text-[10px] font-mono text-foreground/40 uppercase">/{post.slug}</div>
         </div>
@@ -51,11 +53,15 @@ export default function PostsListView({
       header: "Status",
       skeletonWidth: "w-20",
       cell: (post) => (
-        <span className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-[2px] border uppercase ${
-          post.status === 'PUBLISHED' ? 'border-green-500/20 bg-green-500/5 text-green-500/60' :
-          post.status === 'DRAFT' ? 'border-blue-500/20 bg-blue-500/5 text-blue-500/60' :
-          'border-red-500/20 bg-red-500/5 text-red-500/60'
-        }`}>
+        <span
+          className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-[2px] border uppercase ${
+            post.status === "PUBLISHED"
+              ? "border-green-500/20 bg-green-500/5 text-green-500/60"
+              : post.status === "DRAFT"
+                ? "border-blue-500/20 bg-blue-500/5 text-blue-500/60"
+                : "border-red-500/20 bg-red-500/5 text-red-500/60"
+          }`}
+        >
           {post.status}
         </span>
       ),

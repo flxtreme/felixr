@@ -1,15 +1,11 @@
-import useSWR, { mutate } from 'swr';
+import useSWR from "swr";
 
-import {
-  getPosts,
-} from '@/src/features/admin/posts/services';
+import { getPosts } from "@/src/features/admin/posts/services";
 
-import type {
-  GetPostsQuery,
-} from '@/src/features/admin/posts/types';
+import type { GetPostsQuery } from "@/src/features/admin/posts/types";
 
 const usePosts = (params?: GetPostsQuery) => {
-  const key = ['posts', params];
+  const key = ["posts", params];
 
   const swr = useSWR(key, () => getPosts(params));
 

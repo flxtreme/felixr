@@ -7,11 +7,7 @@ interface SinglePageLayoutProps {
   headerClassName?: string;
 }
 
-export const SinglePageLayout = ({
-  header,
-  children,
-  headerClassName,
-}: SinglePageLayoutProps) => {
+export const SinglePageLayout = ({ header, children, headerClassName }: SinglePageLayoutProps) => {
   return (
     <div className="flex flex-col">
       <section className={cln("border-b border-border", headerClassName)}>

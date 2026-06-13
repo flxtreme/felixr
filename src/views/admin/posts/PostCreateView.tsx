@@ -55,8 +55,7 @@ export default function PostCreateView() {
           onContentChange={(value) => setPost((p) => ({ ...p, content: value }))}
           onFileUpload={(file) => {
             const reader = new FileReader();
-            reader.onload = (e) =>
-              setPost((p) => ({ ...p, content: e.target?.result as string }));
+            reader.onload = (e) => setPost((p) => ({ ...p, content: e.target?.result as string }));
             reader.readAsText(file);
           }}
         />
@@ -115,9 +114,7 @@ export default function PostCreateView() {
 
             <PostMetadataEditor
               metadata={post.metadata?.seo as Metadata}
-              onChange={(seo) =>
-                setPost((p) => ({ ...p, metadata: { ...p.metadata, seo } }))
-              }
+              onChange={(seo) => setPost((p) => ({ ...p, metadata: { ...p.metadata, seo } }))}
             />
           </section>
         </div>

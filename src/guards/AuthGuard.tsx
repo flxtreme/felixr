@@ -12,7 +12,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const [status, setStatus] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
+  const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
 
   useEffect(() => {
     const verify = () => {
@@ -20,36 +20,32 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
       const token = getSession("accessToken");
       console.log("token:", token);
       if (!token) {
-        setStatus('unauthenticated');
+        setStatus("unauthenticated");
         router.replace("/login");
       } else {
-        setStatus('authenticated');
+        setStatus("authenticated");
       }
     };
 
     console.log("useEffect fired");
     verify();
 
-    window.addEventListener('pageshow', verify);
-    window.addEventListener('focus', verify);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') verify();
+    window.addEventListener("pageshow", verify);
+    window.addEventListener("focus", verify);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") verify();
     });
 
     return () => {
-      window.removeEventListener('pageshow', verify);
-      window.removeEventListener('focus', verify);
+      window.removeEventListener("pageshow", verify);
+      window.removeEventListener("focus", verify);
     };
-  }, []);
+  }, [router]);
 
-  if (status === 'loading') return null;
-  if (status === 'unauthenticated') return null;
+  if (status === "loading") return null;
+  if (status === "unauthenticated") return null;
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated: true }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ isAuthenticated: true }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

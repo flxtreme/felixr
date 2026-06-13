@@ -66,9 +66,7 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
 
     if (m[1] !== undefined) {
       // ![alt](src "title")
-      nodes.push(
-        <img key={k} src={m[2]} alt={m[1]} title={m[3]} className="pr-img" />
-      );
+      nodes.push(<img key={k} src={m[2]} alt={m[1]} title={m[3]} className="pr-img" />);
     } else if (m[4] !== undefined) {
       // [text](href "title")
       nodes.push(
@@ -137,10 +135,16 @@ function renderUL(lines: string[], baseIndent: number, keyBase: string): JSX.Ele
   while (i < lines.length) {
     const line = lines[i];
     const indentMatch = line.match(/^(\s*)[-*+] /);
-    if (!indentMatch) { i++; continue; }
+    if (!indentMatch) {
+      i++;
+      continue;
+    }
 
     const indent = indentMatch[1].length;
-    if (indent !== baseIndent) { i++; continue; }
+    if (indent !== baseIndent) {
+      i++;
+      continue;
+    }
 
     const content = line.replace(/^(\s*)[-*+] /, "");
     const taskMatch = content.match(/^\[(x| )\] (.+)$/i);
@@ -148,10 +152,7 @@ function renderUL(lines: string[], baseIndent: number, keyBase: string): JSX.Ele
     // Collect child lines (deeper indent)
     const nested: string[] = [];
     i++;
-    while (
-      i < lines.length &&
-      (lines[i].match(/^(\s*)[-*+] /)?.[1]?.length ?? 0) > baseIndent
-    ) {
+    while (i < lines.length && (lines[i].match(/^(\s*)[-*+] /)?.[1]?.length ?? 0) > baseIndent) {
       nested.push(lines[i]);
       i++;
     }
@@ -197,7 +198,10 @@ function renderBlocks(markdown: string): ReactNode[] {
     const line = lines[i];
 
     // Blank line
-    if (line.trim() === "") { i++; continue; }
+    if (line.trim() === "") {
+      i++;
+      continue;
+    }
 
     // ── Fenced code block
     if (/^```/.test(line)) {
@@ -269,11 +273,7 @@ function renderBlocks(markdown: string): ReactNode[] {
             <thead>
               <tr>
                 {head.map((cell, ci) => (
-                  <th
-                    key={ci}
-                    className="pr-th"
-                    style={{ textAlign: aligns[ci] ?? "left" }}
-                  >
+                  <th key={ci} className="pr-th" style={{ textAlign: aligns[ci] ?? "left" }}>
                     {parseInline(cell, key("thc"))}
                   </th>
                 ))}
@@ -283,11 +283,7 @@ function renderBlocks(markdown: string): ReactNode[] {
               {body.map((row, ri) => (
                 <tr key={ri} className="pr-tr">
                   {row.map((cell, ci) => (
-                    <td
-                      key={ci}
-                      className="pr-td"
-                      style={{ textAlign: aligns[ci] ?? "left" }}
-                    >
+                    <td key={ci} className="pr-td" style={{ textAlign: aligns[ci] ?? "left" }}>
                       {parseInline(cell, key("tdc"))}
                     </td>
                   ))}
@@ -304,10 +300,7 @@ function renderBlocks(markdown: string): ReactNode[] {
     if (/^(\s*)[-*+] /.test(line)) {
       const baseIndent = line.match(/^(\s*)/)?.[1].length ?? 0;
       const listLines: string[] = [];
-      while (
-        i < lines.length &&
-        (/^(\s*)[-*+] /.test(lines[i]) || /^\s{2,}/.test(lines[i]))
-      ) {
+      while (i < lines.length && (/^(\s*)[-*+] /.test(lines[i]) || /^\s{2,}/.test(lines[i]))) {
         listLines.push(lines[i]);
         i++;
       }
@@ -339,8 +332,7 @@ function renderBlocks(markdown: string): ReactNode[] {
     if (fnMatch) {
       blocks.push(
         <p key={key("fn")} className="pr-footnote-def" id={`fn-${fnMatch[1]}`}>
-          <sup>{fnMatch[1]}</sup>{" "}
-          {parseInline(fnMatch[2], key("fni"))}
+          <sup>{fnMatch[1]}</sup> {parseInline(fnMatch[2], key("fni"))}
         </p>
       );
       i++;
@@ -348,11 +340,7 @@ function renderBlocks(markdown: string): ReactNode[] {
     }
 
     // ── Definition list  (term\n: definition)
-    if (
-      i + 1 < lines.length &&
-      /^:\s+/.test(lines[i + 1]) &&
-      line.trim() !== ""
-    ) {
+    if (i + 1 < lines.length && /^:\s+/.test(lines[i + 1]) && line.trim() !== "") {
       const term = line.trim();
       const defs: string[] = [];
       i++;
@@ -376,14 +364,7 @@ function renderBlocks(markdown: string): ReactNode[] {
     // ── Standalone image  ![alt](src)
     const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (imgMatch) {
-      blocks.push(
-        <img
-          key={key("img")}
-          src={imgMatch[2]}
-          alt={imgMatch[1]}
-          className="pr-img"
-        />
-      );
+      blocks.push(<img key={key("img")} src={imgMatch[2]} alt={imgMatch[1]} className="pr-img" />);
       i++;
       continue;
     }
@@ -590,18 +571,13 @@ const styles = `
  * <PostRenderer content={markdownString} />
  * <PostRenderer content={markdownString} className="my-prose" />
  */
-export default function PostRenderer({
-  content = "",
-  className,
-}: PostRendererProps): JSX.Element {
+export default function PostRenderer({ content = "", className }: PostRendererProps): JSX.Element {
   const blocks = useMemo(() => renderBlocks(content), [content]);
 
   return (
     <>
       <style>{styles}</style>
-      <article className={`pr-root${className ? ` ${className}` : ""}`}>
-        {blocks}
-      </article>
+      <article className={`pr-root${className ? ` ${className}` : ""}`}>{blocks}</article>
     </>
   );
 }

@@ -3,9 +3,4 @@ import { PostMetaFields } from "@/src/features/admin/components/post/PostMetaFie
 import { PostStatusSelector } from "@/src/features/admin/components/post/PostStatusSelector";
 import { PostTagsInput } from "@/src/features/admin/components/post/PostTagsInput";
 
-export {
-    PostTagsInput,
-    PostContentEditor,
-    PostMetaFields,
-    PostStatusSelector
-}
+export { PostTagsInput, PostContentEditor, PostMetaFields, PostStatusSelector };

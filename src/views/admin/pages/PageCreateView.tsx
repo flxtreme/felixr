@@ -1,7 +1,12 @@
 "use client";
 
 import { ManagePostLayout } from "@/src/layouts/ManagePostLayout";
-import { PostContentEditor, PostMetaFields, PostStatusSelector, PostTagsInput } from "@/src/features/admin/components/post";
+import {
+  PostContentEditor,
+  PostMetaFields,
+  PostStatusSelector,
+  PostTagsInput,
+} from "@/src/features/admin/components/post";
 import PostMetaEditor from "@/src/features/admin/components/post/PostMetadataEditor";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { CreatePostPayload, Post } from "@/src/features/admin/posts/types";
@@ -52,8 +57,7 @@ export default function PageCreateView() {
           onContentChange={(value) => setPage((p) => ({ ...p, content: value }))}
           onFileUpload={(file) => {
             const reader = new FileReader();
-            reader.onload = (e) =>
-              setPage((p) => ({ ...p, content: e.target?.result as string }));
+            reader.onload = (e) => setPage((p) => ({ ...p, content: e.target?.result as string }));
             reader.readAsText(file);
           }}
         />

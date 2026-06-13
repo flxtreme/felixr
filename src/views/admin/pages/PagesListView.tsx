@@ -7,7 +7,6 @@ import { Pagination } from "@/src/components/Pagination";
 import { usePosts } from "@/src/features/admin/posts/hooks";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { Post } from "@/src/features/admin/posts/types";
-import { NoItemsFound } from "@/src/features/admin/components/NoItemsFound";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
 
 export default function PagesListView({
@@ -21,11 +20,15 @@ export default function PagesListView({
   const pageSize = 10;
   const currentStatus = (status || "ALL").toUpperCase();
 
-  const { posts: paginatedPages, isLoading, meta } = usePosts({ 
-    postType: "PAGE", 
+  const {
+    posts: paginatedPages,
+    isLoading,
+    meta,
+  } = usePosts({
+    postType: "PAGE",
     status: currentStatus === "ALL" ? undefined : (currentStatus as any),
     offset: (currentPage - 1) * pageSize,
-    limit: pageSize 
+    limit: pageSize,
   });
 
   const totalPages = Math.ceil((meta?.total || 0) / pageSize) || 1;
@@ -36,11 +39,11 @@ export default function PagesListView({
       skeletonWidth: "w-48",
       cell: (page) => (
         <div className="space-y-1">
-          <Link 
+          <Link
             href={`/admin/pages/${page.id}`}
             className="text-sm font-bold text-foreground hover:text-primary transition-colors block"
           >
-            {page.title || page.slug.replace(/-/g, ' ')}
+            {page.title || page.slug.replace(/-/g, " ")}
           </Link>
           <div className="text-[10px] font-mono text-foreground/40 uppercase">/{page.slug}</div>
         </div>
@@ -50,11 +53,15 @@ export default function PagesListView({
       header: "Status",
       skeletonWidth: "w-20",
       cell: (page) => (
-        <span className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-[2px] border uppercase ${
-          page.status === 'PUBLISHED' ? 'border-green-500/20 bg-green-500/5 text-green-500/60' :
-          page.status === 'DRAFT' ? 'border-blue-500/20 bg-blue-500/5 text-blue-500/60' :
-          'border-red-500/20 bg-red-500/5 text-red-500/60'
-        }`}>
+        <span
+          className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-[2px] border uppercase ${
+            page.status === "PUBLISHED"
+              ? "border-green-500/20 bg-green-500/5 text-green-500/60"
+              : page.status === "DRAFT"
+                ? "border-blue-500/20 bg-blue-500/5 text-blue-500/60"
+                : "border-red-500/20 bg-red-500/5 text-red-500/60"
+          }`}
+        >
           {page.status}
         </span>
       ),

@@ -1,6 +1,6 @@
-export type PostStatus = 'DRAFT' | 'PUBLISHED' | 'TRASHED';
+export type PostStatus = "DRAFT" | "PUBLISHED" | "TRASHED";
 
-export type PostType = 'POST' | 'PAGE';
+export type PostType = "POST" | "PAGE";
 
 export interface Post {
   id: string;

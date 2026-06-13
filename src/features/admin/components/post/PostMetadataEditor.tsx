@@ -138,12 +138,14 @@ function generateMetadata(c: MetadataConfig): Metadata {
   if (c.ogSiteName) og.siteName = c.ogSiteName;
   if (c.ogLocale) og.locale = c.ogLocale;
   if (c.ogImageUrl) {
-    og.images = [{
-      url: c.ogImageUrl,
-      width: c.ogImageWidth ? parseInt(c.ogImageWidth) : undefined,
-      height: c.ogImageHeight ? parseInt(c.ogImageHeight) : undefined,
-      alt: c.ogImageAlt || undefined,
-    }];
+    og.images = [
+      {
+        url: c.ogImageUrl,
+        width: c.ogImageWidth ? parseInt(c.ogImageWidth) : undefined,
+        height: c.ogImageHeight ? parseInt(c.ogImageHeight) : undefined,
+        alt: c.ogImageAlt || undefined,
+      },
+    ];
   }
   if (Object.keys(og).length) meta.openGraph = og;
 
@@ -153,7 +155,10 @@ function generateMetadata(c: MetadataConfig): Metadata {
   if (c.twitterDescription) tw.description = c.twitterDescription;
   if (c.twitterSite) tw.site = c.twitterSite;
   if (c.twitterCreator) tw.creator = c.twitterCreator;
-  if (c.twitterImageUrl) tw.images = [{ url: c.twitterImageUrl, ...(c.twitterImageAlt ? { alt: c.twitterImageAlt } : {}) }];
+  if (c.twitterImageUrl)
+    tw.images = [
+      { url: c.twitterImageUrl, ...(c.twitterImageAlt ? { alt: c.twitterImageAlt } : {}) },
+    ];
   if (Object.keys(tw).length) meta.twitter = tw;
 
   const rob: any = { index: c.robotsIndex, follow: c.robotsFollow };
@@ -170,8 +175,10 @@ function generateMetadata(c: MetadataConfig): Metadata {
   if (c.manifest) meta.manifest = c.manifest;
 
   const themes: { media: string; color: string }[] = [];
-  if (c.themeColorLight) themes.push({ media: "(prefers-color-scheme: light)", color: c.themeColorLight });
-  if (c.themeColorDark) themes.push({ media: "(prefers-color-scheme: dark)", color: c.themeColorDark });
+  if (c.themeColorLight)
+    themes.push({ media: "(prefers-color-scheme: light)", color: c.themeColorLight });
+  if (c.themeColorDark)
+    themes.push({ media: "(prefers-color-scheme: dark)", color: c.themeColorDark });
   if (themes.length === 1) meta.themeColor = themes[0].color;
   else if (themes.length > 1) meta.themeColor = themes;
 
@@ -303,7 +310,15 @@ function parseMetadata(meta?: Metadata): MetadataConfig {
 
 // ── Shared field styles (matching PostTagsInput) ──────────────────────────────
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-mono font-medium text-foreground/40">{label}</label>
@@ -331,7 +346,10 @@ function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   );
 }
 
-function Select({ children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { children: React.ReactNode }) {
+function Select({
+  children,
+  ...props
+}: React.SelectHTMLAttributes<HTMLSelectElement> & { children: React.ReactNode }) {
   return (
     <select
       {...props}
@@ -348,7 +366,13 @@ function Row({ children }: { children: React.ReactNode }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function MetadataBuilder({ onChange, metadata }: { onChange?: (metadata: Metadata) => void, metadata?: Metadata }) {
+export default function MetadataBuilder({
+  onChange,
+  metadata,
+}: {
+  onChange?: (metadata: Metadata) => void;
+  metadata?: Metadata;
+}) {
   const [activeTab, setActiveTab] = useState<TabId>("basic");
   const [config, setConfig] = useState<MetadataConfig>(() => parseMetadata(metadata));
   const [keywordInput, setKeywordInput] = useState("");
@@ -361,7 +385,7 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
     if (metadata) {
       const incomingConfig = parseMetadata(metadata);
       const incomingStr = JSON.stringify(incomingConfig);
-      
+
       if (incomingStr !== lastSerializedConfig.current) {
         lastSerializedConfig.current = incomingStr;
         setConfig(incomingConfig);
@@ -391,7 +415,10 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
   };
 
   const removeKeyword = (kw: string) =>
-    set("keywords", config.keywords.filter((k) => k !== kw));
+    set(
+      "keywords",
+      config.keywords.filter((k) => k !== kw)
+    );
 
   return (
     <section className="space-y-8">
@@ -415,18 +442,35 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
       {activeTab === "basic" && (
         <div className="space-y-8">
           <Field label="Title">
-            <Input value={config.title} onChange={(e) => set("title", e.target.value)} placeholder="My App" />
+            <Input
+              value={config.title}
+              onChange={(e) => set("title", e.target.value)}
+              placeholder="My App"
+            />
           </Field>
           <Row>
             <Field label="Title Template" hint="e.g. %s | My App">
-              <Input value={config.titleTemplate} onChange={(e) => set("titleTemplate", e.target.value)} placeholder="%s | My App" />
+              <Input
+                value={config.titleTemplate}
+                onChange={(e) => set("titleTemplate", e.target.value)}
+                placeholder="%s | My App"
+              />
             </Field>
             <Field label="Title Default">
-              <Input value={config.titleDefault} onChange={(e) => set("titleDefault", e.target.value)} placeholder="My App" />
+              <Input
+                value={config.titleDefault}
+                onChange={(e) => set("titleDefault", e.target.value)}
+                placeholder="My App"
+              />
             </Field>
           </Row>
           <Field label="Description">
-            <Textarea value={config.description} onChange={(e) => set("description", e.target.value)} placeholder="A brief description of your page." rows={3} />
+            <Textarea
+              value={config.description}
+              onChange={(e) => set("description", e.target.value)}
+              placeholder="A brief description of your page."
+              rows={3}
+            />
           </Field>
           <Field label="Keywords" hint="Press Enter to add.">
             <div
@@ -434,9 +478,15 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
               onClick={() => document.getElementById("kw-input")?.focus()}
             >
               {config.keywords.map((kw) => (
-                <span key={kw} className="inline-flex items-center gap-1 px-2 py-1 bg-primary/5 text-primary text-xs font-mono font-medium border border-primary/10 rounded">
+                <span
+                  key={kw}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-primary/5 text-primary text-xs font-mono font-medium border border-primary/10 rounded"
+                >
                   {kw}
-                  <button onClick={() => removeKeyword(kw)} className="hover:text-red-500 transition-colors">
+                  <button
+                    onClick={() => removeKeyword(kw)}
+                    className="hover:text-red-500 transition-colors"
+                  >
                     <X className="w-2.5 h-2.5" />
                   </button>
                 </span>
@@ -453,18 +503,34 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
           </Field>
           <Row>
             <Field label="Authors">
-              <Input value={config.authors} onChange={(e) => set("authors", e.target.value)} placeholder="Jane Doe" />
+              <Input
+                value={config.authors}
+                onChange={(e) => set("authors", e.target.value)}
+                placeholder="Jane Doe"
+              />
             </Field>
             <Field label="Application Name">
-              <Input value={config.applicationName} onChange={(e) => set("applicationName", e.target.value)} placeholder="My App" />
+              <Input
+                value={config.applicationName}
+                onChange={(e) => set("applicationName", e.target.value)}
+                placeholder="My App"
+              />
             </Field>
           </Row>
           <Row>
             <Field label="Generator">
-              <Input value={config.generator} onChange={(e) => set("generator", e.target.value)} placeholder="Next.js" />
+              <Input
+                value={config.generator}
+                onChange={(e) => set("generator", e.target.value)}
+                placeholder="Next.js"
+              />
             </Field>
             <Field label="Category">
-              <Input value={config.category} onChange={(e) => set("category", e.target.value)} placeholder="technology" />
+              <Input
+                value={config.category}
+                onChange={(e) => set("category", e.target.value)}
+                placeholder="technology"
+              />
             </Field>
           </Row>
           <Field label="Referrer">
@@ -497,33 +563,72 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
             </Select>
           </Field>
           <Field label="og:title">
-            <Input value={config.ogTitle} onChange={(e) => set("ogTitle", e.target.value)} placeholder="Defaults to title" />
+            <Input
+              value={config.ogTitle}
+              onChange={(e) => set("ogTitle", e.target.value)}
+              placeholder="Defaults to title"
+            />
           </Field>
           <Field label="og:description">
-            <Textarea value={config.ogDescription} onChange={(e) => set("ogDescription", e.target.value)} placeholder="Defaults to description" rows={3} />
+            <Textarea
+              value={config.ogDescription}
+              onChange={(e) => set("ogDescription", e.target.value)}
+              placeholder="Defaults to description"
+              rows={3}
+            />
           </Field>
           <Field label="og:url">
-            <Input value={config.ogUrl} onChange={(e) => set("ogUrl", e.target.value)} placeholder="https://example.com" />
+            <Input
+              value={config.ogUrl}
+              onChange={(e) => set("ogUrl", e.target.value)}
+              placeholder="https://example.com"
+            />
           </Field>
           <Field label="og:site_name">
-            <Input value={config.ogSiteName} onChange={(e) => set("ogSiteName", e.target.value)} placeholder="My App" />
+            <Input
+              value={config.ogSiteName}
+              onChange={(e) => set("ogSiteName", e.target.value)}
+              placeholder="My App"
+            />
           </Field>
           <Field label="og:image url">
-            <Input value={config.ogImageUrl} onChange={(e) => set("ogImageUrl", e.target.value)} placeholder="https://example.com/og.png" />
+            <Input
+              value={config.ogImageUrl}
+              onChange={(e) => set("ogImageUrl", e.target.value)}
+              placeholder="https://example.com/og.png"
+            />
           </Field>
           <Row>
             <Field label="og:image width">
-              <Input type="number" value={config.ogImageWidth} onChange={(e) => set("ogImageWidth", e.target.value)} placeholder="1200" />
+              <Input
+                type="number"
+                value={config.ogImageWidth}
+                onChange={(e) => set("ogImageWidth", e.target.value)}
+                placeholder="1200"
+              />
             </Field>
             <Field label="og:image height">
-              <Input type="number" value={config.ogImageHeight} onChange={(e) => set("ogImageHeight", e.target.value)} placeholder="630" />
+              <Input
+                type="number"
+                value={config.ogImageHeight}
+                onChange={(e) => set("ogImageHeight", e.target.value)}
+                placeholder="630"
+              />
             </Field>
           </Row>
           <Field label="og:image alt">
-            <Input value={config.ogImageAlt} onChange={(e) => set("ogImageAlt", e.target.value)} placeholder="Descriptive alt text" />
+            <Input
+              value={config.ogImageAlt}
+              onChange={(e) => set("ogImageAlt", e.target.value)}
+              placeholder="Descriptive alt text"
+            />
           </Field>
           <Field label="og:locale">
-            <Input value={config.ogLocale} onChange={(e) => set("ogLocale", e.target.value)} placeholder="en_US" />
+            <Input
+              value={config.ogLocale}
+              onChange={(e) => set("ogLocale", e.target.value)}
+              placeholder="en_US"
+            />
           </Field>
         </div>
       )}
@@ -540,24 +645,49 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
             </Select>
           </Field>
           <Field label="twitter:title">
-            <Input value={config.twitterTitle} onChange={(e) => set("twitterTitle", e.target.value)} placeholder="Defaults to og:title" />
+            <Input
+              value={config.twitterTitle}
+              onChange={(e) => set("twitterTitle", e.target.value)}
+              placeholder="Defaults to og:title"
+            />
           </Field>
           <Field label="twitter:description">
-            <Textarea value={config.twitterDescription} onChange={(e) => set("twitterDescription", e.target.value)} placeholder="Defaults to og:description" rows={3} />
+            <Textarea
+              value={config.twitterDescription}
+              onChange={(e) => set("twitterDescription", e.target.value)}
+              placeholder="Defaults to og:description"
+              rows={3}
+            />
           </Field>
           <Row>
             <Field label="twitter:site">
-              <Input value={config.twitterSite} onChange={(e) => set("twitterSite", e.target.value)} placeholder="@handle" />
+              <Input
+                value={config.twitterSite}
+                onChange={(e) => set("twitterSite", e.target.value)}
+                placeholder="@handle"
+              />
             </Field>
             <Field label="twitter:creator">
-              <Input value={config.twitterCreator} onChange={(e) => set("twitterCreator", e.target.value)} placeholder="@author" />
+              <Input
+                value={config.twitterCreator}
+                onChange={(e) => set("twitterCreator", e.target.value)}
+                placeholder="@author"
+              />
             </Field>
           </Row>
           <Field label="twitter:image url">
-            <Input value={config.twitterImageUrl} onChange={(e) => set("twitterImageUrl", e.target.value)} placeholder="https://example.com/twitter.png" />
+            <Input
+              value={config.twitterImageUrl}
+              onChange={(e) => set("twitterImageUrl", e.target.value)}
+              placeholder="https://example.com/twitter.png"
+            />
           </Field>
           <Field label="twitter:image alt">
-            <Input value={config.twitterImageAlt} onChange={(e) => set("twitterImageAlt", e.target.value)} placeholder="Descriptive alt text" />
+            <Input
+              value={config.twitterImageAlt}
+              onChange={(e) => set("twitterImageAlt", e.target.value)}
+              placeholder="Descriptive alt text"
+            />
           </Field>
         </div>
       )}
@@ -567,13 +697,19 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
         <div className="space-y-8">
           <Row>
             <Field label="index">
-              <Select value={String(config.robotsIndex)} onChange={(e) => set("robotsIndex", e.target.value === "true")}>
+              <Select
+                value={String(config.robotsIndex)}
+                onChange={(e) => set("robotsIndex", e.target.value === "true")}
+              >
                 <option value="true">true (index)</option>
                 <option value="false">false (noindex)</option>
               </Select>
             </Field>
             <Field label="follow">
-              <Select value={String(config.robotsFollow)} onChange={(e) => set("robotsFollow", e.target.value === "true")}>
+              <Select
+                value={String(config.robotsFollow)}
+                onChange={(e) => set("robotsFollow", e.target.value === "true")}
+              >
                 <option value="true">true (follow)</option>
                 <option value="false">false (nofollow)</option>
               </Select>
@@ -581,14 +717,20 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
           </Row>
           <Row>
             <Field label="nocache">
-              <Select value={config.robotsNocache} onChange={(e) => set("robotsNocache", e.target.value)}>
+              <Select
+                value={config.robotsNocache}
+                onChange={(e) => set("robotsNocache", e.target.value)}
+              >
                 <option value="">— not set —</option>
                 <option value="true">true</option>
                 <option value="false">false</option>
               </Select>
             </Field>
             <Field label="googleBot index">
-              <Select value={config.googleBotIndex} onChange={(e) => set("googleBotIndex", e.target.value)}>
+              <Select
+                value={config.googleBotIndex}
+                onChange={(e) => set("googleBotIndex", e.target.value)}
+              >
                 <option value="">— inherit —</option>
                 <option value="true">true</option>
                 <option value="false">false</option>
@@ -597,14 +739,20 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
           </Row>
           <Row>
             <Field label="googleBot follow">
-              <Select value={config.googleBotFollow} onChange={(e) => set("googleBotFollow", e.target.value)}>
+              <Select
+                value={config.googleBotFollow}
+                onChange={(e) => set("googleBotFollow", e.target.value)}
+              >
                 <option value="">— inherit —</option>
                 <option value="true">true</option>
                 <option value="false">false</option>
               </Select>
             </Field>
             <Field label="googleBot noimageindex">
-              <Select value={config.googleBotNoimageindex} onChange={(e) => set("googleBotNoimageindex", e.target.value)}>
+              <Select
+                value={config.googleBotNoimageindex}
+                onChange={(e) => set("googleBotNoimageindex", e.target.value)}
+              >
                 <option value="">— not set —</option>
                 <option value="true">true</option>
                 <option value="false">false</option>
@@ -612,7 +760,12 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
             </Field>
           </Row>
           <Field label="googleBot maxSnippet">
-            <Input type="number" value={config.googleBotMaxSnippet} onChange={(e) => set("googleBotMaxSnippet", e.target.value)} placeholder="-1 (unlimited)" />
+            <Input
+              type="number"
+              value={config.googleBotMaxSnippet}
+              onChange={(e) => set("googleBotMaxSnippet", e.target.value)}
+              placeholder="-1 (unlimited)"
+            />
           </Field>
         </div>
       )}
@@ -621,17 +774,33 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
       {activeTab === "advanced" && (
         <div className="space-y-8">
           <Field label="Canonical URL">
-            <Input value={config.canonical} onChange={(e) => set("canonical", e.target.value)} placeholder="https://example.com/page" />
+            <Input
+              value={config.canonical}
+              onChange={(e) => set("canonical", e.target.value)}
+              placeholder="https://example.com/page"
+            />
           </Field>
           <Field label="Manifest">
-            <Input value={config.manifest} onChange={(e) => set("manifest", e.target.value)} placeholder="/manifest.json" />
+            <Input
+              value={config.manifest}
+              onChange={(e) => set("manifest", e.target.value)}
+              placeholder="/manifest.json"
+            />
           </Field>
           <Row>
             <Field label="Theme Color (light)">
-              <Input value={config.themeColorLight} onChange={(e) => set("themeColorLight", e.target.value)} placeholder="#ffffff" />
+              <Input
+                value={config.themeColorLight}
+                onChange={(e) => set("themeColorLight", e.target.value)}
+                placeholder="#ffffff"
+              />
             </Field>
             <Field label="Theme Color (dark)">
-              <Input value={config.themeColorDark} onChange={(e) => set("themeColorDark", e.target.value)} placeholder="#000000" />
+              <Input
+                value={config.themeColorDark}
+                onChange={(e) => set("themeColorDark", e.target.value)}
+                placeholder="#000000"
+              />
             </Field>
           </Row>
           <Field label="Color Scheme">
@@ -646,18 +815,33 @@ export default function MetadataBuilder({ onChange, metadata }: { onChange?: (me
             </Select>
           </Field>
           <Field label="Viewport" hint="Leave blank to use Next.js defaults.">
-            <Input value={config.viewport} onChange={(e) => set("viewport", e.target.value)} placeholder="width=device-width, initial-scale=1" />
+            <Input
+              value={config.viewport}
+              onChange={(e) => set("viewport", e.target.value)}
+              placeholder="width=device-width, initial-scale=1"
+            />
           </Field>
           <Row>
             <Field label="Verification — Google">
-              <Input value={config.verificationGoogle} onChange={(e) => set("verificationGoogle", e.target.value)} placeholder="verification token" />
+              <Input
+                value={config.verificationGoogle}
+                onChange={(e) => set("verificationGoogle", e.target.value)}
+                placeholder="verification token"
+              />
             </Field>
             <Field label="Verification — Yandex">
-              <Input value={config.verificationYandex} onChange={(e) => set("verificationYandex", e.target.value)} placeholder="verification code" />
+              <Input
+                value={config.verificationYandex}
+                onChange={(e) => set("verificationYandex", e.target.value)}
+                placeholder="verification code"
+              />
             </Field>
           </Row>
           <Field label="Format Detection">
-            <Select value={config.formatDetection} onChange={(e) => set("formatDetection", e.target.value)}>
+            <Select
+              value={config.formatDetection}
+              onChange={(e) => set("formatDetection", e.target.value)}
+            >
               <option value="">— default —</option>
               <option value="false">telephone: false</option>
             </Select>

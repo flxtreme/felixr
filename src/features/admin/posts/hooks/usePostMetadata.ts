@@ -1,11 +1,8 @@
-import useSWR from 'swr';
-import { getPostMetadataById } from '@/src/features/admin/posts/services';
+import useSWR from "swr";
+import { getPostMetadataById } from "@/src/features/admin/posts/services";
 
 const usePostMetadata = (id?: string) => {
-  const swr = useSWR(
-    id ? ['post-metadata', id] : null,
-    () => getPostMetadataById(id as string),
-  );
+  const swr = useSWR(id ? ["post-metadata", id] : null, () => getPostMetadataById(id as string));
 
   return {
     ...swr,

@@ -1,11 +1,8 @@
-import useSWR from 'swr';
-import { searchTags } from '@/src/features/admin/tags/services';
+import useSWR from "swr";
+import { searchTags } from "@/src/features/admin/tags/services";
 
 export const useSearchTags = (query: string) => {
-  const swr = useSWR(
-    query ? ['searchTags', query] : null,
-    () => searchTags(query),
-  );
+  const swr = useSWR(query ? ["searchTags", query] : null, () => searchTags(query));
 
   return {
     ...swr,

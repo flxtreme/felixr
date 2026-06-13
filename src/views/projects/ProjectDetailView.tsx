@@ -5,7 +5,7 @@ import PostRender from "@/src/components/PostRenderer";
 import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { SinglePageLayout } from "@/src/layouts/SinglePageLayout";
 import * as service from "@/src/features/public/posts/services";
-import { trimContent } from "@/src/utils/trim";
+import parseMetadata from "@/src/utils/parseMetadata";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -21,12 +21,9 @@ async function getProject(slug: string): Promise<Post | null> {
   }
 
   try {
-    const res = await fetch(
-      `${API_URL}/api/public/post/page/${slug}`,
-      {
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`${API_URL}/api/public/post/page/${slug}`, {
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       return null;
@@ -38,9 +35,7 @@ async function getProject(slug: string): Promise<Post | null> {
   }
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
 
   const [project, metadata, content] = await Promise.all([
@@ -53,27 +48,10 @@ export async function generateMetadata({
     return {};
   }
 
-  const seo = metadata?.seo;
-
-  const description =
-    project?.excerpt ||
-    seo?.description ||
-    trimContent(content);
-  
-  return {
-    ...seo,
-    title: seo?.title ?? project.title ?? slug,
-    description,
-    openGraph: {
-      title: project.title,
-      description,
-    },
-  };
+  return parseMetadata(project, slug, content, metadata);
 }
 
-export default async function ProjectDetailPage({
-  params,
-}: Props) {
+export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
 
   const [project, content] = await Promise.all([
@@ -104,9 +82,7 @@ export default async function ProjectDetailPage({
                 href: "/projects",
               },
               {
-                label: (
-                  project.title || project.slug
-                ).toLowerCase(),
+                label: (project.title || project.slug).toLowerCase(),
               },
             ]}
           />

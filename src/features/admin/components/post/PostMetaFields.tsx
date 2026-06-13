@@ -29,7 +29,7 @@ export const PostMetaFields = ({
         .replace(/-+/g, "-");
       onSlugChange(generated);
     }
-  }, [title, isSlugEditable]);
+  }, [title, isSlugEditable, onSlugChange]);
 
   return (
     <section className="space-y-8">
@@ -71,9 +71,7 @@ export const PostMetaFields = ({
             onChange={(e) => onSlugChange(e.target.value)}
             readOnly={!isSlugEditable}
             className={`w-full bg-transparent border-b border-border py-2 text-sm font-mono font-medium focus:outline-none transition-colors placeholder:text-foreground/10 ${
-              isSlugEditable
-                ? "focus:border-primary"
-                : "cursor-default text-foreground/50"
+              isSlugEditable ? "focus:border-primary" : "cursor-default text-foreground/50"
             }`}
             placeholder="post-slug-format"
           />

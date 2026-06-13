@@ -5,8 +5,8 @@ import { ArrowRight } from "lucide-react";
 import { usePosts } from "@/src/features/public/posts/hooks";
 
 const navItems = [
-  { label: 'Projects', path: '/projects' },
-  { label: 'Posts', path: '/blog' },
+  { label: "Projects", path: "/projects" },
+  { label: "Posts", path: "/blog" },
 ];
 
 export default function HomeView() {
@@ -29,17 +29,15 @@ export default function HomeView() {
       <section>
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-6 space-y-4">
           <div className="space-y-2">
-            <h1 className="text-5xl font-bold text-primary">
-              felixr
-            </h1>
+            <h1 className="text-5xl font-bold text-primary">felixr</h1>
           </div>
-          
+
           <p className="text-lg font-medium text-foreground/60 leading-relaxed max-w-xl">
             A space for code, learning, and growth.
           </p>
 
-          <Link 
-            href="/about" 
+          <Link
+            href="/about"
             className="inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all underline underline-offset-4"
           >
             More about my background <ArrowRight className="w-4 h-4" />
@@ -68,76 +66,102 @@ export default function HomeView() {
           <h2 className="text-2xl font-bold">Latest Posts</h2>
 
           <div className="flex flex-col gap-10">
-          {postsLoading ? (
-            <p className="text-sm font-mono text-foreground/40 animate-pulse">Loading latest posts...</p>
-          ) : latestPosts.length > 0 ? (
-            latestPosts.map((post, idx) => {
+            {postsLoading ? (
+              <p className="text-sm font-mono text-foreground/40 animate-pulse">
+                Loading latest posts...
+              </p>
+            ) : latestPosts.length > 0 ? (
+              latestPosts.map((post, idx) => {
+                const publishedAt = post?.publishedAt ?? post?.createdAt ?? post?.updatedAt;
 
-              const publishedAt = post?.publishedAt ?? post?.createdAt ?? post?.updatedAt;
-
-              return(
-                <article key={`${post.id}-${idx}}`} className="group relative flex flex-col items-start">
-                  <time 
-                    className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono" 
-                    dateTime={post.publishedAt || undefined}
+                return (
+                  <article
+                    key={`${post.id}-${idx}}`}
+                    className="group relative flex flex-col items-start"
                   >
-                    {publishedAt ? new Date(publishedAt).toLocaleDateString('en-US', {
-                      month: 'long', day: 'numeric', year: 'numeric'
-                    }) : '-'}
-                  </time>
-                  <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                    <Link href={`/blog/${post.slug}`}>
-                      {post.title || post.slug.replace(/-/g, ' ')}
-                    </Link>
-                  </h3>
-                  <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
-                    { post.excerpt && post.excerpt.replace(/[#*`]/g, '').substring(0, 180)}...
-                  </p>
-                </article>
-              )
-            })
-          ) : (
-            <p className="text-sm font-medium text-foreground/40 italic">No posts published yet.</p>
-          )}
+                    <time
+                      className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono"
+                      dateTime={post.publishedAt || undefined}
+                    >
+                      {publishedAt
+                        ? new Date(publishedAt).toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })
+                        : "-"}
+                    </time>
+                    <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                      <Link href={`/blog/${post.slug}`}>
+                        {post.title || post.slug.replace(/-/g, " ")}
+                      </Link>
+                    </h3>
+                    <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
+                      {post.excerpt && post.excerpt.replace(/[#*`]/g, "").substring(0, 180)}...
+                    </p>
+                  </article>
+                );
+              })
+            ) : (
+              <p className="text-sm font-medium text-foreground/40 italic">
+                No posts published yet.
+              </p>
+            )}
           </div>
-          <Link href="/blog" className="inline-block text-sm font-medium text-foreground/60 hover:text-primary hover:underline underline-offset-4 transition-all">View all posts</Link>
+          <Link
+            href="/blog"
+            className="inline-block text-sm font-medium text-foreground/60 hover:text-primary hover:underline underline-offset-4 transition-all"
+          >
+            View all posts
+          </Link>
         </div>
       </section>
-      
+
       {/* Featured Projects Section */}
       <section className="border-b border-border">
         <div className="max-w-3xl mx-auto px-6 py-12 space-y-8">
           <h2 className="text-2xl font-bold">Featured Projects</h2>
 
           <div className="flex flex-col gap-10">
-          {projectsLoading ? (
-            <p className="text-sm font-mono text-foreground/40 animate-pulse">Loading featured projects...</p>
-          ) : featuredProjects.length > 0 ? (
-            featuredProjects.map((project, idx) => {
+            {projectsLoading ? (
+              <p className="text-sm font-mono text-foreground/40 animate-pulse">
+                Loading featured projects...
+              </p>
+            ) : featuredProjects.length > 0 ? (
+              featuredProjects.map((project, idx) => {
+                const publishedAt =
+                  project?.publishedAt ?? project?.createdAt ?? project?.updatedAt;
 
-              const publishedAt = project?.publishedAt ?? project?.createdAt ?? project?.updatedAt;
-
-              return(
-                <article key={`${project.id}-${idx}`} className="group relative flex flex-col items-start">
-                  <span className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono">
-                    { publishedAt? new Date(publishedAt).getFullYear() : ""}
-                  </span>
-                  <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                    <Link href={`/projects/${project.slug}`}>
-                      {project.title}
-                    </Link>
-                  </h3>
-                  <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
-                    {project.excerpt && project.excerpt.replace(/[#*`]/g, '').substring(0, 180)}...
-                  </p> 
-                </article>
-              )
-            })
-          ) : (
-            <p className="text-sm font-medium text-foreground/40 italic">No featured projects yet.</p>
-          )}
+                return (
+                  <article
+                    key={`${project.id}-${idx}`}
+                    className="group relative flex flex-col items-start"
+                  >
+                    <span className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono">
+                      {publishedAt ? new Date(publishedAt).getFullYear() : ""}
+                    </span>
+                    <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                      <Link href={`/projects/${project.slug}`}>{project.title}</Link>
+                    </h3>
+                    <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
+                      {project.excerpt && project.excerpt.replace(/[#*`]/g, "").substring(0, 180)}
+                      ...
+                    </p>
+                  </article>
+                );
+              })
+            ) : (
+              <p className="text-sm font-medium text-foreground/40 italic">
+                No featured projects yet.
+              </p>
+            )}
           </div>
-          <Link href="/projects" className="inline-block text-sm font-medium text-foreground/60 hover:text-primary hover:underline underline-offset-4 transition-all">View all projects</Link>
+          <Link
+            href="/projects"
+            className="inline-block text-sm font-medium text-foreground/60 hover:text-primary hover:underline underline-offset-4 transition-all"
+          >
+            View all projects
+          </Link>
         </div>
       </section>
     </div>

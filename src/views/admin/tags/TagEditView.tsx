@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useTagsContext } from "@/src/features/admin/tags/TagsContext";
 import { ChevronLeft } from "lucide-react";
@@ -10,24 +10,18 @@ export default function TagEditView() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
-  
+
   const { tags, updateTag, isLoading: isContextLoading } = useTagsContext();
-  
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [excludeFromPages, setExcludeFromPages] = useState(false);
+
+  const tag = tags.find((t) => t.id === id);
+
+  const [formData, setFormData] = useState({
+    name: tag?.name ?? "",
+    slug: tag?.slug ?? "",
+    excludeFromPages: tag?.excludeFromPages ?? false,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Load existing tag data into state
-  useEffect(() => {
-    const tag = tags.find((t) => t.id === id);
-    if (tag) {
-      setName(tag.name);
-      setSlug(tag.slug);
-      setExcludeFromPages(tag.excludeFromPages || false);
-    }
-  }, [tags, id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,10 +29,10 @@ export default function TagEditView() {
     setError(null);
 
     try {
-      await updateTag(id, { name, slug, excludeFromPages });
+      await updateTag(id, formData);
       router.push("/admin/tags");
-    } catch (err: any) {
-      setError(err.message || "Failed to update tag. Please try again.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to update tag. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -46,14 +40,16 @@ export default function TagEditView() {
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    setName(val);
-    // Auto-slugify
-    setSlug(val.toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]+/g, '')
-      .replace(/--+/g, '-')
-      .trim()
-    );
+    setFormData((prev) => ({
+      ...prev,
+      name: val,
+      slug: val
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "")
+        .replace(/--+/g, "-")
+        .trim(),
+    }));
   };
 
   if (isContextLoading && tags.length === 0) {
@@ -63,7 +59,7 @@ export default function TagEditView() {
   return (
     <div className="p-8 max-w-2xl space-y-6">
       <header className="space-y-4">
-        <Link 
+        <Link
           href="/admin/tags"
           className="text-xs font-mono font-medium text-foreground/40 hover:text-primary flex items-center gap-1 transition-colors w-fit"
         >
@@ -81,29 +77,35 @@ export default function TagEditView() {
       <form onSubmit={handleSubmit} className="space-y-6 border border-border p-6">
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1" htmlFor="name">
+            <label
+              className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1"
+              htmlFor="name"
+            >
               Tag Name
             </label>
             <input
               id="name"
               type="text"
               required
-              value={name}
+              value={formData.name}
               onChange={handleNameChange}
               className="w-full h-10 bg-transparent border border-border px-3 rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm font-mono transition-shadow"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1" htmlFor="slug">
+            <label
+              className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1"
+              htmlFor="slug"
+            >
               Slug
             </label>
             <input
               id="slug"
               type="text"
               required
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
+              value={formData.slug}
+              onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value }))}
               className="w-full h-10 bg-transparent border border-border px-3 rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm font-mono transition-shadow"
             />
           </div>
@@ -112,11 +114,16 @@ export default function TagEditView() {
             <input
               id="excludeFromPages"
               type="checkbox"
-              checked={excludeFromPages}
-              onChange={(e) => setExcludeFromPages(e.target.checked)}
+              checked={formData.excludeFromPages}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, excludeFromPages: e.target.checked }))
+              }
               className="w-4 h-4 bg-transparent border border-border rounded focus:ring-offset-0 focus:ring-1 focus:ring-primary text-primary transition-all cursor-pointer"
             />
-            <label className="text-xs font-mono font-medium text-foreground/40 cursor-pointer select-none" htmlFor="excludeFromPages">
+            <label
+              className="text-xs font-mono font-medium text-foreground/40 cursor-pointer select-none"
+              htmlFor="excludeFromPages"
+            >
               Exclude this tag from public pages list
             </label>
           </div>

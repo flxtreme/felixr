@@ -3,9 +3,12 @@
 import React, { createContext, useContext, ReactNode, useState } from "react";
 import { useTags, useTagActions } from "@/src/features/admin/tags/hooks";
 import { Tag, GetTagsQuery } from "@/src/features/admin/tags/types";
+import { Meta } from "@/src/common/types";
 
 interface TagsContextType {
   tags: Tag[];
+  meta?: Meta;
+  setParams: (params: GetTagsQuery) => void;
   isLoading: boolean;
   error: any;
   mutate: () => Promise<any>;
@@ -16,18 +19,14 @@ interface TagsContextType {
 
 const TagsContext = createContext<TagsContextType | undefined>(undefined);
 
-export const TagsProvider = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+export const TagsProvider = ({ children }: { children: ReactNode }) => {
   const [params, setParams] = useState<GetTagsQuery>({
-    isActive: true
+    isActive: true,
   });
 
   // Centralize tag data fetching via SWR
   const { tags, meta, isLoading, error, mutate } = useTags(params);
-  
+
   // Extract actions for creating, updating, and removing tags
   const { create, update, remove } = useTagActions();
 
@@ -35,6 +34,8 @@ export const TagsProvider = ({
     <TagsContext.Provider
       value={{
         tags,
+        meta,
+        setParams,
         isLoading,
         error,
         mutate,

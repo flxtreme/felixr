@@ -34,9 +34,7 @@ export default function DashboardView() {
                 </span>
                 <Icon className="w-4 h-4 text-foreground/20 group-hover:text-primary transition-colors" />
               </div>
-              <div className="text-3xl font-bold">
-                {stat.value}
-              </div>
+              <div className="text-3xl font-bold">{stat.value}</div>
             </div>
           );
 
@@ -57,10 +55,19 @@ export default function DashboardView() {
             {[1, 2, 3].map((i) => (
               <div key={i} className="py-4 flex items-center justify-between group">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium group-hover:text-primary transition-colors cursor-default">How to scale Node.js microservices</p>
-                  <p className="text-xs font-mono font-medium text-foreground/40">Published · May 24, 2024</p>
+                  <p className="text-sm font-medium group-hover:text-primary transition-colors cursor-default">
+                    How to scale Node.js microservices
+                  </p>
+                  <p className="text-xs font-mono font-medium text-foreground/40">
+                    Published · May 24, 2024
+                  </p>
                 </div>
-                <Link href="/admin/posts/edit" className="text-xs font-mono font-medium text-foreground/30 hover:text-primary transition-colors">Edit</Link>
+                <Link
+                  href="/admin/posts/edit"
+                  className="text-xs font-mono font-medium text-foreground/30 hover:text-primary transition-colors"
+                >
+                  Edit
+                </Link>
               </div>
             ))}
           </div>
@@ -69,11 +76,17 @@ export default function DashboardView() {
         <section className="bg-surface shadow-sm rounded-lg p-6 space-y-4">
           <h2 className="text-sm font-mono font-bold text-foreground/40">Quick Actions</h2>
           <div className="grid grid-cols-1 gap-3">
-            <Link href="/admin/posts/new" className="flex items-center justify-between p-4 border border-dashed border-border rounded-lg text-sm font-mono font-medium text-foreground/40 hover:border-primary hover:text-primary transition-all">
+            <Link
+              href="/admin/posts/new"
+              className="flex items-center justify-between p-4 border border-dashed border-border rounded-lg text-sm font-mono font-medium text-foreground/40 hover:border-primary hover:text-primary transition-all"
+            >
               <span>Create new post</span>
               <span>+</span>
             </Link>
-            <Link href="/admin/pages/new" className="flex items-center justify-between p-4 border border-dashed border-border rounded-lg text-sm font-mono font-medium text-foreground/40 hover:border-primary hover:text-primary transition-all">
+            <Link
+              href="/admin/pages/new"
+              className="flex items-center justify-between p-4 border border-dashed border-border rounded-lg text-sm font-mono font-medium text-foreground/40 hover:border-primary hover:text-primary transition-all"
+            >
               <span>Create new page</span>
               <span>+</span>
             </Link>

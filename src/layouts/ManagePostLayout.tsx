@@ -24,7 +24,10 @@ export function ManagePostLayout({
   return (
     <div className="flex flex-col h-full bg-background">
       <header className="h-12 border-b border-border flex items-center px-6 gap-3 shrink-0 bg-background z-10">
-        <Link href={backHref} className="text-foreground/40 hover:text-foreground transition-colors">
+        <Link
+          href={backHref}
+          className="text-foreground/40 hover:text-foreground transition-colors"
+        >
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <h1 className="text-sm font-bold">{pageTitle}</h1>
@@ -36,9 +39,7 @@ export function ManagePostLayout({
         </main>
 
         <aside className="w-[30%] flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-5">
-            {sidebar}
-          </div>
+          <div className="flex-1 overflow-y-auto p-5">{sidebar}</div>
 
           <div className="shrink-0 border-t border-border px-5 py-3 flex items-center gap-3 bg-background">
             <Link

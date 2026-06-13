@@ -5,5 +5,5 @@ export default function TagLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <TagsProvider>{children}</TagsProvider>
+  return <TagsProvider>{children}</TagsProvider>;
 }

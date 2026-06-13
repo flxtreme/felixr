@@ -11,11 +11,7 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 export const DashboardContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [user] = useState({ name: "felixr", email: "flxrzjr@gmail.com" });
 
-  return (
-    <DashboardContext.Provider value={{ user }}>
-      {children}
-    </DashboardContext.Provider>
-  );
+  return <DashboardContext.Provider value={{ user }}>{children}</DashboardContext.Provider>;
 };
 
 export const useDashboard = () => {

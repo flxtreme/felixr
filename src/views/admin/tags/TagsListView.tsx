@@ -1,12 +1,10 @@
 "use client";
 
 import React from "react";
-import { use } from "react";
 import Link from "next/link";
 import { Edit2, Trash2, Plus, EyeOff } from "lucide-react";
 import { Pagination } from "@/src/components/Pagination";
 import { useTagsContext } from "@/src/features/admin/tags/TagsContext";
-import { NoItemsFound } from "@/src/features/admin/components/NoItemsFound";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
 import { Tag } from "@/src/features/admin/tags/types";
 
@@ -32,7 +30,9 @@ export default function TagsListView({
     {
       header: "Slug",
       skeletonWidth: "w-40",
-      cell: (tag) => <span className="text-sm font-mono font-medium text-foreground/40">{tag.slug}</span>,
+      cell: (tag) => (
+        <span className="text-sm font-mono font-medium text-foreground/40">{tag.slug}</span>
+      ),
     },
     {
       header: "Tagged",
@@ -42,15 +42,16 @@ export default function TagsListView({
     {
       header: "Status",
       skeletonWidth: "w-24",
-      cell: (tag) => (
+      cell: (tag) =>
         tag.excludeFromPages ? (
           <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold text-red-500/60 uppercase px-2 py-0.5 border border-red-500/20 bg-red-500/5 rounded">
             <EyeOff className="w-3 h-3" /> Excluded
           </span>
         ) : (
-          <span className="inline-flex items-center text-[10px] font-mono font-bold text-emerald-500/60 uppercase px-2 py-0.5 border border-emerald-500/20 bg-emerald-500/5 rounded">Public</span>
-        )
-      ),
+          <span className="inline-flex items-center text-[10px] font-mono font-bold text-emerald-500/60 uppercase px-2 py-0.5 border border-emerald-500/20 bg-emerald-500/5 rounded">
+            Public
+          </span>
+        ),
     },
     {
       header: "Created At",
@@ -119,11 +120,7 @@ export default function TagsListView({
         emptyMessage="No tags found."
       />
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        basePath="/admin/tags"
-      />
+      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin/tags" />
     </div>
   );
 }

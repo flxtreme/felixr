@@ -7,11 +7,7 @@ interface PageLayoutProps {
   headerClassName?: string;
 }
 
-export const PageLayout = ({
-  title,
-  children,
-  headerClassName,
-}: PageLayoutProps) => {
+export const PageLayout = ({ title, children, headerClassName }: PageLayoutProps) => {
   return (
     <div className="flex flex-col">
       <section className={cln("border-b border-border", headerClassName)}>
