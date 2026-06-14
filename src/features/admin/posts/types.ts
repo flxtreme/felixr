@@ -14,6 +14,7 @@ export interface Post {
   featureImages: string[];
   metadata?: Record<string, unknown> | null;
   userId: string;
+  tags?: string[];
   isDeleted: boolean;
   deletedAt: string | null;
   createdBy: string | null;

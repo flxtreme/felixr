@@ -6,6 +6,8 @@ import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { SinglePageLayout } from "@/src/layouts/SinglePageLayout";
 import * as service from "@/src/features/public/posts/services";
 import parseMetadata from "@/src/utils/parseMetadata";
+import { TagFooter } from "@/src/features/public/components/Tags";
+import { useMemo } from "react";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -90,6 +92,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       }
     >
       <PostRender content={content} />
+      <TagFooter tags={project?.tags ?? []} />
     </SinglePageLayout>
   );
 }

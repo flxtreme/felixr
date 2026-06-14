@@ -77,7 +77,7 @@ export default function PagesListView({
       cell: (page) => (
         <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-foreground/40 uppercase">
           <Tag className="w-3 h-3 text-foreground/20" />
-          <span>{(page.metadata?.tags as string[])?.join(", ") || "NO TAGS"}</span>
+          <span>{((page?.tags ?? page.metadata?.tags) as string[])?.join(", ") || "NO TAGS"}</span>
         </div>
       ),
     },

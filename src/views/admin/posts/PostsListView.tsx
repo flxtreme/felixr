@@ -77,7 +77,7 @@ export default function PostsListView({
       cell: (post) => (
         <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-foreground/40 uppercase">
           <Tag className="w-3 h-3 text-foreground/20" />
-          <span>{(post.metadata?.tags as string[])?.join(", ") || "NO TAGS"}</span>
+          <span>{((post?.tags ?? post.metadata?.tags) as string[])?.join(", ") || "NO TAGS"}</span>
         </div>
       ),
     },

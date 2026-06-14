@@ -14,6 +14,7 @@ export interface Post {
   publishedAt: string | null;
   featureImages: string[];
   userId: string;
+  tags?: string[];
   isDeleted: boolean;
   deletedAt: string | null;
   createdBy: string | null;
