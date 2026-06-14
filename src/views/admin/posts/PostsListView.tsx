@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React from "react";
 import Link from "next/link";
 import { Edit2, Trash2, Plus, Tag } from "lucide-react";
@@ -15,10 +17,12 @@ export default function PostsListView({
   searchParams: Promise<{ page?: string; status?: string }>;
 }) {
   const { removePost } = usePostContext();
-  const { page, status = "PUBLISHED" } = React.use(searchParams);
+  const resolvedParams = React.use(searchParams);
+  const page = resolvedParams?.page;
+  const status = resolvedParams?.status ?? "published";
   const currentPage = Math.max(1, Number(page) || 1);
   const pageSize = 10;
-  const currentStatus = status?.toUpperCase();
+  const currentStatus = status.toUpperCase();
 
   const {
     posts: paginatedPosts,
