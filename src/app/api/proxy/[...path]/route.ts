@@ -37,10 +37,15 @@ async function handleProxy(req: NextRequest) {
     });
 
     const data = await response.blob();
+
+    const responseHeaders = new Headers(response.headers);
+    responseHeaders.delete("content-encoding"); // ← body is already decoded by fetch
+    responseHeaders.delete("content-length");   // ← length no longer matches after decode
+
     return new NextResponse(data, {
       status: response.status,
       statusText: response.statusText,
-      headers: response.headers,
+      headers: responseHeaders,
     });
   } catch (error) {
     console.error("Proxy error:", error);
