@@ -6,6 +6,7 @@ import { Pagination } from "@/src/components/Pagination";
 import { Breadcrumbs } from "@/src/components/BreadCrumbs";
 import { PageLayout } from "@/src/layouts/PageLayout";
 import { use } from "react";
+import { PostShimmer } from "@/src/components/shimmer/PostShimmer";
 
 export default function ProjectsListView({
   searchParams,
@@ -44,11 +45,7 @@ export default function ProjectsListView({
     >
       <div className="flex flex-col gap-12">
         {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-sm font-mono text-foreground/40 animate-pulse">
-              Loading projects...
-            </p>
-          </div>
+          <PostShimmer />
         )}
 
         {paginatedProjects.length > 0

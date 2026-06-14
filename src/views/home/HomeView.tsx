@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { usePosts } from "@/src/features/public/posts/hooks";
+import { PostShimmer } from "@/src/components/shimmer/PostShimmer";
 
 const navItems = [
   { label: "Projects", path: "/projects" },
@@ -67,9 +68,7 @@ export default function HomeView() {
 
           <div className="flex flex-col gap-10">
             {postsLoading ? (
-              <p className="text-sm font-mono text-foreground/40 animate-pulse">
-                Loading latest posts...
-              </p>
+              <PostShimmer />
             ) : latestPosts.length > 0 ? (
               latestPosts.map((post, idx) => {
                 const publishedAt = post?.publishedAt ?? post?.createdAt ?? post?.updatedAt;
@@ -124,9 +123,7 @@ export default function HomeView() {
 
           <div className="flex flex-col gap-10">
             {projectsLoading ? (
-              <p className="text-sm font-mono text-foreground/40 animate-pulse">
-                Loading featured projects...
-              </p>
+              <PostShimmer />
             ) : featuredProjects.length > 0 ? (
               featuredProjects.map((project, idx) => {
                 const publishedAt =
@@ -138,7 +135,13 @@ export default function HomeView() {
                     className="group relative flex flex-col items-start"
                   >
                     <span className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono">
-                      {publishedAt ? new Date(publishedAt).getFullYear() : ""}
+                      {publishedAt
+                        ? new Date(publishedAt).toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })
+                        : "-"}
                     </span>
                     <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
                       <Link href={`/projects/${project.slug}`}>{project.title}</Link>
