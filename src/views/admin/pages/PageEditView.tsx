@@ -13,11 +13,12 @@ import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { UpdatePostPayload, Post } from "@/src/features/admin/posts/types";
 import type { Metadata } from "next";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
 export default function PageEditView() {
   const { id } = useParams();
   const router = useRouter();
+  const prevBaseRef = useRef<Partial<Post>>({}); 
 
   const {
     updatePage,
@@ -71,6 +72,13 @@ export default function PageEditView() {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (JSON.stringify(prevBaseRef.current) !== JSON.stringify(basePage)) {
+      prevBaseRef.current = basePage;
+      setOverrides({});
+    }
+  }, [basePage]);
 
   return (
     <ManagePostLayout

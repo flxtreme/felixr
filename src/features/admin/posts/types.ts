@@ -7,7 +7,7 @@ export interface Post {
   slug: string;
   title: string;
   excerpt: string | null;
-  content: string;
+  content?: string;
   status: PostStatus;
   postType: PostType;
   publishedAt: string | null;

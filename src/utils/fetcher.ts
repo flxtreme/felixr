@@ -5,7 +5,15 @@ interface FetcherOptions extends RequestInit {
   headers?: HeadersInit;
 }
 
-export const fetcher = async <T = any>(url: string, options?: FetcherOptions): Promise<T> => {
+interface ApiError {
+  message: string;
+  data: unknown;
+}
+
+export const fetcher = async <T = unknown>(
+  url: string,
+  options?: FetcherOptions
+): Promise<T> => {
   const headers = new Headers(options?.headers);
 
   if (!headers.has("Content-Type")) {
@@ -20,65 +28,67 @@ export const fetcher = async <T = any>(url: string, options?: FetcherOptions): P
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
-  const response = await fetch(`/api/proxy/${cleanUrl}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(`/api/proxy/${cleanUrl}`, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    let errorDetail = `HTTP error! status: ${response.status}`;
+    if (!response.ok) {
+      let message = `HTTP error! status: ${response.status}`;
+      let data: unknown = null;
 
-    try {
-      const contentType = response.headers.get("content-type");
+      try {
+        const contentType = response.headers.get("content-type");
 
-      if (contentType?.includes("application/json")) {
-        const errorJson = await response.json();
+        if (contentType?.includes("application/json")) {
+          const errorJson = (await response.json()) as Partial<ApiError>;
 
-        errorDetail += ` - ${JSON.stringify(errorJson)}`;
+          message = errorJson.message ?? message;
+          data = errorJson.data ?? null;
 
-        if (
-          response.status === 403 &&
-          errorJson?.message === "Your session has expired. Please log in again."
-        ) {
-          removeSession("accessToken");
-
-          if (typeof window !== "undefined") {
-            window.location.href = "/login";
+          if (
+            response.status === 403 &&
+            errorJson?.message === "Your session has expired. Please log in again."
+          ) {
+            removeSession("accessToken");
+            if (typeof window !== "undefined") {
+              window.location.href = "/login";
+            }
           }
+        } else {
+          data = await response.text();
         }
-      } else {
-        const errorText = await response.text();
-
-        if (errorText) {
-          errorDetail += ` - ${errorText}`;
-        }
+      } catch (parseError) {
+        console.error("[Fetcher] Failed to parse error response:", parseError);
       }
-    } catch {}
 
-    errorEmitter.emit(new Error(errorDetail));
-    throw new Error(errorDetail);
-  }
+      console.error("[Fetcher] API error:", { status: response.status, url: cleanUrl, data });
+      throw new Error(message);
+    }
 
-  const contentType = response.headers.get("content-type");
+    const contentType = response.headers.get("content-type");
 
-  if (!contentType) {
-    return undefined as T;
-  }
+    if (!contentType) throw new Error("No content type");
 
-  if (
-    contentType.includes("application/json") ||
-    contentType.includes("application/problem+json")
-  ) {
-    return (await response.json()) as T;
-  }
+    if (
+      contentType.includes("application/json") ||
+      contentType.includes("application/problem+json")
+    ) {
+      return (await response.json()) as T;
+    }
 
-  if (
-    contentType.includes("text/plain") ||
-    contentType.includes("text/html") ||
-    contentType.includes("text/markdown")
-  ) {
+    if (
+      contentType.includes("text/plain") ||
+      contentType.includes("text/html") ||
+      contentType.includes("text/markdown")
+    ) {
+      return (await response.text()) as T;
+    }
+
     return (await response.text()) as T;
+  } catch (error) { 
+    errorEmitter.emit(error as Error);
+    throw error;
   }
-
-  return (await response.text()) as T;
 };
