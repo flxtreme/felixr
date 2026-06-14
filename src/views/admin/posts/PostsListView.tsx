@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import React from "react";
 import Link from "next/link";
 import { Edit2, Trash2, Plus, Tag } from "lucide-react";
@@ -18,11 +16,14 @@ export default function PostsListView({
 }) {
   const { removePost } = usePostContext();
   const resolvedParams = React.use(searchParams);
-  const page = resolvedParams?.page;
-  const status = resolvedParams?.status ?? "published";
-  const currentPage = Math.max(1, Number(page) || 1);
+
+  const [currentStatus, setCurrentStatus] = React.useState(
+    (resolvedParams?.status ?? "published").toUpperCase()
+  );
+  const [currentPage, setCurrentPage] = React.useState(
+    Math.max(1, Number(resolvedParams?.page) || 1)
+  );
   const pageSize = 10;
-  const currentStatus = status.toUpperCase();
 
   const {
     posts: paginatedPosts,
@@ -127,11 +128,11 @@ export default function PostsListView({
 
       <div className="flex items-center gap-6 border-b border-border">
         {["PUBLISHED", "DRAFT", "TRASHED"].map((s) => (
-          <Link
+          <button
             key={s}
-            href={{
-              pathname: "/admin/posts",
-              query: { status: s.toLowerCase() },
+            onClick={() => {
+              setCurrentStatus(s);
+              setCurrentPage(1);
             }}
             className={`pb-4 text-xs font-mono font-bold uppercase tracking-wider transition-colors border-b-2 -mb-px ${
               currentStatus === s
@@ -140,7 +141,7 @@ export default function PostsListView({
             }`}
           >
             {s}
-          </Link>
+          </button>
         ))}
       </div>
 
