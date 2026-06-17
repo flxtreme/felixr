@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f8fa;
+  --background: #f5f4f0;
   --foreground: #1a1a2e;
   --primary: #7c3aed;
   --primary-hover: #6d28d9;
-  --border: #e2e2ea;
-  --surface: #ffffff;
-  --muted: #f0f0f5;
+  --border: #e8e6e0;
+  --surface: #fafaf7;
+  --muted: #f0eee9;
 }
 
 .dark {
-  --background: #131520;
+  --background: #0e0d1a;
   --foreground: #e8e8ef;
   --primary: #a78bfa;
   --primary-hover: #c4b5fd;
-  --border: #252538;
-  --surface: #1a1c2e;
-  --muted: #1e2035;
+  --border: #1e1d32;
+  --surface: #13121f;
+  --muted: #17162a;
 }
 
 @theme inline {
@@ -36,6 +36,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-dm-sans), Arial, Helvetica, sans-serif;
+}
+
+.dark body {
+  background-image: radial-gradient(
+    ellipse 80% 40% at 50% -10%,
+    rgba(124, 58, 237, 0.12) 0%,
+    transparent 70%
+  );
+  background-attachment: fixed;
 }
 
 select {

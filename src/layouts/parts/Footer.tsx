@@ -14,38 +14,48 @@ const socialLinks = [
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-border">
-      <div className="max-w-3xl mx-auto px-6 pt-4 pb-12 flex flex-col gap-4">
-        <nav className="flex gap-8">
-          {pageLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.path}
-              className="text-sm font-medium text-foreground/60 hover:text-primary hover:underline underline-offset-4 transition-all"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+    <footer className="border-t border-border mt-auto">
+      <div className="max-w-3xl mx-auto px-6 py-10 flex flex-col gap-8">
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 border-t border-border pt-4">
-          <div className="flex gap-8">
-            {socialLinks.map((link) => (
+        {/* Top row: name + page nav */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <span className="text-lg font-bold text-primary">felixr</span>
+          <nav className="flex gap-6">
+            {pageLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.path}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium text-foreground/60 hover:text-primary hover:underline underline-offset-4 transition-all"
+                className="text-sm font-medium text-foreground/50 hover:text-primary hover:underline underline-offset-4 transition-all"
               >
                 {link.label}
               </Link>
             ))}
+          </nav>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-border" />
+
+        {/* Bottom row: socials + copyright */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-5">
+            {socialLinks.map(({ label, path }) => (
+              <Link
+                key={label}
+                href={path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-foreground/40 hover:text-primary hover:underline underline-offset-4 transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
           </div>
-          <p className="text-sm text-foreground/40 font-medium">
-            © {new Date().getFullYear()} felixr
+          <p className="text-xs text-foreground/35 font-medium">
+            © {new Date().getFullYear()} felixr — Built with Next.js
           </p>
         </div>
+
       </div>
     </footer>
   );

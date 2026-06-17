@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { usePosts } from "@/src/features/public/posts/hooks";
-import { PostShimmer } from "@/src/components/shimmer/PostShimmer";
+import { PostShimmer, ProjectShimmer } from "@/src/components/shimmer/PostShimmer";
 
-const navItems = [
-  { label: "Projects", path: "/projects" },
-  { label: "Posts", path: "/blog" },
+const socialLinks = [
+  { label: "GitHub", href: "https://github.com/flxtreme" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/flxtremee" },
+  { label: "X", href: "https://x.com/flxtremee" },
 ];
 
 export default function HomeView() {
@@ -21,152 +23,182 @@ export default function HomeView() {
     postType: "PAGE",
     status: "PUBLISHED",
     tags: ["project", "projects"],
-    limit: 3,
+    limit: 6,
   });
 
   return (
     <div className="flex flex-col">
-      {/* 1st Section: About */}
-      <section>
-        <div className="max-w-3xl mx-auto px-6 pt-16 pb-6 space-y-4">
-          <div className="space-y-2">
-            <h1 className="text-5xl font-bold text-primary">felixr</h1>
+
+      {/* Hero / About */}
+      <section className="border-b border-border">
+        <div className="max-w-3xl mx-auto px-6 pt-16 pb-14">
+
+          {/* Avatar + name row */}
+          <div className="flex items-center gap-5 mb-6">
+            <div className="relative w-16 h-16 shrink-0 rounded-full overflow-hidden ring-2 ring-border">
+              <Image
+                src="/og-image.jpg"
+                alt="Felix R"
+                fill
+                className="object-cover object-top"
+                priority
+              />
+            </div>
+            <div>
+              <p className="text-xs font-semibold tracking-widest uppercase text-foreground/40 mb-0.5">
+                Available for work
+              </p>
+              <h1 className="text-3xl font-bold text-primary leading-none">felix <span className="text-foreground">ruz</span></h1>
+            </div>
           </div>
 
-          <p className="text-lg font-medium text-foreground/60 leading-relaxed max-w-xl">
-            A space for code, learning, and growth.
+          {/* Tagline */}
+          <p className="text-xl font-semibold text-foreground leading-snug max-w-lg mb-2">
+            Full-Stack | Agentic
+          </p>
+          <p className="text-base text-foreground/55 leading-relaxed max-w-xl mb-8">
+            I love coding, been at it for nearly 8 years now.
           </p>
 
-          <Link
-            href="/about"
-            className="inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all underline underline-offset-4"
-          >
-            More about my background <ArrowRight className="w-4 h-4" />
-          </Link>
+          {/* CTA + socials */}
+          <div className="flex flex-wrap items-center gap-6">
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
+            >
+              More about me <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+
+            <div className="flex items-center gap-4">
+              {socialLinks.map(({ label, href }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-foreground/40 hover:text-primary hover:underline underline-offset-4 transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Navigation Section */}
-      <section className="border-b border-border">
-        <nav className="max-w-3xl mx-auto px-6 py-6 flex flex-wrap gap-10">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              href={item.path}
-              className="text-lg font-medium transition-all hover:text-primary hover:underline underline-offset-4 text-foreground/60"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </section>
-
-      {/* 2nd Section: Latest Posts Listing */}
+      {/* Latest Posts */}
       <section className="border-b border-border">
         <div className="max-w-3xl mx-auto px-6 py-12 space-y-8">
-          <h2 className="text-2xl font-bold">Latest Posts</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold tracking-tight">Latest Posts</h2>
+            <Link
+              href="/blog"
+              className="text-xs font-semibold text-foreground/40 hover:text-primary transition-colors hover:underline underline-offset-4"
+            >
+              View all →
+            </Link>
+          </div>
 
-          <div className="flex flex-col gap-10">
+          <div className="flex flex-col divide-y divide-border">
             {postsLoading ? (
               <PostShimmer />
             ) : latestPosts.length > 0 ? (
               latestPosts.map((post, idx) => {
                 const publishedAt = post?.publishedAt ?? post?.createdAt ?? post?.updatedAt;
-
                 return (
                   <article
-                    key={`${post.id}-${idx}}`}
-                    className="group relative flex flex-col items-start"
+                    key={`${post.id}-${idx}`}
+                    className="group py-6 first:pt-0 last:pb-0"
                   >
-                    <time
-                      className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono"
-                      dateTime={post.publishedAt || undefined}
-                    >
-                      {publishedAt
-                        ? new Date(publishedAt).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                          })
-                        : "-"}
-                    </time>
-                    <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                      <Link href={`/blog/${post.slug}`}>
-                        {post.title || post.slug.replace(/-/g, " ")}
-                      </Link>
-                    </h3>
-                    <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
-                      {post.excerpt && post.excerpt.replace(/[#*`]/g, "").substring(0, 180)}...
-                    </p>
+                    <Link href={`/blog/${post.slug}`} className="block space-y-1.5">
+                      <div className="flex items-center justify-between gap-4">
+                        <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">
+                          {post.title || post.slug.replace(/-/g, " ")}
+                        </h3>
+                        <ArrowRight className="w-4 h-4 shrink-0 text-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                      <p className="text-sm text-foreground/55 leading-relaxed line-clamp-2">
+                        {post.excerpt && post.excerpt.replace(/[#*`]/g, "").substring(0, 160)}
+                      </p>
+                      <time
+                        className="block text-xs font-medium text-foreground/35 font-mono pt-0.5"
+                        dateTime={post.publishedAt || undefined}
+                      >
+                        {publishedAt
+                          ? new Date(publishedAt).toLocaleDateString("en-US", {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "—"}
+                      </time>
+                    </Link>
                   </article>
                 );
               })
             ) : (
-              <p className="text-sm font-medium text-foreground/40 italic">
-                No posts published yet.
-              </p>
+              <p className="text-sm text-foreground/40 italic py-6">No posts published yet.</p>
             )}
           </div>
-          <Link
-            href="/blog"
-            className="inline-block text-sm font-medium text-foreground/60 hover:text-primary hover:underline underline-offset-4 transition-all"
-          >
-            View all posts
-          </Link>
         </div>
       </section>
 
-      {/* Featured Projects Section */}
+      {/* Projects */}
       <section className="border-b border-border">
-        <div className="max-w-3xl mx-auto px-6 py-12 space-y-8">
-          <h2 className="text-2xl font-bold">Featured Projects</h2>
+        <div className="max-w-7xl mx-auto py-12 space-y-8">
+          <div className="w-full max-w-3xl mx-auto flex items-center justify-between px-6">
+            <h2 className="text-lg font-bold tracking-tight">Projects</h2>
+            <Link
+              href="/projects"
+              className="text-xs font-semibold text-foreground/40 hover:text-primary transition-colors hover:underline underline-offset-4"
+            >
+              View all →
+            </Link>
+          </div>
 
-          <div className="flex flex-col gap-10">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 px-6">
             {projectsLoading ? (
-              <PostShimmer />
+              <ProjectShimmer count={6} />
             ) : featuredProjects.length > 0 ? (
               featuredProjects.map((project, idx) => {
                 const publishedAt =
                   project?.publishedAt ?? project?.createdAt ?? project?.updatedAt;
-
                 return (
-                  <article
+                  <Link
                     key={`${project.id}-${idx}`}
-                    className="group relative flex flex-col items-start"
+                    href={`/projects/${project.slug}`}
+                    className="group relative flex flex-col rounded-xl border border-border bg-background hover:bg-foreground/[0.03] hover:border-primary/30 overflow-hidden transition-all"
                   >
-                    <span className="order-first mb-1 flex items-center text-sm font-medium text-foreground/40 font-mono">
-                      {publishedAt
-                        ? new Date(publishedAt).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                          })
-                        : "-"}
-                    </span>
-                    <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                      <Link href={`/projects/${project.slug}`}>{project.title}</Link>
-                    </h3>
-                    <p className="mt-1 text-sm font-medium text-foreground/60 leading-6 line-clamp-3">
-                      {project.excerpt && project.excerpt.replace(/[#*`]/g, "").substring(0, 180)}
-                      ...
-                    </p>
-                  </article>
+                    <div className="flex flex-col gap-1.5 px-5 py-4">
+                      <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">
+                        {project.title}
+                      </h3>
+                      <p className="text-sm text-foreground/55 leading-relaxed line-clamp-2">
+                        {project.excerpt &&
+                          project.excerpt.replace(/[#*`]/g, "").substring(0, 160)}
+                      </p>
+                      <span className="text-xs font-medium text-foreground/35 font-mono mt-0.5">
+                        {publishedAt
+                          ? new Date(publishedAt).toLocaleDateString("en-US", {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "—"}
+                      </span>
+                    </div>
+                  </Link>
                 );
               })
             ) : (
-              <p className="text-sm font-medium text-foreground/40 italic">
-                No featured projects yet.
+              <p className="text-sm text-foreground/40 italic py-6 col-span-3">
+                No projects yet.
               </p>
             )}
           </div>
-          <Link
-            href="/projects"
-            className="inline-block text-sm font-medium text-foreground/60 hover:text-primary hover:underline underline-offset-4 transition-all"
-          >
-            View all projects
-          </Link>
         </div>
       </section>
+
     </div>
   );
 }
