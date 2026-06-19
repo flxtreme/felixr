@@ -12,10 +12,12 @@ import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { CreatePostPayload, Post } from "@/src/features/admin/posts/types";
 import type { Metadata } from "next";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDashboard } from "@/src/features/admin/DashboardContext";
 
 export default function PageCreateView() {
   const router = useRouter();
+  const { setGoBackUrl } = useDashboard();
   const {
     createPage,
     tagInput,
@@ -44,6 +46,10 @@ export default function PageCreateView() {
       console.error("Failed to create page", err);
     }
   };
+
+  useEffect(() => {
+    setGoBackUrl("/admin/pages");
+  }, []);
 
   return (
     <ManagePostLayout

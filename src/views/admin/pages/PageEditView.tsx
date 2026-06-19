@@ -14,10 +14,12 @@ import { UpdatePostPayload, Post } from "@/src/features/admin/posts/types";
 import type { Metadata } from "next";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useDashboard } from "@/src/features/admin/DashboardContext";
 
 export default function PageEditView() {
   const { id } = useParams();
   const router = useRouter();
+  const { setGoBackUrl } = useDashboard();
   const prevBaseRef = useRef<Partial<Post>>({}); 
 
   const {
@@ -72,6 +74,10 @@ export default function PageEditView() {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    setGoBackUrl("/admin/pages");
+  }, []);
 
   useEffect(() => {
     if (JSON.stringify(prevBaseRef.current) !== JSON.stringify(basePage)) {

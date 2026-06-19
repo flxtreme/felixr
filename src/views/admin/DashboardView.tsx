@@ -15,7 +15,7 @@ export default function DashboardView() {
   const { user } = useDashboard();
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-6 space-y-6">
       <header className="space-y-1">
         <h1 className="text-2xl font-bold">Overview</h1>
         <p className="text-sm font-mono font-medium text-foreground/40">

@@ -8,6 +8,7 @@ import { usePosts } from "@/src/features/admin/posts/hooks";
 import { usePostContext } from "@/src/features/admin/posts/PostsContext";
 import { Post } from "@/src/features/admin/posts/types";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
+import { Button } from "@/src/components/Button";
 
 export default function PostsListView({
   searchParams,
@@ -59,13 +60,12 @@ export default function PostsListView({
       skeletonWidth: "w-20",
       cell: (post) => (
         <span
-          className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-[2px] border uppercase ${
-            post.status === "PUBLISHED"
+          className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-[2px] border uppercase ${post.status === "PUBLISHED"
               ? "border-green-500/20 bg-green-500/5 text-green-500/60"
               : post.status === "DRAFT"
                 ? "border-blue-500/20 bg-blue-500/5 text-blue-500/60"
                 : "border-red-500/20 bg-red-500/5 text-red-500/60"
-          }`}
+            }`}
         >
           {post.status}
         </span>
@@ -86,22 +86,21 @@ export default function PostsListView({
       className: "text-right",
       skeletonWidth: "w-16",
       cell: (post) => (
-        <div className="flex items-center justify-end gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center justify-end gap-2 text-xs font-mono font-medium text-foreground/40">
           <Link
             href={`/admin/posts/${post.id}`}
-            className="text-foreground/40 hover:text-primary transition-colors"
-            aria-label="Edit post"
+            className="hover:text-primary hover:underline transition-colors"
           >
-            <Edit2 className="w-3.5 h-3.5" />
+            Edit
           </Link>
+          <span className="text-foreground/20">|</span>
           <button
             onClick={() => {
               if (window.confirm("Delete this post?")) removePost(post.id);
             }}
-            className="text-foreground/40 hover:text-red-500 transition-colors"
-            aria-label="Delete post"
+            className="hover:text-red-500 hover:underline transition-colors"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            Remove
           </button>
         </div>
       ),
@@ -109,7 +108,7 @@ export default function PostsListView({
   ];
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-6 space-y-6">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">Posts</h1>
@@ -119,10 +118,14 @@ export default function PostsListView({
         </div>
         <Link
           href="/admin/posts/new"
-          className="text-primary hover:underline text-sm font-medium flex items-center gap-1 transition-all"
         >
-          <Plus className="w-3.5 h-3.5" />
-          Create Post
+          <Button
+            variant="primary"
+            size="sm"
+          >
+            <span>Create Post</span>
+            <Plus className="size-4 ml-2" />
+          </Button>
         </Link>
       </header>
 
@@ -134,11 +137,10 @@ export default function PostsListView({
               setCurrentStatus(s);
               setCurrentPage(1);
             }}
-            className={`pb-4 text-xs font-mono font-bold uppercase tracking-wider transition-colors border-b-2 -mb-px ${
-              currentStatus === s
+            className={`pb-4 text-xs font-mono font-bold uppercase tracking-wider transition-colors border-b-2 -mb-px ${currentStatus === s
                 ? "border-primary text-primary"
                 : "border-transparent text-foreground/40 hover:text-foreground"
-            }`}
+              }`}
           >
             {s}
           </button>

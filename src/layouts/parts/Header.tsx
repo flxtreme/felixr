@@ -7,6 +7,7 @@ import { Sun, Moon } from "lucide-react";
 import { cln } from "@/src/utils/cln";
 import { useTheme } from "@/src/contexts/ThemeContext";
 import { navItems } from "@/src/config/nav";
+import { Button } from "@/src/components/Button";
 
 export const Header = () => {
   const pathname = usePathname();
@@ -73,17 +74,19 @@ export const Header = () => {
           </nav>
 
           {/* Theme toggle */}
-          <button
+          <Button
+            variant="tertiary"
+            size="sm"
+            square
             onClick={toggleTheme}
-            className="p-1.5 rounded-md text-foreground/40 hover:text-primary hover:bg-foreground/5 transition-all"
-            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
           >
+
             {theme === "light" ? (
-              <Moon className="w-4 h-4" />
+              <Moon className="size-4" />
             ) : (
-              <Sun className="w-4 h-4" />
+              <Sun className="size-4" />
             )}
-          </button>
+          </Button>
         </div>
 
       </div>

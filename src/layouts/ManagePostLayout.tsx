@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ReactNode } from "react";
 import Shimmer from "@/src/components/shimmer/Shimmer";
 import { EditorShimmer, SidebarShimmer } from "@/src/components/shimmer/EditorShimmer";
+import { Button } from "@/src/components/Button";
 
 interface ManagePostLayoutProps {
   pageTitle: string;
@@ -28,12 +29,6 @@ export function ManagePostLayout({
   return (
     <div className="flex flex-col h-full bg-background">
       <header className="h-12 border-b border-border flex items-center px-6 gap-3 shrink-0 bg-background z-10">
-        <Link
-          href={backHref}
-          className="text-foreground/40 hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
         {isLoading ? (
           <Shimmer className="h-4 w-40" />
         ) : (
@@ -52,11 +47,8 @@ export function ManagePostLayout({
           </div>
 
           <div className="shrink-0 border-t border-border px-5 py-3 flex items-center gap-3 bg-background">
-            <Link
-              href={backHref}
-              className="flex items-center justify-center gap-1.5 border border-border text-foreground/50 hover:text-foreground text-xs font-mono font-medium px-3 py-2 rounded-sm transition-colors"
-            >
-              Cancel
+            <Link href={backHref}>
+              <Button variant="tertiary" size="sm">Cancel</Button>
             </Link>
             <button
               type="button"

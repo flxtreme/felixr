@@ -23,6 +23,7 @@ export interface Post {
 }
 
 export interface GetPostsQuery {
+  search?: string;
   offset?: number;
   limit?: number;
   status?: PostStatus;

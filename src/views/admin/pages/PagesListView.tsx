@@ -8,6 +8,7 @@ import { usePosts } from "@/src/features/admin/posts/hooks";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { Post } from "@/src/features/admin/posts/types";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
+import { Button } from "@/src/components/Button";
 
 export default function PagesListView({
   searchParams,
@@ -86,22 +87,21 @@ export default function PagesListView({
       className: "text-right",
       skeletonWidth: "w-16",
       cell: (page) => (
-        <div className="flex items-center justify-end gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center justify-end gap-2 text-xs font-mono font-medium text-foreground/40">
           <Link
             href={`/admin/pages/${page.id}`}
-            className="text-foreground/40 hover:text-primary transition-colors"
-            aria-label="Edit page"
+            className="hover:text-primary hover:underline transition-colors"
           >
-            <Edit2 className="w-3.5 h-3.5" />
+            Edit
           </Link>
+          <span className="text-foreground/20">|</span>
           <button
             onClick={() => {
               if (window.confirm("Delete this page?")) removePage(page.id);
             }}
-            className="text-foreground/40 hover:text-red-500 transition-colors"
-            aria-label="Delete page"
+            className="hover:text-red-500 hover:underline transition-colors"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            Remove
           </button>
         </div>
       ),
@@ -109,7 +109,7 @@ export default function PagesListView({
   ];
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-6 space-y-6">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">Pages</h1>
@@ -119,10 +119,14 @@ export default function PagesListView({
         </div>
         <Link
           href="/admin/pages/new"
-          className="text-primary hover:underline text-sm font-medium flex items-center gap-1 transition-all"
         >
-          <Plus className="w-3.5 h-3.5" />
-          Create Page
+          <Button
+            variant="primary"
+            size="sm"
+          >
+            <span>Create Page</span>
+            <Plus className="size-4 ml-2" />
+          </Button>
         </Link>
       </header>
 

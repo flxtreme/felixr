@@ -7,6 +7,7 @@ import { Pagination } from "@/src/components/Pagination";
 import { useTagsContext } from "@/src/features/admin/tags/TagsContext";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
 import { Tag } from "@/src/features/admin/tags/types";
+import { Button } from "@/src/components/Button";
 
 export default function TagsListView({
   searchParams,
@@ -71,24 +72,23 @@ export default function TagsListView({
       className: "text-right",
       skeletonWidth: "w-16",
       cell: (tag) => (
-        <div className="flex items-center justify-end gap-4">
+        <div className="flex items-center justify-end gap-2 text-xs font-mono font-medium text-foreground/40">
           <Link
             href={`/admin/tags/${tag.id}`}
-            className="text-foreground/40 hover:text-primary transition-colors"
-            aria-label="Edit tag"
+            className="hover:text-primary hover:underline transition-colors"
           >
-            <Edit2 className="w-3.5 h-3.5" />
+            Edit
           </Link>
+          <span className="text-foreground/20">|</span>
           <button
             onClick={() => {
               if (window.confirm("Are you sure you want to delete this tag?")) {
                 removeTag(tag.id, { isPermanent: false });
               }
             }}
-            className="text-foreground/40 hover:text-red-500 transition-colors"
-            aria-label="Delete tag"
+            className="hover:text-red-500 hover:underline transition-colors"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            Remove
           </button>
         </div>
       ),
@@ -96,7 +96,7 @@ export default function TagsListView({
   ];
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-6 space-y-6">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">Tags</h1>
@@ -106,10 +106,14 @@ export default function TagsListView({
         </div>
         <Link
           href="/admin/tags/new"
-          className="text-primary hover:underline text-sm font-medium flex items-center gap-1 transition-all"
         >
-          <Plus className="w-3.5 h-3.5" />
-          Create Tag
+          <Button
+            variant="primary"
+            size="sm"
+          >
+            <span>Create Tag</span>
+            <Plus className="size-4 ml-2" />
+          </Button>
         </Link>
       </header>
 

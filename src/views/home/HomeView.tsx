@@ -4,7 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { usePosts } from "@/src/features/public/posts/hooks";
+import { useProjects } from "@/src/features/public/projects/hooks";
 import { PostShimmer, ProjectShimmer } from "@/src/components/shimmer/PostShimmer";
+import { SOCIAL_ICONS } from "@/src/common/icons";
+import { stringToKey } from "@/src/utils/string";
+import { cln } from "@/src/utils/cln";
+import { Button } from "@/src/components/Button";
+import { ProjectCard } from "@/src/features/public/components/ProjectCard";
 
 const socialLinks = [
   { label: "GitHub", href: "https://github.com/flxtreme" },
@@ -19,10 +25,7 @@ export default function HomeView() {
     limit: 3,
   });
 
-  const { posts: featuredProjects, isLoading: projectsLoading } = usePosts({
-    postType: "PAGE",
-    status: "PUBLISHED",
-    tags: ["project", "projects"],
+  const { projects: featuredProjects, isLoading: projectsLoading } = useProjects({
     limit: 6,
   });
 
@@ -70,17 +73,22 @@ export default function HomeView() {
             </Link>
 
             <div className="flex items-center gap-4">
-              {socialLinks.map(({ label, href }) => (
-                <Link
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-foreground/40 hover:text-primary hover:underline underline-offset-4 transition-colors"
-                >
-                  {label}
-                </Link>
-              ))}
+              {socialLinks.map(({ label, href }) => {
+                const iconKey = stringToKey(label);
+                const Icon = SOCIAL_ICONS[iconKey];
+                return (
+                  <Link
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm font-medium text-foreground/40 hover:text-primary transition-colors group"
+                  >
+                    {Icon && <Icon className="w-4 h-4 group-hover:text-primary transition-colors" />}
+                    <span className="group-hover:underline underline-offset-4">{label}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -93,9 +101,13 @@ export default function HomeView() {
             <h2 className="text-lg font-bold tracking-tight">Latest Posts</h2>
             <Link
               href="/blog"
-              className="text-xs font-semibold text-foreground/40 hover:text-primary transition-colors hover:underline underline-offset-4"
             >
-              View all →
+              <Button
+                variant="tertiary"
+                size="sm"
+              >
+                View all
+              </Button>
             </Link>
           </div>
 
@@ -112,7 +124,7 @@ export default function HomeView() {
                   >
                     <Link href={`/blog/${post.slug}`} className="block space-y-1.5">
                       <div className="flex items-center justify-between gap-4">
-                        <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">
+                        <h3 className="group-hover:underline text-base font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">
                           {post.title || post.slug.replace(/-/g, " ")}
                         </h3>
                         <ArrowRight className="w-4 h-4 shrink-0 text-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
@@ -126,10 +138,10 @@ export default function HomeView() {
                       >
                         {publishedAt
                           ? new Date(publishedAt).toLocaleDateString("en-US", {
-                              month: "long",
-                              day: "numeric",
-                              year: "numeric",
-                            })
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                           : "—"}
                       </time>
                     </Link>
@@ -145,50 +157,38 @@ export default function HomeView() {
 
       {/* Projects */}
       <section className="border-b border-border">
-        <div className="max-w-7xl mx-auto py-12 space-y-8">
+        <div className={cln(
+          "mx-auto py-12 space-y-8",
+          featuredProjects.length >= 3 && "max-w-7xl",
+          featuredProjects.length === 2 && "max-w-5xl",
+          featuredProjects.length <= 1 && "max-w-3xl"
+        )}>
           <div className="w-full max-w-3xl mx-auto flex items-center justify-between px-6">
             <h2 className="text-lg font-bold tracking-tight">Projects</h2>
             <Link
               href="/projects"
-              className="text-xs font-semibold text-foreground/40 hover:text-primary transition-colors hover:underline underline-offset-4"
             >
-              View all →
+              <Button
+                variant="tertiary"
+                size="sm"
+              >
+                View all
+              </Button>
             </Link>
           </div>
 
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 px-6">
+          <div className={cln(
+            "grid gap-4 px-6",
+            featuredProjects.length === 1 && "grid-cols-1",
+            featuredProjects.length === 2 && "grid-cols-1 sm:grid-cols-2",
+            featuredProjects.length >= 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+          )}>
             {projectsLoading ? (
               <ProjectShimmer count={6} />
             ) : featuredProjects.length > 0 ? (
               featuredProjects.map((project, idx) => {
-                const publishedAt =
-                  project?.publishedAt ?? project?.createdAt ?? project?.updatedAt;
-                return (
-                  <Link
-                    key={`${project.id}-${idx}`}
-                    href={`/projects/${project.slug}`}
-                    className="group relative flex flex-col rounded-xl border border-border bg-background hover:bg-foreground/[0.03] hover:border-primary/30 overflow-hidden transition-all"
-                  >
-                    <div className="flex flex-col gap-1.5 px-5 py-4">
-                      <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">
-                        {project.title}
-                      </h3>
-                      <p className="text-sm text-foreground/55 leading-relaxed line-clamp-2">
-                        {project.excerpt &&
-                          project.excerpt.replace(/[#*`]/g, "").substring(0, 160)}
-                      </p>
-                      <span className="text-xs font-medium text-foreground/35 font-mono mt-0.5">
-                        {publishedAt
-                          ? new Date(publishedAt).toLocaleDateString("en-US", {
-                              month: "long",
-                              day: "numeric",
-                              year: "numeric",
-                            })
-                          : "—"}
-                      </span>
-                    </div>
-                  </Link>
-                );
+
+                return <ProjectCard key={`project-item-${idx}`} project={project} />
               })
             ) : (
               <p className="text-sm text-foreground/40 italic py-6 col-span-3">

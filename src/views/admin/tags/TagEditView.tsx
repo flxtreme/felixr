@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useTagsContext } from "@/src/features/admin/tags/TagsContext";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/src/components/Button";
 
 export default function TagEditView() {
   const router = useRouter();
@@ -59,12 +60,11 @@ export default function TagEditView() {
   return (
     <div className="p-8 max-w-2xl space-y-6">
       <header className="space-y-4">
-        <Link
-          href="/admin/tags"
-          className="text-xs font-mono font-medium text-foreground/40 hover:text-primary flex items-center gap-1 transition-colors w-fit"
-        >
-          <ChevronLeft className="w-3 h-3" />
-          Back to Tags
+        <Link href="/admin/tags">
+          <Button variant="tertiary" size="sm">
+            <ChevronLeft className="w-3.5 h-3.5" />
+            Back to Tags
+          </Button>
         </Link>
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">Edit Tag</h1>
@@ -136,16 +136,12 @@ export default function TagEditView() {
         )}
 
         <div className="flex items-center gap-4">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="h-10 px-6 bg-primary text-white rounded font-mono font-bold text-xs hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
+          <Button type="submit" disabled={isSubmitting} variant="primary">
             {isSubmitting ? "SAVING..." : "UPDATE TAG"}
-          </button>
+          </Button>
           <Link
             href="/admin/tags"
-            className="h-10 px-6 border border-border rounded font-mono font-bold text-xs flex items-center justify-center hover:bg-foreground/5 transition-colors"
+            className="inline-flex items-center justify-center h-10 px-4 text-sm rounded-md border border-foreground bg-transparent text-foreground hover:bg-foreground/10 transition-colors"
           >
             CANCEL
           </Link>

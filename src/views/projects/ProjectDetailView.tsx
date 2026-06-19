@@ -10,7 +10,7 @@ import { TagFooter } from "@/src/features/public/components/Tags";
 import { useMemo } from "react";
 
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string, }>;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

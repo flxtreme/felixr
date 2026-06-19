@@ -16,6 +16,10 @@ const buildQuery = (params?: GetPostsQuery) => {
 
   const searchParams = new URLSearchParams();
 
+  if (params.search !== undefined) {
+    searchParams.append("search", String(params.search));
+  }
+
   if (params.offset !== undefined) {
     searchParams.append("offset", String(params.offset));
   }
