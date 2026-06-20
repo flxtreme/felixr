@@ -28,7 +28,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary: "bg-primary text-white border border-primary hover:bg-primary/90",
   secondary: "bg-secondary text-white border border-secondary hover:bg-secondary/90",
   outline: "bg-transparent text-foreground border border-foreground hover:bg-foreground/10",
-  tertiary: "bg-foreground/5 text-foreground/60 border border-foreground/20 hover:bg-foreground/10 hover:text-foreground shadow-sm",
+  tertiary: "bg-foreground/5 text-foreground/60 border border-foreground/20 hover:bg-foreground/10 hover:text-foreground shadow-xs",
 };
 
 export const Button: React.FC<ButtonProps> = ({

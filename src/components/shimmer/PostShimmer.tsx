@@ -24,23 +24,19 @@ const PostShimmer = ({ count = 3 }: PostShimmerProps) => {
 };
 
 // Matches the bordered card grid in HomeView (3-col with image carousel)
-const ProjectShimmer = ({ count = 6 }: PostShimmerProps) => {
+const ProjectCardShimmer = () => {
   return (
-    <>
-      {[...Array(count)].map((_, i) => (
-        <div key={i} className="rounded-xl border border-border overflow-hidden flex flex-col gap-0">
-          {/* Image placeholder matching aspect-video */}
-          <Shimmer className="w-full aspect-video rounded-none" />
-          <div className="flex flex-col gap-2 px-5 pb-4 pt-3">
-            <Shimmer className="h-4 w-2/3" />
-            <Shimmer className="h-3.5 w-full" />
-            <Shimmer className="h-3.5 w-4/5" />
-            <Shimmer className="h-3 w-24 mt-0.5" />
-          </div>
-        </div>
-      ))}
-    </>
+    <div className="p-4 border-l-6 border-primary/20 bg-primary/5 space-y-2 min-h-[173.5]">
+      <Shimmer className="h-5 w-40 mb-4" />
+      <Shimmer className="h-4 w-full" />
+      <Shimmer className="h-4 w-1/2" />
+      <Shimmer className="h-3 w-30" />
+      <div className="flex items-center gap-2 mt-3">
+        <Shimmer className="size-8 rounded" />
+        <Shimmer className="size-8 rounded" />
+      </div>
+    </div>
   );
 };
 
-export { PostShimmer, ProjectShimmer };
+export { PostShimmer, ProjectCardShimmer };

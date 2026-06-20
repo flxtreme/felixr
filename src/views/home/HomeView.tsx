@@ -5,18 +5,19 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { usePosts } from "@/src/features/public/posts/hooks";
 import { useProjects } from "@/src/features/public/projects/hooks";
-import { PostShimmer, ProjectShimmer } from "@/src/components/shimmer/PostShimmer";
+import { PostShimmer, ProjectCardShimmer } from "@/src/components/shimmer/PostShimmer";
 import { SOCIAL_ICONS } from "@/src/common/icons";
 import { stringToKey } from "@/src/utils/string";
 import { cln } from "@/src/utils/cln";
 import { Button } from "@/src/components/Button";
 import { ProjectCard } from "@/src/features/public/components/ProjectCard";
+import { TechStackMarquee } from "@/src/features/public/components/TechStackMarquee";
 
 const socialLinks = [
   { label: "GitHub", href: "https://github.com/flxtreme" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/flxtremee" },
-  { label: "X", href: "https://x.com/flxtremee" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/flxrzjr" },
 ];
+
 
 export default function HomeView() {
   const { posts: latestPosts, isLoading: postsLoading } = usePosts({
@@ -33,12 +34,12 @@ export default function HomeView() {
     <div className="flex flex-col">
 
       {/* Hero / About */}
-      <section className="border-b border-border">
+      <section className="hero">
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-14">
 
           {/* Avatar + name row */}
           <div className="flex items-center gap-5 mb-6">
-            <div className="relative w-16 h-16 shrink-0 rounded-full overflow-hidden ring-2 ring-border">
+            <div className="relative w-24 h-24 shrink-0 rounded-full overflow-hidden ring-4 ring-primary/40">
               <Image
                 src="/og-image.jpg"
                 alt="Felix R"
@@ -59,19 +60,12 @@ export default function HomeView() {
           <p className="text-xl font-semibold text-foreground leading-snug max-w-lg mb-2">
             Full-Stack | Agentic
           </p>
-          <p className="text-base text-foreground/55 leading-relaxed max-w-xl mb-8">
+          <p className="text-base text-foreground/55 leading-relaxed max-w-xl mb-6">
             I love coding, been at it for nearly 8 years now.
           </p>
 
           {/* CTA + socials */}
           <div className="flex flex-wrap items-center gap-6">
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
-            >
-              More about me <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-
             <div className="flex items-center gap-4">
               {socialLinks.map(({ label, href }) => {
                 const iconKey = stringToKey(label);
@@ -90,24 +84,100 @@ export default function HomeView() {
                 );
               })}
             </div>
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
+            >
+              Know me better <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="p-4 text-sm text-foreground/60 border-l-6 border-primary bg-primary/5 font-medium mt-8">
+            <p className="mb-4">I'm currently available for freelance work and part-time roles.</p>
+            <div className="flex gap-4 items-center">
+              <Link
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=flxrzjr@gmail.com&su=Let's%20Build%20Something%20Amazing%20Together&body=Hi%20Felix,%0A%0AI%20came%20across%20your%20portfolio%20and%20would%20love%20to%20discuss%20a%20potential%20project%20or%20opportunity.%0A%0AProject%20Overview:%20%0A%0ATimeline:%20%0A%0ABudget:%20%0A%0AAdditional%20Details:%20%0A%0ALooking%20forward%20to%20hearing%20from%20you.%0A%0ABest%20regards,"
+                target="_blank"
+              >
+                <Button variant="tertiary" size="sm">
+                  Hire Me
+                </Button>
+              </Link>
+              <Link
+                href="/resume/"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
+              >
+                Download CV
+              </Link>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Tech Stack */}
+      <section className="skills pb-6">
+        <TechStackMarquee />
+      </section>
+
+      {/* Projects */}
+      <section className="projects bg-surface">
+        <div className={cln(
+          "mx-auto py-12 space-y-8",
+          projectsLoading && "max-w-7xl",
+          featuredProjects.length >= 3 && "max-w-7xl",
+          featuredProjects.length === 2 && "max-w-5xl",
+          (featuredProjects.length <= 1 && !projectsLoading) && "max-w-3xl"
+        )}>
+          <div className="w-full max-w-3xl mx-auto flex items-center justify-between px-6">
+            <h2 className="text-lg font-bold tracking-tight">Projects</h2>
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
+            >
+              View all <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div>
+            {projectsLoading ? (
+              <div className={cln(
+                "grid gap-4 px-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              )}>
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <ProjectCardShimmer key={`project-shimmer-${idx}`} />
+                ))}
+              </div>
+            ) : featuredProjects.length > 0 ? (
+              <div className={cln(
+                "grid gap-4 px-6",
+                featuredProjects.length === 1 && "grid-cols-1",
+                featuredProjects.length === 2 && "grid-cols-1 sm:grid-cols-2",
+                featuredProjects.length >= 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              )}>
+                {featuredProjects.map((project, idx) => {
+                  return <ProjectCard key={`project-item-${idx}`} project={project} />
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-foreground/40 italic py-6 col-span-3">
+                No projects yet.
+              </p>
+            )}
           </div>
         </div>
       </section>
 
       {/* Latest Posts */}
-      <section className="border-b border-border">
+      <section className="posts border-b border-border">
         <div className="max-w-3xl mx-auto px-6 py-12 space-y-8">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold tracking-tight">Latest Posts</h2>
             <Link
               href="/blog"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
             >
-              <Button
-                variant="tertiary"
-                size="sm"
-              >
-                View all
-              </Button>
+              View all <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
@@ -150,50 +220,6 @@ export default function HomeView() {
               })
             ) : (
               <p className="text-sm text-foreground/40 italic py-6">No posts published yet.</p>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Projects */}
-      <section className="border-b border-border">
-        <div className={cln(
-          "mx-auto py-12 space-y-8",
-          featuredProjects.length >= 3 && "max-w-7xl",
-          featuredProjects.length === 2 && "max-w-5xl",
-          featuredProjects.length <= 1 && "max-w-3xl"
-        )}>
-          <div className="w-full max-w-3xl mx-auto flex items-center justify-between px-6">
-            <h2 className="text-lg font-bold tracking-tight">Projects</h2>
-            <Link
-              href="/projects"
-            >
-              <Button
-                variant="tertiary"
-                size="sm"
-              >
-                View all
-              </Button>
-            </Link>
-          </div>
-
-          <div className={cln(
-            "grid gap-4 px-6",
-            featuredProjects.length === 1 && "grid-cols-1",
-            featuredProjects.length === 2 && "grid-cols-1 sm:grid-cols-2",
-            featuredProjects.length >= 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-          )}>
-            {projectsLoading ? (
-              <ProjectShimmer count={6} />
-            ) : featuredProjects.length > 0 ? (
-              featuredProjects.map((project, idx) => {
-
-                return <ProjectCard key={`project-item-${idx}`} project={project} />
-              })
-            ) : (
-              <p className="text-sm text-foreground/40 italic py-6 col-span-3">
-                No projects yet.
-              </p>
             )}
           </div>
         </div>

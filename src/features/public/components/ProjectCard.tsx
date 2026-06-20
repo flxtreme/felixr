@@ -15,7 +15,7 @@ export const ProjectCard = ({ project, noCard = false }: ProjectProps) => {
     page?.publishedAt ?? page?.createdAt ?? page?.updatedAt;
   return (
     <div
-      className={cln("group relative flex flex-col transition-all", noCard ? "" : "rounded-xl border border-border bg-background hover:bg-foreground/[0.03] hover:border-primary/30 overflow-hidden")}
+      className={cln("group relative flex flex-col transition-all", noCard ? "" : "border-l-6 border-primary/20 hover:border-primary bg-primary/5 hover:bg-primary/10 overflow-hidden")}
     >
       <div className={cln("flex flex-col gap-1.5", noCard ? "" : "px-5 py-4")}>
         <Link

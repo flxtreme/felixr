@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Felix Ruz - Resume</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #0f172a;
+            --secondary: #334155;
+            --accent: #2563eb;
+            --bg: #ffffff;
+            --text: #1e293b;
+            --light-bg: #f0f4f8;
+            --border: #cbd5e1;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #94a3b8;
+            color: var(--text);
+            line-height: 1.35;
+            font-size: 8pt;
+        }
+        
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: var(--bg);
+            margin: 5px auto;
+            padding: 10mm;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @media print {
+            body { background: none; margin: 0; }
+            .page {
+                margin: 0; box-shadow: none; width: 100%; height: 100%;
+                padding: 4mm 6mm;
+            }
+            .no-print { display: none !important; }
+            @page { size: A4; margin: 0; }
+        }
+        
+        header { 
+            text-align: left; 
+            margin-bottom: 15px; 
+        }
+        h1 { 
+            font-size: 24pt; 
+            font-weight: 700; 
+            color: var(--primary); 
+            letter-spacing: 1px; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+        }
+        .contact { 
+            font-size: 8.5pt; 
+            color: var(--secondary); 
+            font-weight: 500; 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap;
+        }
+        .contact span { display: flex; align-items: center; gap: 6px; }
+        .lucide { width: 14px; height: 14px; stroke-width: 2.5px; }
+        
+        .layout {
+            display: flex;
+            gap: 20px;
+            height: calc(100% - 75px);
+        }
+        
+        .left-col {
+            width: 25%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-right: 1px solid var(--border);
+            padding-right: 8px;
+        }
+        
+        .right-col {
+            width: 75%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        h2 {
+            font-size: 11pt; 
+            color: var(--primary); 
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-text { 
+            text-align: justify; 
+            margin-bottom: 0; 
+            margin-bottom: 15px; 
+        }
+        p, li { text-align: left; }
+        
+        .sidebar-item h3 { font-size: 9pt; color: var(--primary); font-weight: 700; margin-bottom: 2px; }
+        .sidebar-item p { font-size: 8pt; color: var(--secondary); margin-bottom: 2px; }
+        .sidebar-item ul { padding-left: 16px; margin-top: 4px; }
+        .sidebar-item li { font-size: 8pt; color: var(--secondary); margin-bottom: 3px; }
+        
+        .tech-card {
+            border-radius: 5px;
+            margin-bottom: 12px;
+        }
+        .tech-title { font-weight: 700; font-size: 8pt; color: #000000; margin-bottom: 1px; text-transform: uppercase; }
+        .tech-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+        .tech-badge { 
+            padding: 1px 5px; 
+            border-radius: 12px; 
+            font-size: 7pt; 
+            font-weight: 600; 
+            border: 1px solid transparent;
+            white-space: nowrap;
+            display: flex; 
+            align-items: center; 
+            gap: 4px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .tech-react { background-color: #20232a; color: #61DAFB; }
+        .tech-nextjs { background-color: #000000; color: #ffffff; }
+        .tech-tailwind { background-color: #38BDF8; color: #ffffff; }
+        .tech-vite { background-color: #646CFF; color: #ffffff; }
+        .tech-angular { background-color: #DD0031; color: #ffffff; }
+        .tech-flutter { background-color: #02569B; color: #ffffff; }
+        .tech-nodejs { background-color: #339933; color: #ffffff; }
+        .tech-nestjs { background-color: #E0234E; color: #ffffff; }
+        .tech-fastify, .tech-express, .tech-cursor, .tech-copilot { background-color: #000000; color: #ffffff; }
+        .tech-postgres { background-color: #336791; color: #ffffff; }
+        .tech-drizzle { background-color: #C5F74F; color: #000000; }
+        .tech-prisma { background-color: #2D3748; color: #ffffff; }
+        .tech-gcp, .tech-bigquery, .tech-pubsub { background-color: #4285F4; color: #ffffff; }
+        .tech-firestore { background-color: #FFCA28; color: #000000; }
+        .tech-claude { background-color: #D97757; color: #ffffff; }
+        .tech-gemini { background-color: #1a73e8; color: #ffffff; }
+        .tech-jira { background-color: #0052CC; color: #ffffff; }
+        .tech-postman { background-color: #FF6C37; color: #ffffff; }
+        .tech-figma { background-color: #F24E1E; color: #ffffff; }
+        .tech-generic { background-color: #e2e8f0; color: #475569; }
+        .badge-contact { background-color: #f0f4f8; color: #334155; border-color: #cbd5e1; padding: 3px 10px; }
+        .badge-interest { background-color: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
+        .badge-remote { background-color: #dcfce7; color: #16a34a; border-color: #bbf7d0; }
+        .badge-onsite { background-color: #fffbe0; color: #b45309; border-color: #fde68a; }
+        .badge-regular { background-color: #dcfce7; color: #16a34a; border-color: #bbf7d0; }
+        .badge-freelance { background-color: #fffbe0; color: #b45309; border-color: #fde68a; }
+        
+        .job { margin-bottom: 10px; }
+        .job-header { margin-bottom: 3px; }
+        .job-title { font-weight: 700; font-size: 10pt; color: var(--primary); }
+        .job-company { font-weight: 500; color: var(--accent); }
+        .job-meta { font-size: 8pt; color: var(--secondary); font-weight: 600; margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+        
+        .right-col ul { padding-left: 16px; }
+        .job ul li { margin-bottom: 3.5px; font-size: 8pt; }
+        
+        .print-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            background-color: var(--accent); color: white; border: none;
+            padding: 12px 24px; font-size: 14px; font-weight: bold;
+            border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            transition: transform 0.2s, background-color 0.2s; z-index: 1000;
+        }
+        .print-btn:hover { background-color: #1d4ed8; transform: translateY(-2px); }
+        .print-btn .lucide { width: 18px; height: 18px; }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">
+        <i data-lucide="printer"></i> Print
+    </button>
+
+    <div class="page">
+        <header>
+            <h1>Felix Ruz</h1>
+            <div class="contact">
+                <span class="tech-badge badge-contact" style="background-color: #f0f4f8; color: #334155; padding: 3px 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact;"><i data-lucide="phone"></i> +63 950 345 9931</span>
+                <span class="tech-badge badge-contact" style="background-color: #f0f4f8; color: #334155; padding: 3px 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact;"><i data-lucide="mail"></i> flxrzjr@gmail.com</span>
+                <span class="tech-badge badge-contact" style="background-color: #f0f4f8; color: #334155; padding: 3px 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact;"><i data-lucide="map-pin"></i> Lucena City, Philippines</span>
+            </div>
+        </header>
+
+        <section>
+            <p class="summary-text">Software Engineer and Agentic Engineer with nearly 8 years of experience delivering high-impact web and mobile applications for global teams. I practice agentic engineering, leveraging AI tools to automate development workflows, accelerate delivery cycles, and consistently ship high-quality software. My approach balances technical full-stack expertise with AI-driven methodologies to build robust digital products that drive business value.</p>
+        </section>
+
+        <div class="layout">
+            <!-- Left Column -->
+            <div class="left-col">
+                <div class="sidebar-item">
+                    <h2>Core Tech Stack</h2>
+                    <div class="tech-card">
+                        <div class="tech-title">Frontend</div>
+                        <div class="tech-badges">
+                            <span class="tech-badge tech-react" style="background-color: #20232a; color: #61DAFB; -webkit-print-color-adjust: exact; print-color-adjust: exact;">React</span>
+                            <span class="tech-badge tech-nextjs" style="background-color: #000000; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Next.js</span>
+                            <span class="tech-badge tech-tailwind" style="background-color: #38BDF8; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Tailwind</span>
+                            <span class="tech-badge tech-vite" style="background-color: #646CFF; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Vite</span>
+                            <span class="tech-badge tech-angular" style="background-color: #DD0031; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Angular</span>
+                            <span class="tech-badge tech-flutter" style="background-color: #02569B; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Flutter</span>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-title">Backend</div>
+                        <div class="tech-badges">
+                            <span class="tech-badge tech-nodejs" style="background-color: #339933; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Node.js</span>
+                            <span class="tech-badge tech-nestjs" style="background-color: #E0234E; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">NestJS</span>
+                            <span class="tech-badge tech-fastify" style="background-color: #000000; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Fastify</span>
+                            <span class="tech-badge tech-express" style="background-color: #000000; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Express</span>
+                            <span class="tech-badge tech-postgres" style="background-color: #336791; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">PostgreSQL</span>
+                            <span class="tech-badge tech-drizzle" style="background-color: #C5F74F; color: #000000; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Drizzle</span>
+                            <span class="tech-badge tech-prisma" style="background-color: #2D3748; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Prisma</span>
+                            <span class="tech-badge tech-bigquery" style="background-color: #4285F4; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">BigQuery</span>
+                            <span class="tech-badge tech-generic" style="background-color: #e2e8f0; color: #475569; -webkit-print-color-adjust: exact; print-color-adjust: exact;">REST</span>
+                            <span class="tech-badge tech-generic" style="background-color: #e2e8f0; color: #475569; -webkit-print-color-adjust: exact; print-color-adjust: exact;">SOAP</span>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-title">Cloud & DevOps</div>
+                        <div class="tech-badges">
+                            <span class="tech-badge tech-gcp" style="background-color: #4285F4; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Google Cloud</span>
+                            <span class="tech-badge tech-firestore" style="background-color: #FFCA28; color: #000000; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Cloud Firestore</span>
+                            <span class="tech-badge tech-pubsub" style="background-color: #4285F4; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Pub/Sub</span>
+                            <span class="tech-badge tech-generic" style="background-color: #e2e8f0; color: #475569; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Git</span>
+                            <span class="tech-badge tech-generic" style="background-color: #e2e8f0; color: #475569; -webkit-print-color-adjust: exact; print-color-adjust: exact;">GitLab</span>
+                            <span class="tech-badge tech-generic" style="background-color: #e2e8f0; color: #475569; -webkit-print-color-adjust: exact; print-color-adjust: exact;">CI/CD</span>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-title">AI & Agentic Tools</div>
+                        <div class="tech-badges">
+                            <span class="tech-badge tech-claude" style="background-color: #D97757; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Claude</span>
+                            <span class="tech-badge tech-cursor" style="background-color: #000000; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Cursor</span>
+                            <span class="tech-badge tech-gemini" style="background-color: #1a73e8; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Gemini</span>
+                            <span class="tech-badge tech-copilot" style="background-color: #000000; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">GitHub Copilot</span>
+                            <span class="tech-badge tech-generic" style="background-color: #e2e8f0; color: #475569; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Antigravity</span>
+                            <span class="tech-badge tech-generic" style="background-color: #e2e8f0; color: #475569; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Vibe Coding</span>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-title">Tools & Design</div>
+                        <div class="tech-badges">
+                            <span class="tech-badge tech-jira" style="background-color: #0052CC; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Jira</span>
+                            <span class="tech-badge tech-postman" style="background-color: #FF6C37; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Postman</span>
+                            <span class="tech-badge tech-figma" style="background-color: #F24E1E; color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Figma</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-item">
+                    <h2>Certification</h2>
+                    <h3>ITIL Foundation Certificate</h3>
+                    <p>IT Service Management</p>
+                    <p>PeopleCert &bull; <em>March 2025</em></p>
+                </div>
+                <div class="sidebar-item">
+                    <h2>Education</h2>
+                    <h3>BS in Information Technology</h3>
+                    <p>Dalubhasaan ng Lungsod ng Lucena</p>
+                    <p><em>2018</em></p>
+                </div>
+                
+                <div class="sidebar-item">
+                    <h2>Interests</h2>
+                    <div class="tech-badges">
+                        <span class="tech-badge badge-interest" style="background-color: #fef2f2; color: #b91c1c; -webkit-print-color-adjust: exact; print-color-adjust: exact;">WFH Setup</span>
+                        <span class="tech-badge badge-interest" style="background-color: #fef2f2; color: #b91c1c; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Visa Sponsorship</span>
+                        <span class="tech-badge badge-interest" style="background-color: #fef2f2; color: #b91c1c; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Australia</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-col">
+                <section>
+                    <h2>Experience</h2>
+                    
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="job-title">Software Engineer <span class="job-company">| AirAsia Philippines, Inc.</span></div>
+                            <div class="job-meta">
+                                <span style="color: #94a3b8;">Philippines</span>
+                                <span class="tech-badge badge-remote" style="background-color: #dcfce7; color: #16a34a; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Remote</span>
+                                <span class="tech-badge badge-regular" style="background-color: #dcfce7; color: #16a34a; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Regular</span>
+                                <span style="margin-left: auto;">Nov 2022 – Present</span>
+                            </div>
+                        </div>
+                        <ul>
+                            <li>Pioneered AI-assisted and vibe coding workflows on the team, accelerating development cycles and elevating code quality.</li>
+                            <li>Pioneered development of an internal airline system and co-led the development of its pricing module.</li>
+                            <li>Engineered a data sync service that fetches Workday updates, persists them to a central database, and propagates changes to downstream applications.</li>
+                            <li>Revamped a Vite module-federated flight scheduling app, integrating 25 report modules each with distinct UI, data sources, and Excel and PDF exports.</li>
+                            <li>Enhanced seat and baggage recommendation engines on AirAsia Move, implementing sit-together and child-adult pairing logic that drove ancillary sales uplift.</li>
+                            <li>Shipped a real-time airport operations monitoring application covering all AirAsia airports, enabling flight operations and network teams to surface and escalate live issues faster.</li>
+                            <li>Developed a Workvivo chatbot with self-service features including ISR creation, password reset, and account unlock, with live agent transfer support.</li>
+                            <li>Built a C-Level KPI dashboard with 100+ BigQuery queries and LLM-generated insights per chart for executive visibility.</li>
+                            <li>Delivered a pilot training tracker application for AirAsia with offline-first capabilities, allowing pilots to log and monitor training progress during flights and sync data upon reconnection.</li>
+                            <li>Created a crew portal for tracking sales, commissions, and flight schedules, with data sourced from BigQuery.</li>
+                            <li>Developed a recruitment application that pulls job postings from Workday, allows users to create hiring events with shareable applicant form links and custom email templates, and syncs candidate assessments back to Workday.</li>
+                            <li>Collaborated with Malaysia-based developers on cross-functional projects, including on-site work and training in Kuala Lumpur.</li>
+                        </ul>
+                    </div>
+
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="job-title">Flutter Developer <span class="job-company">| Ben Edictio Corp.</span></div>
+                            <div class="job-meta">
+                                <span style="color: #94a3b8;">Philippines</span>
+                                <span class="tech-badge badge-remote" style="background-color: #dcfce7; color: #16a34a; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Remote</span>
+                                <span class="tech-badge badge-regular" style="background-color: #dcfce7; color: #16a34a; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Regular</span>
+                                <span style="margin-left: auto;">Nov 2021 – Nov 2022</span>
+                            </div>
+                        </div>
+                        <ul>
+                            <li>Assigned to Indra Philippines, Inc. as Flutter Developer; later seconded to AirAsia as Software Engineer and subsequently absorbed.</li>
+                            <li>Helped develop, debug, test, and maintain applications used by thousands of AirAsia users.</li>
+                        </ul>
+                    </div>
+
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="job-title">Mobile Developer <span class="job-company">| Bookdis Technology</span></div>
+                            <div class="job-meta">
+                                <span style="color: #94a3b8;">Philippines</span>
+                                <span class="tech-badge badge-onsite" style="background-color: #fffbe0; color: #b45309; -webkit-print-color-adjust: exact; print-color-adjust: exact;">On-site</span>
+                                <span class="tech-badge badge-regular" style="background-color: #dcfce7; color: #16a34a; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Regular</span>
+                                <span style="margin-left: auto;">Jun 2020 – Oct 2021</span>
+                            </div>
+                        </div>
+                        <ul>
+                            <li>Led the development of multiple Flutter mobile applications aligned with a food delivery service, including pricing logic and Google Maps integration.</li>
+                            <li>Built an order monitoring website to track and manage ongoing deliveries in real time.</li>
+                            <li>Translated UI/UX designs into smooth and user-friendly interfaces across mobile and web.</li>
+                        </ul>
+                    </div>
+
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="job-title">Freelance Web Developer <span class="job-company">| Oolong Media &amp; Social Garden</span></div>
+                            <div class="job-meta">
+                                <span style="color: #94a3b8;">Canada / Australia</span>
+                                <span class="tech-badge badge-remote" style="background-color: #dcfce7; color: #16a34a; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Remote</span>
+                                <span class="tech-badge badge-freelance" style="background-color: #fffbe0; color: #b45309; -webkit-print-color-adjust: exact; print-color-adjust: exact;">Freelance</span>
+                                <span style="margin-left: auto;">Aug 2018 – Feb 2020</span>
+                            </div>
+                        </div>
+                        <ul>
+                            <li>Converted PSD and design mockups into custom WordPress pages and templates for Oolong Media.</li>
+                            <li>Built responsive Gravity Forms with dynamic fields to capture marketing leads effectively.</li>
+                            <li>Optimized WordPress sites through image deferring, performance tuning, and page speed testing.</li>
+                            <li>Maintained WordPress sites by keeping plugins up to date and ensuring overall stability.</li>
+                            <li>Built Unbounce landing pages for Social Garden's real estate developer clients, showcasing properties and floor plans.</li>
+                            <li>Built custom dynamic Unbounce forms to capture and convert leads.</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

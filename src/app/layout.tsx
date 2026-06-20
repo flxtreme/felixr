@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | Felix Ruz",
   },
   description:
-    "Software Engineer with 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
+    "Software Engineer with nearly 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
   keywords: [
     "Felix Ruz",
     "Full Stack Developer",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     siteName: "Felix Ruz",
     title: "Felix Ruz — Full Stack & Agentic Engineer",
     description:
-      "Software Engineer with 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
+      "Software Engineer with nearly 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
     images: [
       {
         url: "/og-image.png", // 1200x630px recommended
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Felix Ruz — Full Stack & Agentic Engineer",
     description:
-      "Software Engineer with 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
+      "Software Engineer with nearly 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
     images: ["/og-image.jpg"],
     creator: "@felixruz", // update if you have a handle
   },
