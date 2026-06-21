@@ -104,7 +104,8 @@ export default function HomeView() {
                 </Button>
               </Link>
               <Link
-                href="/resume/"
+                href="https://flxtreme.github.io/resume-builder/"
+                target="_blank"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
               >
                 Download CV
