@@ -104,8 +104,9 @@ export default function HomeView() {
                 </Button>
               </Link>
               <Link
-                href="https://flxtreme.github.io/resume-builder/"
+                href="/felix-ruz-cv.pdf"
                 target="_blank"
+                download
                 className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
               >
                 Download CV
@@ -114,15 +115,15 @@ export default function HomeView() {
           </div>
 
         </div>
-      </section>
+      </section >
 
       {/* Tech Stack */}
-      <section className="skills pb-6">
+      < section className="skills pb-6" >
         <TechStackMarquee />
-      </section>
+      </section >
 
       {/* Projects */}
-      <section className="projects bg-surface">
+      < section className="projects bg-surface" >
         <div className={cln(
           "mx-auto py-12 space-y-8",
           projectsLoading && "max-w-7xl",
@@ -167,10 +168,10 @@ export default function HomeView() {
             )}
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Latest Posts */}
-      <section className="posts border-b border-border">
+      < section className="posts border-b border-border" >
         <div className="max-w-3xl mx-auto px-6 py-12 space-y-8">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold tracking-tight">Latest Posts</h2>
@@ -224,8 +225,8 @@ export default function HomeView() {
             )}
           </div>
         </div>
-      </section>
+      </section >
 
-    </div>
+    </div >
   );
 }
