@@ -5,6 +5,8 @@ import { ModalProvider } from "@/src/contexts/ModalContext";
 import { ErrorBoundary } from "@/src/contexts/ErrorBoundary";
 import { GlobalErrorHandler } from "../contexts/GlobalErrorHandler";
 import { Metadata } from "next";
+import { Analytics } from "@/src/lib/analytics/Analytics";
+import { Suspense } from "react";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -52,7 +54,7 @@ export const metadata: Metadata = {
       "Software Engineer with nearly 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
     images: [
       {
-        url: "/og-image.png", // 1200x630px recommended
+        url: "./og-image.png", // 1200x630px recommended
         width: 1200,
         height: 630,
         alt: "Felix Ruz — Full Stack & Agentic Engineer",
@@ -95,6 +97,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
         <ThemeProvider>
           <ModalProvider>
             <GlobalErrorHandler />
