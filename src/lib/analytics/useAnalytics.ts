@@ -25,11 +25,9 @@ async function getLocation(): Promise<{
     return { enabled: false };
   }
 
-  // Check existing permission state — never trigger a prompt
   const { state } = await navigator.permissions.query({ name: "geolocation" });
 
   if (state !== "granted") {
-    // "prompt" or "denied" — don't ask, just skip
     return { enabled: false };
   }
 
@@ -57,7 +55,6 @@ async function getLocation(): Promise<{
 export function useAnalytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  // useRef persists across re-renders without triggering them
   const previousUrlRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
@@ -65,23 +62,23 @@ export function useAnalytics() {
       try {
         const visitorId = getOrCreateVisitorId();
 
-        // Build current URL
         const currentUrl = window.location.href;
 
-        // Parse query parameters into a plain object
+        // Derive path array from pathname
+        // e.g. /blog/my-post → ["blog", "my-post"], / → []
+        const path = pathname.split("/").filter(Boolean);
+
         const parameters: Record<string, string> = {};
         searchParams.forEach((value, key) => {
           parameters[key] = value;
         });
 
-        // Navigation context
         const from = {
           referrer: document.referrer || undefined,
           previousUrl: previousUrlRef.current,
           historyLength: window.history.length,
         };
 
-        // Visitor info
         const visitor = {
           userAgent: navigator.userAgent,
           language: navigator.language,
@@ -96,11 +93,11 @@ export function useAnalytics() {
           },
         };
 
-        // Geolocation (non-blocking — resolves quickly either way)
         const location = await getLocation();
 
         const payload = {
           visitorId,
+          path,
           currentUrl,
           parameters,
           from,
@@ -109,23 +106,18 @@ export function useAnalytics() {
           timestamp: new Date().toISOString(),
         };
 
-        // 1. JSON stringify
         const raw = JSON.stringify(payload);
 
-        // 2. Split into 100-char chunks and prefix each with its zero-padded index
-        //    e.g. "00:first100chars", "01:next100chars", ...
         const rawChunks: string[] = [];
         for (let i = 0; i < raw.length; i += 100) {
           const index = String(Math.floor(i / 100)).padStart(2, "0");
           rawChunks.push(`${index}~~~${raw.slice(i, i + 100)}`);
         }
 
-        // 3. Base64-encode each indexed chunk individually
         const encodedChunks = rawChunks.map((chunk) =>
           btoa(unescape(encodeURIComponent(chunk)))
         );
 
-        // 4. Shuffle so order is not obvious
         for (let i = encodedChunks.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [encodedChunks[i], encodedChunks[j]] = [encodedChunks[j], encodedChunks[i]];
@@ -138,16 +130,13 @@ export function useAnalytics() {
           keepalive: true,
         });
 
-        // Store current URL for the next navigation
         previousUrlRef.current = currentUrl;
       } catch (err) {
-        // Never let analytics crash the app
         console.error("[analytics] failed to track view:", err);
       }
     };
 
     trackView();
-    // Re-run on every route change (pathname + searchParams together)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, searchParams]);
 }
