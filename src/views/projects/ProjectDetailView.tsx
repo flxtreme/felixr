@@ -8,6 +8,7 @@ import * as service from "@/src/features/public/posts/services";
 import parseMetadata from "@/src/utils/parseMetadata";
 import { TagFooter } from "@/src/features/public/components/Tags";
 import { useMemo } from "react";
+import { PageViews } from "@/src/lib/analytics/useViews";
 
 interface Props {
   params: Promise<{ slug: string, }>;
@@ -77,17 +78,20 @@ export default async function ProjectDetailPage({ params }: Props) {
             {project.title || project.slug.replace(/-/g, " ")}
           </h1>
 
-          <Breadcrumbs
-            items={[
-              {
-                label: "projects",
-                href: "/projects",
-              },
-              {
-                label: (project.title || project.slug).toLowerCase(),
-              },
-            ]}
-          />
+          <div className="flex items-center justify-between">
+            <Breadcrumbs
+              items={[
+                {
+                  label: "projects",
+                  href: "/projects",
+                },
+                {
+                  label: (project.title || project.slug).toLowerCase(),
+                },
+              ]}
+            />
+            <PageViews path={["projects", project.slug]} className="text-foreground/40" />
+          </div>
         </div>
       }
     >

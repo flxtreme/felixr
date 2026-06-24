@@ -20,6 +20,7 @@ export interface Post {
   createdBy: string | null;
   createdAt: string;
   updatedAt: string;
+  views?: number;
 }
 
 export interface GetPostsQuery {

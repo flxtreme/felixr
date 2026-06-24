@@ -29,15 +29,23 @@ export const ProjectCard = ({ project, noCard = false }: ProjectProps) => {
             page.excerpt.replace(/[#*`]/g, "").substring(0, 160)}...
         </p>
 
-        <span className="text-xs font-medium text-foreground/35 font-mono mt-0.5">
-          {publishedAt
-            ? new Date(publishedAt).toLocaleDateString("en-US", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })
-            : "—"}
-        </span>
+        <div className="flex items-center gap-2 text-xs font-medium text-foreground/35 font-mono mt-0.5">
+          <span>
+            {publishedAt
+              ? new Date(publishedAt).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })
+              : "—"}
+          </span>
+          {page?.views !== undefined && (
+            <>
+              <span>&bull;</span>
+              <span>{page.views} views</span>
+            </>
+          )}
+        </div>
 
         {project.links && project.links.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 mt-1.5 relative z-10">

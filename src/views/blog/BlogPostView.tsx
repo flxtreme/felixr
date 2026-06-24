@@ -7,6 +7,7 @@ import { SinglePageLayout } from "@/src/layouts/SinglePageLayout";
 import * as service from "@/src/features/public/posts/services";
 import parseMetadata from "@/src/utils/parseMetadata";
 import { TagFooter } from "@/src/features/public/components/Tags";
+import { PageViews } from "@/src/lib/analytics/useViews";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -67,17 +68,20 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="space-y-4">
           <h1 className="text-5xl font-bold">{post.title || post.slug.replace(/-/g, " ")}</h1>
 
-          <Breadcrumbs
-            items={[
-              {
-                label: "posts",
-                href: "/blog",
-              },
-              {
-                label: (post.title || post.slug).toLowerCase(),
-              },
-            ]}
-          />
+          <div className="flex items-center justify-between">
+            <Breadcrumbs
+              items={[
+                {
+                  label: "posts",
+                  href: "/blog",
+                },
+                {
+                  label: (post.title || post.slug).toLowerCase(),
+                },
+              ]}
+            />
+            <PageViews path={["blog", post.slug]} className="text-foreground/40" />
+          </div>
         </div>
       }
     >

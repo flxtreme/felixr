@@ -70,13 +70,20 @@ export default async function StaticPage({ params }: Props) {
             {page.title || page.slug?.replace(/-/g, " ")}
           </h1>
 
-          <Breadcrumbs
-            items={[
-              {
-                label: (page.title || page.slug)?.toLowerCase(),
-              },
-            ]}
-          />
+          <div className="flex items-center justify-between">
+            <Breadcrumbs
+              items={[
+                {
+                  label: (page.title || page.slug)?.toLowerCase(),
+                },
+              ]}
+            />
+            {page.views !== undefined && (
+              <span className="text-sm text-foreground/40 font-mono">
+                {page.views} views
+              </span>
+            )}
+          </div>
         </div>
       }
     >

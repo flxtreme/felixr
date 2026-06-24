@@ -47,15 +47,23 @@ export default function BlogListView({
         {paginatedPosts.length > 0
           ? paginatedPosts.map((post, idx) => (
               <article key={`${post.slug}-${idx}`} className="group flex flex-col items-start">
-                <time className="text-sm font-medium text-foreground/40 mb-2 font-mono">
-                  {post.publishedAt
-                    ? new Date(post.publishedAt).toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      })
-                    : "Draft"}
-                </time>
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground/40 mb-2 font-mono">
+                  <time>
+                    {post.publishedAt
+                      ? new Date(post.publishedAt).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "Draft"}
+                  </time>
+                  {post.views !== undefined && (
+                    <>
+                      <span>&bull;</span>
+                      <span>{post.views} views</span>
+                    </>
+                  )}
+                </div>
                 <h2 className="text-xl font-bold hover:text-primary transition-colors">
                   <Link href={`/blog/${post.slug}`}>{post.slug.replace(/-/g, " ")}</Link>
                 </h2>
