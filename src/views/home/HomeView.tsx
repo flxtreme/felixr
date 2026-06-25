@@ -103,14 +103,14 @@ export default function HomeView() {
                   Hire Me
                 </Button>
               </Link>
-              <Link
+              {/* <Link
                 href="/felix-ruz-cv.pdf"
                 target="_blank"
                 download
                 className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all underline underline-offset-4"
               >
                 Download CV
-              </Link>
+              </Link> */}
             </div>
           </div>
 
