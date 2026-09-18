@@ -1,11 +1,11 @@
 "use client";
 
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import Link from "next/link";
 import { ReactNode } from "react";
 import Shimmer from "@/src/components/shimmer/Shimmer";
 import { EditorShimmer, SidebarShimmer } from "@/src/components/shimmer/EditorShimmer";
-import { Button } from "@/src/components/Button";
+import { Button } from "flxtheme";
 
 interface ManagePostLayoutProps {
   pageTitle: string;
@@ -48,17 +48,18 @@ export function ManagePostLayout({
 
           <div className="shrink-0 border-t border-border px-5 py-3 flex items-center gap-3 bg-background">
             <Link href={backHref}>
-              <Button variant="tertiary" size="sm">Cancel</Button>
+              <Button variant="ghost" size="sm">Cancel</Button>
             </Link>
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              size="sm"
               onClick={onSave}
               disabled={isLoading}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-primary text-primary-foreground text-xs font-mono font-medium px-3 py-2 rounded-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-1"
             >
               <Save className="w-3.5 h-3.5" />
               {saveLabel}
-            </button>
+            </Button>
           </div>
         </aside>
       </div>

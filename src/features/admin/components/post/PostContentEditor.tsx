@@ -1,6 +1,6 @@
 "use client";
 
-import { Breadcrumbs } from "@/src/components/BreadCrumbs";
+import { Breadcrumb, BreadcrumbItem } from "flxtheme";
 import PostRender from "@/src/components/PostRenderer";
 import SinglePageLayout from "@/src/layouts/SinglePageLayout";
 import {
@@ -343,9 +343,9 @@ export const PostContentEditor = ({
                       Preview
                     </h1>
           
-                    <Breadcrumbs
-                      items={[{ label: "preview", href: "#" }]}
-                    />
+                    <Breadcrumb>
+                      <BreadcrumbItem href="#">preview</BreadcrumbItem>
+                    </Breadcrumb>
                   </div>
                 }
               >

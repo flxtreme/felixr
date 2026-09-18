@@ -4,12 +4,10 @@ import { createContext, useContext, useState } from "react";
 
 interface DashboardContextType {
   user: { name: string; email: string } | null;
-}
-
-interface DashboardContextType {
-  user: { name: string; email: string } | null;
   goBackUrl?: string;
   setGoBackUrl: (url?: string) => void;
+  title?: string;
+  setDashboardTitle: (title?: string) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -18,8 +16,13 @@ export const DashboardContextProvider = ({ children }: { children: React.ReactNo
   const [user] = useState({ name: "felixr", email: "flxrzjr@gmail.com" });
 
   const [goBackUrl, setGoBackUrl] = useState<string | undefined>(undefined);
- 
-  return <DashboardContext.Provider value={{ user, goBackUrl, setGoBackUrl }}>{children}</DashboardContext.Provider>;
+  const [title, setDashboardTitle] = useState<string | undefined>(undefined);
+
+  return (
+    <DashboardContext.Provider value={{ user, goBackUrl, setGoBackUrl, title, setDashboardTitle }}>
+      {children}
+    </DashboardContext.Provider>
+  );
 };
 
 export const useDashboard = () => {

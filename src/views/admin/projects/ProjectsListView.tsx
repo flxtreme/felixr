@@ -1,22 +1,19 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import { Edit2, Trash2, Plus, ExternalLink, Calendar } from "lucide-react";
-import { Pagination } from "@/src/components/Pagination";
 import { useProjects } from "@/src/features/admin/project/hooks";
 import { useProjectContext } from "@/src/features/admin/project/ProjectContext";
-import { Project } from "@/src/features/admin/project/types";
-import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
-import { Button } from "@/src/components/Button";
-import { SOCIAL_ICONS } from "@/src/common/icons";
-import { stringToKey } from "@/src/utils/string";
+import { LuPen, LuExternalLink, LuPlus, LuTrash2 } from "flxtheme/icons/lu";
+import Link from "next/link";
+import React from "react";
+import { useRouter } from "next/navigation";
+import { Card, Button, Pagination } from "flxtheme";
 
 export default function ProjectsListView({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string; search?: string }>;
 }) {
+  const router = useRouter();
   const { removeProject } = useProjectContext();
   const resolvedParams = React.use(searchParams);
 
@@ -35,8 +32,6 @@ export default function ProjectsListView({
     search: resolvedParams?.search || null,
   });
 
-  const totalPages = Math.ceil((meta?.total || 0) / pageSize) || 1;
-
   return (
     <div className="p-6 space-y-6">
       <header className="flex items-center justify-between">
@@ -54,51 +49,39 @@ export default function ProjectsListView({
             size="sm"
           >
             <span>Create Project</span>
-            <Plus className="size-4 ml-2" />
           </Button>
         </Link>
       </header>
 
-      <div className="grid grid-cols-4 gap-4">
-        {
-          projects.map((project, i) => {
-            return (
-              <div key={i} className="flex flex-col bg-surface shadow rounded-sm border p-6 border-foreground/10">
-                <h3 className="mb-2 font-medium text-lg">{project.title}</h3>
-                <p>{project.description}</p>
-                <div className="flex gap-2 items-center justify-end mt-8">
-                  <Link href={`/projects/${project.page.slug}`}>
-                    <Button
-                      variant="tertiary"
-                      size="sm"
-                    >
-                      <ExternalLink className="size-4 mr-2" />
-                      Preview
-                    </Button>
-                  </Link>
-                  <Link href={`/admin/projects/${project.id}`}>
-                    <Button
-                      variant="tertiary"
-                      size="sm"
-                    >
-                      <Edit2 className="size-4 mr-2" />
-                      Edit
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="tertiary"
-                    size="sm"
-                    className="text-red-500"
-                    onClick={() => removeProject(project.id)}
-                  >
-                    <Trash2 className="size-4 mr-2" />
-                    Remove
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {projects.map((project, i) => {
+          return (
+            <Card key={i} className="flex h-full flex-col p-6">
+              <h3 className="mb-2 text-lg font-medium">{project.title}</h3>
+              <p className="line-clamp-3 text-sm text-foreground/70">{project.description}</p>
+              <div className="mt-auto flex flex-wrap items-center justify-end gap-2 pt-8">
+                <Link href={`/projects/${project.page.slug}`}>
+                  <Button variant="secondary" size="sm">
+                    Preview
                   </Button>
-                </div>
+                </Link>
+                <Link href={`/admin/projects/${project.id}`}>
+                  <Button variant="primary" size="sm">
+                    Edit
+                  </Button>
+                </Link>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="text-red-500"
+                  onClick={() => removeProject(project.id)}
+                >
+                  Remove
+                </Button>
               </div>
-            );
-          })
-        }
+            </Card>
+          );
+        })}
       </div>
 
       {!isLoading && projects.length === 0 && (
@@ -107,11 +90,17 @@ export default function ProjectsListView({
         </div>
       )}
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        basePath="/admin/projects"
-      />
+      <div className="pt-8">
+        <Pagination 
+          current={currentPage} 
+          total={meta?.total || 0} 
+          pageSize={pageSize} 
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            router.push(`/admin/projects?page=${page}${resolvedParams?.search ? `&search=${resolvedParams.search}` : ''}`);
+          }} 
+        />
+      </div>
     </div>
   );
 }

@@ -23,13 +23,13 @@ function parseTable(block: string): ParsedTable {
 
   const aligns: Align[] = alignRow
     ? alignRow
-        .split("|")
-        .filter(Boolean)
-        .map((c): Align => {
-          if (c.startsWith(":") && c.endsWith(":")) return "center";
-          if (c.endsWith(":")) return "right";
-          return "left";
-        })
+      .split("|")
+      .filter(Boolean)
+      .map((c): Align => {
+        if (c.startsWith(":") && c.endsWith(":")) return "center";
+        if (c.endsWith(":")) return "right";
+        return "left";
+      })
     : [];
 
   const dataRows = rows.filter((r) => !/^\|[-| :]+\|/.test(r));
@@ -63,7 +63,14 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
       nodes.push(<img key={k} src={m[2]} alt={m[1]} title={m[3]} className="pr-img" />);
     } else if (m[4] !== undefined) {
       nodes.push(
-        <a key={k} href={m[5]} title={m[6]} className="pr-link" target="_blank" rel="noopener noreferrer">
+        <a
+          key={k}
+          href={m[5]}
+          title={m[6]}
+          className="pr-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {m[4]}
         </a>
       );
@@ -74,7 +81,11 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
         </sup>
       );
     } else if (m[8] !== undefined) {
-      nodes.push(<strong key={k}><em>{m[8]}</em></strong>);
+      nodes.push(
+        <strong key={k}>
+          <em>{m[8]}</em>
+        </strong>
+      );
     } else if (m[9] !== undefined) {
       nodes.push(<strong key={k}>{m[9]}</strong>);
     } else if (m[10] !== undefined) {
@@ -90,7 +101,11 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
     } else if (m[15] !== undefined) {
       nodes.push(<ins key={k}>{m[15]}</ins>);
     } else if (m[16] !== undefined) {
-      nodes.push(<code key={k} className="pr-inline-code">{m[16]}</code>);
+      nodes.push(
+        <code key={k} className="pr-inline-code">
+          {m[16]}
+        </code>
+      );
     }
 
     last = pattern.lastIndex;
@@ -110,10 +125,16 @@ function renderUL(lines: string[], baseIndent: number, keyBase: string): JSX.Ele
   while (i < lines.length) {
     const line = lines[i];
     const indentMatch = line.match(/^(\s*)[-*+] /);
-    if (!indentMatch) { i++; continue; }
+    if (!indentMatch) {
+      i++;
+      continue;
+    }
 
     const indent = indentMatch[1].length;
-    if (indent !== baseIndent) { i++; continue; }
+    if (indent !== baseIndent) {
+      i++;
+      continue;
+    }
 
     const content = line.replace(/^(\s*)[-*+] /, "");
     const taskMatch = content.match(/^\[(x| )\] (.+)$/i);
@@ -129,7 +150,9 @@ function renderUL(lines: string[], baseIndent: number, keyBase: string): JSX.Ele
       const done = taskMatch[1].toLowerCase() === "x";
       items.push(
         <li key={`${keyBase}-li-${ki++}`} className="pr-task">
-          <span className={`pr-check${done ? " checked" : ""}`} aria-hidden="true">{done ? "✓" : "○"}</span>
+          <span className={`pr-check${done ? " checked" : ""}`} aria-hidden="true">
+            {done ? "✓" : "○"}
+          </span>
           <span>{parseInline(taskMatch[2], `${keyBase}-t`)}</span>
           {nested.length > 0 && renderUL(nested, indent + 2, `${keyBase}-n`)}
         </li>
@@ -144,7 +167,11 @@ function renderUL(lines: string[], baseIndent: number, keyBase: string): JSX.Ele
     }
   }
 
-  return <ul key={keyBase} className="pr-ul">{items}</ul>;
+  return (
+    <ul key={keyBase} className="pr-ul">
+      {items}
+    </ul>
+  );
 }
 
 // ─── Syntax highlighter ───────────────────────────────────────────────────────
@@ -166,32 +193,82 @@ interface Token {
 }
 
 function highlightCode(code: string): ReactNode[] {
-  const COMMENTS  = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)/g;
-  const STRINGS   = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g;
-  const CONTROL   = /\b(if|else|for|while|do|switch|case|break|continue|return|try|catch|finally|throw|of|in)\b/g;
-  const DECL      = /\b(const|let|var|class|extends|implements|interface|type|enum|namespace|declare|abstract|function|async|await|new|typeof|instanceof|import|export|default|from|as|static|public|private|protected|readonly|override)\b/g;
-  const GENERICS  = /<([A-Z][a-zA-Z0-9_$]*(?:\[\])?(?:,\s*[A-Z][a-zA-Z0-9_$]*(?:\[\])?)*)\s*>/g;
-  const METHODS   = /\.([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\s*\()/g;
-  const FN_NAMES  = /\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g;
-  const CALLS     = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\s*[<(])/g;
-  const NUMBERS   = /\b(\d+\.?\d*)\b/g;
+  const COMMENTS = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)/g;
+  const STRINGS = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g;
+  const CONTROL =
+    /\b(if|else|for|while|do|switch|case|break|continue|return|try|catch|finally|throw|of|in)\b/g;
+  const DECL =
+    /\b(const|let|var|class|extends|implements|interface|type|enum|namespace|declare|abstract|function|async|await|new|typeof|instanceof|import|export|default|from|as|static|public|private|protected|readonly|override)\b/g;
+  const GENERICS = /<([A-Z][a-zA-Z0-9_$]*(?:\[\])?(?:,\s*[A-Z][a-zA-Z0-9_$]*(?:\[\])?)*)\s*>/g;
+  const METHODS = /\.([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\s*\()/g;
+  const FN_NAMES = /\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g;
+  const CALLS = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\s*[<(])/g;
+  const NUMBERS = /\b(\d+\.?\d*)\b/g;
   const VARIABLES = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g;
 
   const resetAll = () => {
-    [COMMENTS, STRINGS, CONTROL, DECL, GENERICS, METHODS, FN_NAMES, CALLS, NUMBERS, VARIABLES].forEach(
-      (r) => (r.lastIndex = 0)
-    );
+    [
+      COMMENTS,
+      STRINGS,
+      CONTROL,
+      DECL,
+      GENERICS,
+      METHODS,
+      FN_NAMES,
+      CALLS,
+      NUMBERS,
+      VARIABLES,
+    ].forEach((r) => (r.lastIndex = 0));
   };
 
   const DECL_WORDS = new Set([
-    "const","let","var","class","extends","implements","interface","type","enum",
-    "namespace","declare","abstract","function","async","await","new","typeof",
-    "instanceof","import","export","default","from","as","static","public",
-    "private","protected","readonly","override",
+    "const",
+    "let",
+    "var",
+    "class",
+    "extends",
+    "implements",
+    "interface",
+    "type",
+    "enum",
+    "namespace",
+    "declare",
+    "abstract",
+    "function",
+    "async",
+    "await",
+    "new",
+    "typeof",
+    "instanceof",
+    "import",
+    "export",
+    "default",
+    "from",
+    "as",
+    "static",
+    "public",
+    "private",
+    "protected",
+    "readonly",
+    "override",
   ]);
   const CONTROL_WORDS = new Set([
-    "if","else","for","while","do","switch","case","break","continue","return",
-    "try","catch","finally","throw","of","in",
+    "if",
+    "else",
+    "for",
+    "while",
+    "do",
+    "switch",
+    "case",
+    "break",
+    "continue",
+    "return",
+    "try",
+    "catch",
+    "finally",
+    "throw",
+    "of",
+    "in",
   ]);
 
   const tokens: Token[] = [];
@@ -203,7 +280,7 @@ function highlightCode(code: string): ReactNode[] {
 
     for (const [pat, type] of [
       [COMMENTS, "comment"],
-      [STRINGS,  "string"],
+      [STRINGS, "string"],
     ] as [RegExp, TokenType][]) {
       pat.lastIndex = 0;
       const m = pat.exec(rest);
@@ -220,8 +297,8 @@ function highlightCode(code: string): ReactNode[] {
     const fnm = FN_NAMES.exec(rest);
     if (fnm && fnm.index === 0) {
       const kwEnd = fnm[0].indexOf(fnm[1]);
-      tokens.push({ type: "decl",    value: rest.slice(0, kwEnd).trimEnd() });
-      tokens.push({ type: "text",    value: " " });
+      tokens.push({ type: "decl", value: rest.slice(0, kwEnd).trimEnd() });
+      tokens.push({ type: "text", value: " " });
       tokens.push({ type: "fn-name", value: fnm[1] });
       i += fnm[0].length;
       continue;
@@ -230,9 +307,9 @@ function highlightCode(code: string): ReactNode[] {
     GENERICS.lastIndex = 0;
     const gm = GENERICS.exec(rest);
     if (gm && gm.index === 0) {
-      tokens.push({ type: "text",    value: "<" });
+      tokens.push({ type: "text", value: "<" });
       tokens.push({ type: "generic", value: gm[1] });
-      tokens.push({ type: "text",    value: ">" });
+      tokens.push({ type: "text", value: ">" });
       i += gm[0].length;
       continue;
     }
@@ -240,7 +317,7 @@ function highlightCode(code: string): ReactNode[] {
     METHODS.lastIndex = 0;
     const mm = METHODS.exec(rest);
     if (mm && mm.index === 0) {
-      tokens.push({ type: "text",    value: "." });
+      tokens.push({ type: "text", value: "." });
       tokens.push({ type: "fn-name", value: mm[1] });
       i += mm[0].length;
       continue;
@@ -296,9 +373,13 @@ function highlightCode(code: string): ReactNode[] {
   }
 
   return tokens.map((t, idx) =>
-    t.type === "text"
-      ? t.value
-      : <span key={idx} className={`sh-${t.type}`}>{t.value}</span>
+    t.type === "text" ? (
+      t.value
+    ) : (
+      <span key={idx} className={`sh-${t.type}`}>
+        {t.value}
+      </span>
+    )
   );
 }
 
@@ -314,7 +395,10 @@ function renderBlocks(markdown: string): ReactNode[] {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (line.trim() === "") { i++; continue; }
+    if (line.trim() === "") {
+      i++;
+      continue;
+    }
 
     if (/^```/.test(line)) {
       const lang = line.slice(3).trim();
@@ -456,7 +540,9 @@ function renderBlocks(markdown: string): ReactNode[] {
         <dl key={key("dl")} className="pr-dl">
           <dt className="pr-dt">{parseInline(term, key("dlt"))}</dt>
           {defs.map((d, di) => (
-            <dd key={di} className="pr-dd">{parseInline(d, key("dld"))}</dd>
+            <dd key={di} className="pr-dd">
+              {parseInline(d, key("dld"))}
+            </dd>
           ))}
         </dl>
       );
@@ -493,7 +579,11 @@ function renderBlocks(markdown: string): ReactNode[] {
           content.push(" ");
         }
       });
-      blocks.push(<p key={key("p")} className="pr-p">{content}</p>);
+      blocks.push(
+        <p key={key("p")} className="pr-p">
+          {content}
+        </p>
+      );
     }
   }
 
@@ -504,17 +594,17 @@ function renderBlocks(markdown: string): ReactNode[] {
 
 const styles = `
 .pr-root {
-  --pr-muted-bg:    color-mix(in srgb, var(--background) 94%, var(--foreground) 6%);
-  --pr-muted-text:  color-mix(in srgb, var(--foreground) 60%, var(--background) 40%);
-  --pr-subtle-text: color-mix(in srgb, var(--foreground) 38%, var(--background) 62%);
-  --pr-primary-dim: color-mix(in srgb, var(--primary) 25%, transparent);
+  --pr-muted-bg:    color-mix(in srgb, var(--color-foreground) 9%, var(--color-background));
+  --pr-muted-text:  color-mix(in srgb, var(--color-foreground) 60%, var(--color-background));
+  --pr-subtle-text: color-mix(in srgb, var(--color-foreground) 38%, var(--color-background));
+  --pr-primary-dim: color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
 .pr-root {
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
   font-size: 16px;
   line-height: 1.75;
-  color: var(--foreground);
+  color: var(--color-foreground);
   background: transparent;
 }
 
@@ -559,7 +649,7 @@ const styles = `
 
 .pr-pre {
   background: var(--pr-muted-bg);
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 22%, var(--color-background));
   border-radius: 8px; padding: 1rem 1.1rem;
   overflow-x: auto; margin: 1.1rem 0;
 }
@@ -571,7 +661,7 @@ const styles = `
   font-family: var(--font-mono, 'Fira Code', 'Cascadia Code', Consolas, monospace);
   font-size: .855em;
   background: var(--pr-muted-bg);
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 22%, var(--color-background));
   border-radius: 4px; padding: .1em .38em;
   color: var(--foreground);
 }

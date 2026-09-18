@@ -1,42 +1,34 @@
 "use client";
 
-import { useEffect } from "react";
-import { useModal } from "@/src/contexts/ModalContext";
+import { useEffect, useState } from "react";
+import { useModal, Modal } from "flxtheme";
 import errorEmitter from "@/src/utils/errorEmitter";
 
+const ERROR_MODAL_ID = "global-error";
+
 export const GlobalErrorHandler = () => {
-  const { showModal } = useModal();
+  const { openModal, closeModal } = useModal();
+  const [error, setError] = useState<{ title: string; message: string } | null>(null);
 
   useEffect(() => {
+    const show = (title: string, message: string) => {
+      setError({ title, message });
+      openModal(ERROR_MODAL_ID);
+    };
+
     const handleError = (e: ErrorEvent) => {
-      showModal({
-        type: "error",
-        title: "Runtime Error",
-        message: e.error?.message || e.message || "An unexpected error occurred.",
-        confirmLabel: "Dismiss",
-      });
+      show("Runtime Error", e.error?.message || e.message || "An unexpected error occurred.");
     };
 
     const handleUnhandledRejection = (e: PromiseRejectionEvent) => {
-      showModal({
-        type: "error",
-        title: "Unhandled Error",
-        message:
-          e.reason instanceof Error
-            ? e.reason.message
-            : String(e.reason) || "An unhandled promise rejection occurred.",
-        confirmLabel: "Dismiss",
-      });
+      show(
+        "Unhandled Error",
+        e.reason instanceof Error ? e.reason.message : String(e.reason) || "An unhandled promise rejection occurred."
+      );
     };
 
-    // Fetcher errors
     errorEmitter.register((error) => {
-      showModal({
-        type: "error",
-        title: "Request Failed",
-        message: error.message,
-        confirmLabel: "Dismiss",
-      });
+      show("Request Failed", error.message);
     });
 
     window.addEventListener("error", handleError);
@@ -47,7 +39,19 @@ export const GlobalErrorHandler = () => {
       window.removeEventListener("unhandledrejection", handleUnhandledRejection);
       errorEmitter.unregister();
     };
-  }, [showModal]);
+  }, [openModal]);
 
-  return null;
+  return (
+    <Modal
+      id={ERROR_MODAL_ID}
+      title={error?.title}
+      footer={
+        <button onClick={() => closeModal(ERROR_MODAL_ID)}>
+          Dismiss
+        </button>
+      }
+    >
+      {error?.message}
+    </Modal>
+  );
 };

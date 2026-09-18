@@ -1,31 +1,29 @@
 "use client";
 
 import React, { Component, ReactNode } from "react";
-import { useModal } from "@/src/contexts/ModalContext";
+import { useModal, Modal } from "flxtheme";
+
+const ERROR_MODAL_ID = "error-boundary";
 
 interface Props {
   children: ReactNode;
+  openModal: (id: string) => void;
 }
 
 interface State {
   hasError: boolean;
+  message: string;
 }
 
-class ErrorBoundaryInner extends Component<Props & { showModal: (o: Parameters<ReturnType<typeof useModal>["showModal"]>[0]) => void }, State> {
-  state: State = { hasError: false };
+class ErrorBoundaryInner extends Component<Props, State> {
+  state: State = { hasError: false, message: "" };
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, message: error.message || "An unexpected error occurred." };
   }
 
-  componentDidCatch(error: Error) {
-    this.props.showModal({
-      type: "error",
-      title: "Something went wrong",
-      message: error.message || "An unexpected error occurred.",
-      confirmLabel: "Dismiss",
-    });
-    this.setState({ hasError: false });
+  componentDidCatch() {
+    this.props.openModal(ERROR_MODAL_ID);
   }
 
   render() {
@@ -33,11 +31,27 @@ class ErrorBoundaryInner extends Component<Props & { showModal: (o: Parameters<R
   }
 }
 
-export const ErrorBoundary = ({ children }: Props) => {
-  const { showModal } = useModal();
+export const ErrorBoundary = ({ children }: { children: ReactNode }) => {
+  const { openModal, closeModal } = useModal();
+  const [message, setMessage] = React.useState("");
+
   return (
-    <ErrorBoundaryInner showModal={showModal}>
-      {children}
-    </ErrorBoundaryInner>
+    <>
+      <ErrorBoundaryInner
+        openModal={(id) => {
+          setMessage("An unexpected error occurred.");
+          openModal(id);
+        }}
+      >
+        {children}
+      </ErrorBoundaryInner>
+      <Modal
+        id={ERROR_MODAL_ID}
+        title="Something went wrong"
+        footer={<button onClick={() => closeModal(ERROR_MODAL_ID)}>Dismiss</button>}
+      >
+        {message}
+      </Modal>
+    </>
   );
 };

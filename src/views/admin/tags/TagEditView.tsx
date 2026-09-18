@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useTagsContext } from "@/src/features/admin/tags/TagsContext";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/src/components/Button";
+import { Button } from "flxtheme";
 
 export default function TagEditView() {
   const router = useRouter();
@@ -61,7 +61,7 @@ export default function TagEditView() {
     <div className="p-8 max-w-2xl space-y-6">
       <header className="space-y-4">
         <Link href="/admin/tags">
-          <Button variant="tertiary" size="sm">
+          <Button variant="ghost" size="sm">
             <ChevronLeft className="w-3.5 h-3.5" />
             Back to Tags
           </Button>
@@ -139,11 +139,8 @@ export default function TagEditView() {
           <Button type="submit" disabled={isSubmitting} variant="primary">
             {isSubmitting ? "SAVING..." : "UPDATE TAG"}
           </Button>
-          <Link
-            href="/admin/tags"
-            className="inline-flex items-center justify-center h-10 px-4 text-sm rounded-md border border-foreground bg-transparent text-foreground hover:bg-foreground/10 transition-colors"
-          >
-            CANCEL
+          <Link href="/admin/tags">
+            <Button variant="outline">CANCEL</Button>
           </Link>
         </div>
       </form>

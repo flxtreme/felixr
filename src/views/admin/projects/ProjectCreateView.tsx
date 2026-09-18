@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/src/components/Button";
+import { Button } from "flxtheme";
 import { useDashboard } from "@/src/features/admin/DashboardContext";
 import { usePosts } from "@/src/features/admin/posts/hooks";
 import { useProjectContext } from "@/src/features/admin/project/ProjectContext";
@@ -254,7 +254,7 @@ export default function ProjectCreateView() {
               href="/admin/projects"
             >
               <Button
-                variant="tertiary"
+                variant="outline"
               >
                 Cancel
               </Button>

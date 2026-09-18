@@ -2,19 +2,20 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Edit2, Trash2, Plus, Tag } from "lucide-react";
-import { Pagination } from "@/src/components/Pagination";
+import { Pagination, Button } from "flxtheme";
 import { usePosts } from "@/src/features/admin/posts/hooks";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { Post } from "@/src/features/admin/posts/types";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
-import { Button } from "@/src/components/Button";
 
 export default function PagesListView({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string; status?: string }>;
 }) {
+  const router = useRouter();
   const { removePage } = usePagesContext();
   const resolvedParams = React.use(searchParams);
 
@@ -36,8 +37,6 @@ export default function PagesListView({
     offset: (currentPage - 1) * pageSize,
     limit: pageSize,
   });
-
-  const totalPages = Math.ceil((meta?.total || 0) / pageSize) || 1;
 
   const columns: Column<Post>[] = [
     {
@@ -156,11 +155,17 @@ export default function PagesListView({
         emptyMessage="No pages found."
       />
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        basePath={`/admin/pages?status=${currentStatus.toLowerCase()}`}
-      />
+      <div className="pt-8">
+        <Pagination 
+          current={currentPage} 
+          total={meta?.total || 0} 
+          pageSize={pageSize} 
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            router.push(`/admin/pages?status=${currentStatus.toLowerCase()}&page=${page}`);
+          }} 
+        />
+      </div>
     </div>
   );
 }

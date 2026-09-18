@@ -2,18 +2,19 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Edit2, Trash2, Plus, EyeOff } from "lucide-react";
-import { Pagination } from "@/src/components/Pagination";
+import { Pagination, Button } from "flxtheme";
 import { useTagsContext } from "@/src/features/admin/tags/TagsContext";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
 import { Tag } from "@/src/features/admin/tags/types";
-import { Button } from "@/src/components/Button";
 
 export default function TagsListView({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
+  const router = useRouter();
   const { tags, isLoading, removeTag } = useTagsContext();
   const { page } = React.use(searchParams);
 
@@ -124,7 +125,14 @@ export default function TagsListView({
         emptyMessage="No tags found."
       />
 
-      <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin/tags" />
+      <div className="pt-8">
+        <Pagination 
+          current={currentPage} 
+          total={tags.length} 
+          pageSize={pageSize} 
+          onPageChange={(page) => router.push(`/admin/tags?page=${page}`)} 
+        />
+      </div>
     </div>
   );
 }

@@ -1,17 +1,16 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Post } from "@/src/features/admin/posts/types";
 import PostRender from "@/src/components/PostRenderer";
-import { Breadcrumbs } from "@/src/components/BreadCrumbs";
-import { SinglePageLayout } from "@/src/layouts/SinglePageLayout";
+import { Breadcrumb, BreadcrumbItem } from "@/src/components/FlxBreadcrumb";
 import * as service from "@/src/features/public/posts/services";
 import parseMetadata from "@/src/utils/parseMetadata";
-import { TagFooter } from "@/src/features/public/components/Tags";
-import { useMemo } from "react";
 import { PageViews } from "@/src/lib/analytics/useViews";
 
 interface Props {
-  params: Promise<{ slug: string, }>;
+  params: Promise<{ slug: string }>;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -67,36 +66,52 @@ export default async function ProjectDetailPage({ params }: Props) {
   }
 
   return (
-    <SinglePageLayout
-      header={
-        <div className="space-y-4">
-          <span className="text-sm text-foreground/40 font-mono block">
-            {project.publishedAt ?? project.createdAt ?? "-"}
-          </span>
-
-          <h1 className="text-4xl font-bold text-primary">
-            {project.title || project.slug.replace(/-/g, " ")}
-          </h1>
-
-          <div className="flex items-center justify-between">
-            <Breadcrumbs
-              items={[
-                {
-                  label: "projects",
-                  href: "/projects",
-                },
-                {
-                  label: (project.title || project.slug).toLowerCase(),
-                },
-              ]}
-            />
-            <PageViews path={["projects", project.slug]} className="text-foreground/40" />
+    <main className="overflow-hidden">
+      <section className="hero-dot-grid">
+        <div className="mx-auto max-w-6xl px-6 py-8 lg:py-10">
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 text-sm font-bold text-primary transition-transform hover:-translate-x-1"
+          >
+            <ArrowLeft className="size-4" /> Back to projects
+          </Link>
+          <div className="mt-5 flex items-center gap-3 text-xs text-foreground/45">
+            <span className="font-mono uppercase tracking-widest">
+              {project.publishedAt ?? project.createdAt ?? "-"}
+            </span>
+            <span aria-hidden="true">*</span>
+            <PageViews path={["projects", project.slug]} className="text-foreground/45" />
+          </div>
+          <div className="mt-3">
+            <Breadcrumb>
+              <BreadcrumbItem href="/projects">projects</BreadcrumbItem>
+              <BreadcrumbItem>{(project.title || project.slug).toLowerCase()}</BreadcrumbItem>
+            </Breadcrumb>
           </div>
         </div>
-      }
-    >
-      <PostRender content={content} />
-      <TagFooter tags={project?.tags ?? []} />
-    </SinglePageLayout>
+      </section>
+
+      <section className="bg-surface/45">
+        <article className="mx-auto max-w-6xl px-6 py-16 lg:py-24">
+          <PostRender content={content} />
+          {project.tags && project.tags.length > 0 && (
+            <div className="mt-16 flex flex-wrap items-center gap-2 border-t border-border pt-6">
+              <span className="mr-2 font-mono text-[10px] uppercase tracking-widest text-foreground/40">
+                Topics
+              </span>
+              {project.tags.map((tag, index) => (
+                <Link
+                  key={`${tag}-${index}`}
+                  href={`/tags/${tag}`}
+                  className="border border-border px-3 py-1.5 text-xs text-foreground/60 transition-colors hover:border-primary hover:text-primary"
+                >
+                  {tag}
+                </Link>
+              ))}
+            </div>
+          )}
+        </article>
+      </section>
+    </main>
   );
 }

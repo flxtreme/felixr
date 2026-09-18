@@ -8,7 +8,7 @@ import { useProject } from "@/src/features/admin/project/hooks";
 import { ChevronLeft, Plus, Trash2, Loader2, Edit2, ExternalLink, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { ProjectLink, UpdateProjectPayload } from "@/src/features/admin/project/types";
-import { Button } from "@/src/components/Button";
+import { Button } from "flxtheme";
 import { useDashboard } from "@/src/features/admin/DashboardContext";
 
 export default function ProjectEditView() {
@@ -292,7 +292,7 @@ export default function ProjectEditView() {
               href="/admin/projects"
             >
               <Button
-                variant="tertiary"
+                variant="outline"
               >
                 Cancel
               </Button>

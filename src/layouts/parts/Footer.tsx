@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { SOCIAL_ICONS } from "@/src/common/icons";
+import { navItems } from "@/src/config/nav";
 import { stringToKey } from "@/src/utils/string";
-
-const pageLinks = [
-  { label: "Projects", path: "/projects" },
-  { label: "Posts", path: "/blog" },
-  { label: "About", path: "/about" },
-];
 
 const socialLinks = [
   { label: "GitHub", path: "https://github.com/flxtreme" },
@@ -16,14 +11,13 @@ const socialLinks = [
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-border mt-auto">
-      <div className="max-w-3xl mx-auto px-6 py-10 flex flex-col gap-8">
-
+    <footer className="mt-auto">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
         {/* Top row: name + page nav */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <span className="text-lg font-bold text-primary">felixr</span>
           <nav className="flex gap-6">
-            {pageLinks.map((link) => (
+            {navItems.map((link) => (
               <Link
                 key={link.label}
                 href={link.path}
@@ -36,8 +30,6 @@ export const Footer = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-border" />
-
         {/* Bottom row: socials + copyright */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-5">
@@ -62,7 +54,6 @@ export const Footer = () => {
             © {new Date().getFullYear()} felixr — Built with Next.js
           </p>
         </div>
-
       </div>
     </footer>
   );

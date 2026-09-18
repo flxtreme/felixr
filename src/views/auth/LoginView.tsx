@@ -3,14 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuthActions } from "@/src/features/auth/hooks";
-import { useTheme } from "@/src/contexts/ThemeContext";
 import { Sun, Moon } from "lucide-react";
-import { cln } from "@/src/utils/cln";
 import { setSession } from "@/src/utils/session";
+import { Button, Card, IconButton, useFlxTheme } from "flxtheme";
 
 export const LoginPage = () => {
   const router = useRouter();
-  const { theme, toggleTheme } = useTheme();
+  const { mode: theme, toggleMode: toggleTheme } = useFlxTheme();
   const { signIn } = useAuthActions();
 
   const [username, setUsername] = useState("");
@@ -39,27 +38,21 @@ export const LoginPage = () => {
     <div className="relative p-8 flex flex-col items-center justify-center min-h-screen bg-background text-foreground">
       {/* Theme toggle button at top right */}
       <div className="absolute top-4 right-4">
-        <button
+        <IconButton
+          icon={theme === "light" ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
           onClick={toggleTheme}
-          className={cln(
-            "p-2 transition-colors hover:text-primary",
-            theme === "light" ? "text-primary" : "text-amber-500"
-          )}
           aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-        >
-          {theme === "light" ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
-        </button>
+        />
       </div>
 
-      <div className="w-full max-w-sm space-y-8">
+      <Card padding="lg" className="w-full max-w-sm rounded-2xl border border-border/60 bg-card/80 p-8 shadow-2xl shadow-black/10 backdrop-blur">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-mono font-bold tracking-tighter uppercase">Admin Login</h1>
           <p className="text-sm text-foreground/40 font-mono">
             Secure access to content management
           </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div className="space-y-1.5">
             <label
               className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1"
@@ -103,15 +96,19 @@ export const LoginPage = () => {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            className="rounded"
+            size="lg"
             disabled={isLoading}
-            className="w-full h-10 bg-primary text-white rounded font-mono font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+            fullWidth
           >
             {isLoading ? "PROCESSING..." : "SIGN IN"}
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
+
     </div>
   );
 };

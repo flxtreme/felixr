@@ -99,14 +99,14 @@ function TechItem({ tech }: { tech: Tech }) {
 
   return (
     <div
-      className="relative flex flex-col items-center gap-2 shrink-0 w-16"
+      className="relative flex w-24 shrink-0 flex-col items-center gap-3"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="relative w-8 h-8 flex items-center justify-center">
+      <div className="relative flex h-12 w-12 items-center justify-center">
         {/* Icon */}
         <Icon
-          className={`w-8 h-8 absolute transition-all duration-200 ${hovered ? "opacity-0 scale-75" : "opacity-60 scale-100"
+          className={`absolute h-12 w-12 transition-all duration-200 ${hovered ? "opacity-0 scale-75" : "opacity-60 scale-100"
             }`}
           style={{ color: tech.color }}
         />
@@ -116,19 +116,19 @@ function TechItem({ tech }: { tech: Tech }) {
             }`}
         >
           <CircularProgress level={tech.level} color={tech.color} />
-          <span className="absolute text-[10px] font-medium text-foreground">{tech.level}%</span>
+          <span className="absolute text-xs font-medium text-foreground">{tech.level}%</span>
         </div>
       </div>
 
-      <span className="relative h-3.5 flex items-center justify-center">
+      <span className="relative flex h-5 items-center justify-center">
         <span
-          className={`absolute text-[11px] font-medium text-center leading-tight whitespace-nowrap text-foreground/60 transition-opacity duration-200 ${hovered ? "opacity-0" : "opacity-100"
+          className={`absolute whitespace-nowrap text-center text-xs font-medium leading-tight text-foreground/60 transition-opacity duration-200 ${hovered ? "opacity-0" : "opacity-100"
             }`}
         >
           {tech.label}
         </span>
         <span
-          className={`absolute text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap transition-opacity duration-200 ${hovered ? "opacity-100" : "opacity-0"
+          className={`absolute whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide transition-opacity duration-200 ${hovered ? "opacity-100" : "opacity-0"
             }`}
           style={{ color: tech.color }}
         >
@@ -151,12 +151,12 @@ export const TechStackMarquee = () => {
   }, [emblaApi]);
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto overflow-visible">
+    <div className="relative w-full overflow-visible">
       <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent z-10" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent z-10" />
 
       <div className="overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
-        <div className="flex gap-8 px-12 py-2">
+        <div className="flex gap-10 px-16 py-4">
           {techStack.map((tech, idx) => (
             <TechItem key={`${tech.key}-${idx}`} tech={tech} />
           ))}

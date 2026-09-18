@@ -2,13 +2,31 @@
 
 import React from "react";
 import Link from "next/link";
-import { Edit2, Trash2, Plus, Tag } from "lucide-react";
-import { Pagination } from "@/src/components/Pagination";
+import { FiEdit, FiTrash2, FiPlus, FiTag } from "flxtheme/icons/fi";
+import {
+  Button,
+  IconButton,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  Badge,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Pagination,
+  Skeleton,
+} from "flxtheme";
 import { usePosts } from "@/src/features/admin/posts/hooks";
 import { usePostContext } from "@/src/features/admin/posts/PostsContext";
 import { Post } from "@/src/features/admin/posts/types";
-import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
-import { Button } from "@/src/components/Button";
+
+const STATUS_VARIANT: Record<string, "success" | "secondary" | "destructive"> = {
+  PUBLISHED: "success",
+  DRAFT: "secondary",
+  TRASHED: "destructive",
+};
 
 export default function PostsListView({
   searchParams,
@@ -37,127 +55,124 @@ export default function PostsListView({
     limit: pageSize,
   });
 
-  const totalPages = Math.ceil((meta?.total || 0) / pageSize) || 1;
-
-  const columns: Column<Post>[] = [
-    {
-      header: "Title",
-      skeletonWidth: "w-48",
-      cell: (post) => (
-        <div className="space-y-1">
-          <Link
-            href={`/admin/posts/${post.id}`}
-            className="text-sm font-bold text-foreground hover:text-primary transition-colors block"
-          >
-            {post.title || post.slug.replace(/-/g, " ")}
-          </Link>
-          <div className="text-[10px] font-mono text-foreground/40 uppercase">/{post.slug}</div>
-        </div>
-      ),
-    },
-    {
-      header: "Status",
-      skeletonWidth: "w-20",
-      cell: (post) => (
-        <span
-          className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-[2px] border uppercase ${post.status === "PUBLISHED"
-              ? "border-green-500/20 bg-green-500/5 text-green-500/60"
-              : post.status === "DRAFT"
-                ? "border-blue-500/20 bg-blue-500/5 text-blue-500/60"
-                : "border-red-500/20 bg-red-500/5 text-red-500/60"
-            }`}
-        >
-          {post.status}
-        </span>
-      ),
-    },
-    {
-      header: "Tags",
-      skeletonWidth: "w-32",
-      cell: (post) => (
-        <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-foreground/40 uppercase">
-          <Tag className="w-3 h-3 text-foreground/20" />
-          <span>{((post?.tags ?? post.metadata?.tags) as string[])?.join(", ") || "NO TAGS"}</span>
-        </div>
-      ),
-    },
-    {
-      header: "Actions",
-      className: "text-right",
-      skeletonWidth: "w-16",
-      cell: (post) => (
-        <div className="flex items-center justify-end gap-2 text-xs font-mono font-medium text-foreground/40">
-          <Link
-            href={`/admin/posts/${post.id}`}
-            className="hover:text-primary hover:underline transition-colors"
-          >
-            Edit
-          </Link>
-          <span className="text-foreground/20">|</span>
-          <button
-            onClick={() => {
-              if (window.confirm("Delete this post?")) removePost(post.id);
-            }}
-            className="hover:text-red-500 hover:underline transition-colors"
-          >
-            Remove
-          </button>
-        </div>
-      ),
-    },
-  ];
+  const total = meta?.total || 0;
 
   return (
     <div className="p-6 space-y-6">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">Posts</h1>
-          <p className="text-sm font-mono font-medium text-foreground/40">
+          <p className="text-sm font-mono font-medium text-muted-foreground">
             Manage your blog posts and articles
           </p>
         </div>
-        <Link
-          href="/admin/posts/new"
-        >
-          <Button
-            variant="primary"
-            size="sm"
-          >
+        <Link href="/admin/posts/new">
+          <Button variant="primary" size="sm">
             <span>Create Post</span>
-            <Plus className="size-4 ml-2" />
+            <FiPlus className="ml-2" />
           </Button>
         </Link>
       </header>
 
-      <div className="flex items-center gap-6 border-b border-border">
-        {["PUBLISHED", "DRAFT", "TRASHED"].map((s) => (
-          <button
-            key={s}
-            onClick={() => {
-              setCurrentStatus(s);
-              setCurrentPage(1);
-            }}
-            className={`pb-4 text-xs font-mono font-bold uppercase tracking-wider transition-colors border-b-2 -mb-px ${currentStatus === s
-                ? "border-primary text-primary"
-                : "border-transparent text-foreground/40 hover:text-foreground"
-              }`}
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        value={currentStatus.toLowerCase()}
+        onValueChange={(v) => {
+          setCurrentStatus(v.toUpperCase());
+          setCurrentPage(1);
+        }}
+      >
+        <TabsList>
+          <TabsTrigger value="published">Published</TabsTrigger>
+          <TabsTrigger value="draft">Draft</TabsTrigger>
+          <TabsTrigger value="trashed">Trashed</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-      <AdminTable
-        columns={columns}
-        data={paginatedPosts}
-        isLoading={isLoading}
-        emptyMessage="No posts found."
-      />
+      <Table striped hoverable>
+        <TableHeader>
+          <TableRow>
+            <TableCell header>Title</TableCell>
+            <TableCell header>Status</TableCell>
+            <TableCell header>Tags</TableCell>
+            <TableCell header className="text-right">Actions</TableCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading &&
+            Array.from({ length: pageSize }).map((_, i) => (
+              <TableRow key={i}>
+                <TableCell><Skeleton variant="text" className="w-48" /></TableCell>
+                <TableCell><Skeleton variant="text" className="w-20" /></TableCell>
+                <TableCell><Skeleton variant="text" className="w-32" /></TableCell>
+                <TableCell className="text-right"><Skeleton variant="text" className="w-16 ml-auto" /></TableCell>
+              </TableRow>
+            ))}
+
+          {!isLoading && paginatedPosts.length === 0 && (
+            <TableRow>
+              <TableCell className="text-center text-muted-foreground py-8">
+                No posts found.
+              </TableCell>
+            </TableRow>
+          )}
+
+          {!isLoading &&
+            paginatedPosts.map((post) => (
+              <TableRow key={post.id}>
+                <TableCell>
+                  <div className="space-y-1">
+                    <Link
+                      href={`/admin/posts/${post.id}`}
+                      className="text-sm font-bold text-foreground hover:text-primary transition-colors block"
+                    >
+                      {post.title || post.slug.replace(/-/g, " ")}
+                    </Link>
+                    <div className="text-[10px] font-mono text-muted-foreground uppercase">
+                      /{post.slug}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={STATUS_VARIANT[post.status] ?? "secondary"} size="sm">
+                    {post.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-muted-foreground uppercase">
+                    <FiTag className="text-muted-foreground" />
+                    <span>
+                      {((post?.tags ?? post.metadata?.tags) as string[])?.join(", ") ||
+                        "NO TAGS"}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <Link href={`/admin/posts/${post.id}`}>
+                      <IconButton icon={<FiEdit />} aria-label="Edit" variant="ghost" size="sm" />
+                    </Link>
+                    <IconButton
+                      icon={<FiTrash2 />}
+                      aria-label="Delete"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        if (window.confirm("Delete this post?")) removePost(post.id);
+                      }}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
 
       <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        basePath={`/admin/posts?status=${currentStatus.toLowerCase()}`}
+        total={total}
+        current={currentPage}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        showTotal
       />
     </div>
   );

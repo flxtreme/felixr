@@ -1,33 +1,46 @@
-import { DM_Sans, DM_Mono } from "next/font/google";
+import { DM_Mono, DM_Serif_Display, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/src/contexts/ThemeContext";
-import { ModalProvider } from "@/src/contexts/ModalContext";
 import { ErrorBoundary } from "@/src/contexts/ErrorBoundary";
 import { GlobalErrorHandler } from "../contexts/GlobalErrorHandler";
 import { Metadata } from "next";
 import { Analytics } from "@/src/lib/analytics/Analytics";
 import { Suspense } from "react";
+import { FlxTheme, ModalProvider } from "flxtheme";
+import FelixrLayout from "./FelixrLayout";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
-  axes: ["opsz"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const dmSerifDisplay = DM_Serif_Display({
+  variable: "--font-dm-serif-display",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
 });
 
 const dmMono = DM_Mono({
   variable: "--font-dm-mono",
   subsets: ["latin"],
   weight: ["300", "400", "500"],
+  display: "swap",
 });
 
+const siteUrl = "https://felixr.vercel.app";
+const title = "Felix Ruz — Full Stack & Agentic Engineer";
+const description =
+  "Software Engineer with nearly 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://felixr.vercel.app"),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "Felix Ruz — Full Stack & Agentic Engineer",
+    default: title,
     template: "%s | Felix Ruz",
   },
-  description:
-    "Software Engineer with nearly 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
+  description,
   keywords: [
     "Felix Ruz",
     "Full Stack Developer",
@@ -42,32 +55,36 @@ export const metadata: Metadata = {
     "Web Developer Portfolio",
     "Tech Blog",
   ],
-  authors: [{ name: "Felix Ruz", url: "https://felixr.vercel.app" }],
+  authors: [{ name: "Felix Ruz", url: siteUrl }],
   creator: "Felix Ruz",
+  publisher: "Felix Ruz",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://felixr.vercel.app",
+    url: siteUrl,
     siteName: "Felix Ruz",
-    title: "Felix Ruz — Full Stack & Agentic Engineer",
-    description:
-      "Software Engineer with nearly 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
+    title,
+    description,
     images: [
       {
-        url: "./og-image.png", // 1200x630px recommended
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Felix Ruz — Full Stack & Agentic Engineer",
+        alt: title,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Felix Ruz — Full Stack & Agentic Engineer",
-    description:
-      "Software Engineer with nearly 8 years of experience building high-impact web and mobile apps. Specializing in React, Next.js, Node.js, and agentic AI-driven development workflows.",
-    images: ["/og-image.jpg"],
-    creator: "@felixruz", // update if you have a handle
+    title,
+    description,
+    images: ["/og-image.png"],
+    creator: "@felixruz",
   },
   robots: {
     index: true,
@@ -81,8 +98,17 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://felixr.vercel.app",
+    canonical: siteUrl,
   },
+};
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Felix Ruz",
+  url: siteUrl,
+  jobTitle: "Full Stack & Agentic Engineer",
+  sameAs: [] as string[],
 };
 
 export default function RootLayout({
@@ -93,21 +119,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${dmMono.variable} h-full antialiased`}
+      className={`${plexSans.variable} ${dmSerifDisplay.variable} ${dmMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>
-        <ThemeProvider>
-          <ModalProvider>
-            <GlobalErrorHandler />
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
-          </ModalProvider>
-        </ThemeProvider>
+        <FelixrLayout>{children}</FelixrLayout>
       </body>
     </html>
   );

@@ -1,59 +1,32 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sun, Moon } from "lucide-react";
 import { cln } from "@/src/utils/cln";
-import { useTheme } from "@/src/contexts/ThemeContext";
 import { navItems } from "@/src/config/nav";
-import { Button } from "@/src/components/Button";
+import { IconButton, useFlxTheme } from "flxtheme";
 
 export const Header = () => {
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
-  const [scrolledPast, setScrolledPast] = useState(false);
-  const isLandingPage = pathname === "/" || pathname === "/home";
-  const showNav = !isLandingPage || scrolledPast;
-
-  useEffect(() => {
-    if (!isLandingPage) return;
-    const handleScroll = () => setScrolledPast(window.scrollY > 260);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isLandingPage]);
-
+  const { mode, toggleMode } = useFlxTheme();
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-transparent data-[scrolled=true]:border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-colors duration-300">
-      <div className="max-w-3xl mx-auto w-full px-6 h-14 flex items-center justify-between gap-4">
-
+    <header className="sticky top-0 z-50 w-full border-b border-transparent bg-background data-[scrolled=true]:border-border transition-colors duration-300">
+      <div className="max-w-6xl mx-auto w-full px-6 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link
           href="/"
-          className={cln(
-            "font-bold transition-all duration-300 hover:text-primary active:scale-95",
-            showNav
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 -translate-y-1 pointer-events-none"
-          )}
+          className="font-bold transition-all duration-300 hover:text-primary active:scale-95"
         >
           <span className="text-primary text-2xl tracking-tight">felixr</span>
         </Link>
 
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4 sm:gap-6">
           {/* Nav links */}
-          <nav
-            className={cln(
-              "flex items-center gap-5 transition-all duration-300",
-              showNav
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-1 pointer-events-none"
-            )}
-          >
+          <nav className="hidden items-center gap-5 sm:flex">
             {navItems.map((item) => {
               const isActive =
-                pathname === item.path ||
-                (item.path !== "/" && pathname.startsWith(item.path));
+                pathname === item.path || (item.path !== "/" && pathname.startsWith(item.path));
 
               return (
                 <Link
@@ -74,21 +47,14 @@ export const Header = () => {
           </nav>
 
           {/* Theme toggle */}
-          <Button
-            variant="tertiary"
+          <IconButton
+            variant="ghost"
             size="sm"
-            square
-            onClick={toggleTheme}
-          >
-
-            {theme === "light" ? (
-              <Moon className="size-4" />
-            ) : (
-              <Sun className="size-4" />
-            )}
-          </Button>
+            onClick={toggleMode}
+            aria-label={`Switch to ${mode === "light" ? "dark" : "light"} mode`}
+            icon={mode === "light" ? <Moon className="size-4" /> : <Sun className="size-4" />}
+          />
         </div>
-
       </div>
     </header>
   );

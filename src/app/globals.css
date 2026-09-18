@@ -1,50 +1,19 @@
 @import "tailwindcss";
-
-:root {
-  --background: #f5f4f0;
-  --foreground: #1a1a2e;
-  --primary: #7c3aed;
-  --primary-hover: #6d28d9;
-  --border: #e8e6e0;
-  --surface: #fafaf7;
-  --muted: #f0eee9;
-}
-
-.dark {
-  --background: #0e0d1a;
-  --foreground: #e8e8ef;
-  --primary: #a78bfa;
-  --primary-hover: #c4b5fd;
-  --border: #1e1d32;
-  --surface: #13121f;
-  --muted: #17162a;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-border: var(--border);
-  --color-surface: var(--surface);
-  --color-muted: var(--muted);
-  --font-sans: var(--font-dm-sans);
-  --font-mono: var(--font-dm-mono);
-}
+@source "../../node_modules/flxtheme";
+@import "./flxtheme.css";
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-dm-sans), Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  font-family: var(--font-plex-sans), sans-serif;
 }
 
-.dark body {
-  background-image: radial-gradient(
-    ellipse 80% 40% at 50% -10%,
-    rgba(124, 58, 237, 0.12) 0%,
-    transparent 70%
-  );
-  background-attachment: fixed;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-dm-serif-display), serif;
 }
 
 select {
@@ -69,4 +38,107 @@ select {
 *::-webkit-scrollbar-thumb {
   background-color: var(--primary);
   border-radius: 10px;
+}
+
+.eyebrow {
+  color: color-mix(in srgb, var(--color-foreground) 45%, transparent);
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-family: var(--font-dm-serif-display), serif;
+  margin-top: 0.8rem;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+.reveal-up {
+  animation: reveal-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-dot-grid,
+.carousel-dot-grid {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-primary) 18%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
+.hero-portrait-shell {
+  position: relative;
+  width: min(100%, 23rem);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-portrait-frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+  background: var(--color-surface);
+  clip-path: inset(0 round 5rem 3rem 6rem 4rem);
+}
+
+.hero-portrait-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: grayscale(0.25) contrast(1.02);
+  transition: filter 0.5s ease;
+}
+
+.hero-portrait-image:hover {
+  filter: grayscale(0) contrast(1.05);
+}
+
+.hero-portrait-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transform: scale(1.04);
+}
+
+.skill-bar {
+  animation: grow-bar 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes grow-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-up,
+  .skill-bar {
+    animation: none;
+  }
 }
