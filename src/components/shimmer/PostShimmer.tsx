@@ -23,17 +23,24 @@ const PostShimmer = ({ count = 3 }: PostShimmerProps) => {
   );
 };
 
-// Matches the bordered card grid in HomeView (3-col with image carousel)
+// Matches the six-card featured project grid in HomeView.
 const ProjectCardShimmer = () => {
   return (
-    <div className="p-4 border-l-6 border-primary/20 bg-primary/5 space-y-2 min-h-[173.5]">
-      <Shimmer className="h-5 w-40 mb-4" />
-      <Shimmer className="h-4 w-full" />
-      <Shimmer className="h-4 w-1/2" />
-      <Shimmer className="h-3 w-30" />
-      <div className="flex items-center gap-2 mt-3">
-        <Shimmer className="size-8 rounded" />
-        <Shimmer className="size-8 rounded" />
+    <div className="flex min-h-56 flex-col justify-between border border-border p-5">
+      <div>
+        <div className="mb-8 flex items-center justify-between">
+          <Shimmer className="h-3 w-14" />
+          <Shimmer className="size-4" />
+        </div>
+        <Shimmer className="h-6 w-3/4" />
+        <div className="mt-2 space-y-2">
+          <Shimmer className="h-4 w-full" />
+          <Shimmer className="h-4 w-5/6" />
+        </div>
+      </div>
+      <div className="mt-6 flex items-center justify-between">
+        <Shimmer className="h-3 w-12" />
+        <Shimmer className="h-3 w-14" />
       </div>
     </div>
   );

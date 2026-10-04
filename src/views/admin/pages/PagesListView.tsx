@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Edit2, Trash2, Plus, Tag } from "lucide-react";
+import { Plus, Tag } from "lucide-react";
 import { Pagination, Button } from "flxtheme";
 import { usePosts } from "@/src/features/admin/posts/hooks";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";

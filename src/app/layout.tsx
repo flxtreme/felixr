@@ -1,31 +1,20 @@
-import { DM_Mono, DM_Serif_Display, IBM_Plex_Sans } from "next/font/google";
+import { Fira_Code, Fira_Sans } from "next/font/google";
 import "./globals.css";
-import { ErrorBoundary } from "@/src/contexts/ErrorBoundary";
-import { GlobalErrorHandler } from "../contexts/GlobalErrorHandler";
 import { Metadata } from "next";
 import { Analytics } from "@/src/lib/analytics/Analytics";
 import { Suspense } from "react";
-import { FlxTheme, ModalProvider } from "flxtheme";
 import FelixrLayout from "./FelixrLayout";
 
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-plex-sans",
+const firaCode = Fira_Code({
+  variable: "--font-fira-code",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const dmSerifDisplay = DM_Serif_Display({
-  variable: "--font-dm-serif-display",
+const firaSans = Fira_Sans({
+  variable: "--font-fira-sans",
   subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-});
-
-const dmMono = DM_Mono({
-  variable: "--font-dm-mono",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
@@ -36,6 +25,11 @@ const description =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
   title: {
     default: title,
     template: "%s | Felix Ruz",
@@ -119,7 +113,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} ${dmSerifDisplay.variable} ${dmMono.variable} h-full antialiased`}
+      className={`${firaCode.variable} ${firaSans.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

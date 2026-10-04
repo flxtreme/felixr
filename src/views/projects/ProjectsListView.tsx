@@ -6,7 +6,13 @@ import { Breadcrumb, BreadcrumbItem } from "@/src/components/FlxBreadcrumb";
 import { use } from "react";
 import { PostShimmer } from "@/src/components/shimmer/PostShimmer";
 import { useProjects } from "@/src/features/public/projects/hooks";
-import { ProjectCard } from "@/src/features/public/components/ProjectCard";
+import { PostCard } from "@/src/components/PostCard";
+import { PageHeader } from "@/src/components/PageHeader";
+import { SectionDivider } from "@/src/components/SectionDivider";
+import { formatShortDate } from "@/src/utils/date";
+
+const cleanExcerpt = (excerpt?: string | null) =>
+  excerpt?.replace(/[#*`]/g, "").substring(0, 200) || "A project built for the web.";
 
 export default function ProjectsListView({
   searchParams,
@@ -32,39 +38,43 @@ export default function ProjectsListView({
 
   return (
     <main className="overflow-hidden">
-      <section className="hero-dot-grid">
-        <div className="mx-auto max-w-6xl px-6 pb-12 pt-14 lg:pb-16 lg:pt-20">
-          <p className="eyebrow">Selected work</p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-black leading-[0.94] tracking-[-0.04em] text-foreground sm:text-6xl">
-            Things I&apos;ve
-            <br />
-            <span className="text-primary">shipped.</span>
-          </h1>
-          <p className="mt-5 max-w-xl text-sm leading-6 text-foreground/55">
-            A collection of products, experiments, and systems built across the web stack.
-          </p>
-          <div className="mt-6">
-            <Breadcrumb>
-              <BreadcrumbItem>projects</BreadcrumbItem>
-            </Breadcrumb>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-surface/45">
-        <div className="mx-auto max-w-6xl px-6 py-20">
+      <PageHeader
+        eyebrow="projects"
+        title="Things I've shipped."
+      >
+        <Breadcrumb>
+          <BreadcrumbItem href="/">home</BreadcrumbItem>
+          <BreadcrumbItem>projects</BreadcrumbItem>
+        </Breadcrumb>
+      </PageHeader>
+      <SectionDivider />
+      <section id="projects">
+        <div className="mx-auto max-w-3xl px-6 py-10">
           {isLoading && <PostShimmer />}
           {paginatedProjects.length > 0 ? (
-            <div className="flex flex-col divide-y divide-border">
-              {paginatedProjects.map((project, index) => (
-                <ProjectCard key={`${project.id}-${index}`} project={project} />
-              ))}
+            <div className="divide-y divide-foreground/10">
+              {paginatedProjects.map((project, index) => {
+                const page = project.page;
+                const publishedAt = page?.publishedAt ?? page?.createdAt ?? page?.updatedAt;
+
+                return (
+                  <PostCard
+                    key={`${project.id}-${index}`}
+                    href={`/projects/${page?.slug}`}
+                    title={page?.title || project.title}
+                    excerpt={cleanExcerpt(page?.excerpt || project.description)}
+                    dateLabel={formatShortDate(publishedAt) || "Recent"}
+                    variant="compact"
+                    excerptSize="sm"
+                  />
+                );
+              })}
             </div>
           ) : (
             !isLoading && <p className="text-sm text-foreground/45">No projects found.</p>
           )}
 
-          <div className="mt-12 border-t border-border pt-8">
+          <div className="mt-12 border-t border-foreground/10 pt-8">
             <Pagination
               current={currentPage}
               total={meta?.total || 0}

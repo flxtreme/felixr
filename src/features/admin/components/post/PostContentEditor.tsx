@@ -53,7 +53,7 @@ const Sep = () => <span className="w-px h-4 bg-border mx-1 self-center shrink-0"
 
 // Shared style applied to BOTH overlay and textarea — must be identical
 const EDITOR_STYLE: React.CSSProperties = {
-  fontFamily: "var(--font-dm-mono), ui-monospace, monospace",
+  fontFamily: "var(--font-fira-code), monospace",
   fontSize: "14px",
   fontWeight: 500,
   lineHeight: "1.625",
@@ -263,9 +263,8 @@ export const PostContentEditor = ({
       <div className="flex flex-col flex-1 border-t border-border overflow-hidden">
         {/* Toolbar */}
         <div
-          className={`flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-border transition-opacity ${
-            isPreview ? "opacity-40 pointer-events-none" : ""
-          }`}
+          className={`flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-border transition-opacity ${isPreview ? "opacity-40 pointer-events-none" : ""
+            }`}
         >
           <span className="text-[10px] font-mono text-foreground/30 px-1">heading</span>
           {(["h1", "h2", "h3"] as const).map((h) => (
@@ -342,7 +341,7 @@ export const PostContentEditor = ({
                     <h1 className="text-4xl font-bold tracking-tight">
                       Preview
                     </h1>
-          
+
                     <Breadcrumb>
                       <BreadcrumbItem href="#">preview</BreadcrumbItem>
                     </Breadcrumb>

@@ -4,13 +4,13 @@
   --color-secondary: #8b5cf6;
   --color-secondary-hover: #7c3aed;
   --color-tertiary: #ec4899;
-  --color-background: #f6f4ef;
+  --color-background: #e8e6e0;
   --color-foreground: #20232b;
-  --color-surface: #ebe9e3;
-  --color-surface-hover: #e1dfd8;
-  --color-border: #d8d5cc;
-  --color-muted: #e5e3dc;
-  --color-muted-foreground: #686b73;
+  --color-surface: #dddbd4;
+  --color-surface-hover: #d3d1ca;
+  --color-border: #c6c3ba;
+  --color-muted: #d9d7d0;
+  --color-muted-foreground: #62656d;
   --color-accent: #f0abfc;
   --color-accent-foreground: #701a75;
   --color-destructive: #ef4444;
@@ -20,7 +20,10 @@
   --color-info: #3b82f6;
 
   --radius-: 0.5rem;
-  --font-: "Inter", system-ui, -apple-system, sans-serif;
+  --font-: var(--font-fira-code), monospace;
+  --font-sans: var(--font-fira-code), monospace;
+  --font-serif: var(--font-fira-sans), sans-serif;
+  --font-mono: var(--font-fira-code), monospace;
 }
 
 :root {

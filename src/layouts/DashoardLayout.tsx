@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { useDashboard } from "@/src/features/admin/DashboardContext";
 import { useAuthActions } from "@/src/features/auth/hooks";
 import {
@@ -21,9 +20,7 @@ import {
   Sparkles,
   Users,
   Settings,
-  ChevronDown,
   ArrowLeft,
-  Plus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";

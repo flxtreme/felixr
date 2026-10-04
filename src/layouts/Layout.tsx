@@ -1,15 +1,11 @@
-import React from "react";
-import { Header } from "@/src/layouts/parts/Header";
-import { Footer } from "@/src/layouts/parts/Footer";
+import type { ReactNode } from "react";
+import { LayoutProvider } from "@/src/layouts/LayoutContext";
+import { LayoutFrame } from "@/src/layouts/LayoutFrame";
 
-export const Layout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <div className="flex-1">{children}</div>
-      <Footer />
-    </div>
-  );
-};
+export const Layout = ({ children }: { children: ReactNode }) => (
+  <LayoutProvider>
+    <LayoutFrame>{children}</LayoutFrame>
+  </LayoutProvider>
+);
 
 export default Layout;

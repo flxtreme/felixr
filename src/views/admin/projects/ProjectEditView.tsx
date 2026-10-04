@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { usePosts, usePost } from "@/src/features/admin/posts/hooks";
 import { useProjectContext } from "@/src/features/admin/project/ProjectContext";
 import { useProject } from "@/src/features/admin/project/hooks";
-import { ChevronLeft, Plus, Trash2, Loader2, Edit2, ExternalLink, RefreshCw } from "lucide-react";
+import { Plus, Trash2, Loader2, Edit2, ExternalLink, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { ProjectLink, UpdateProjectPayload } from "@/src/features/admin/project/types";
 import { Button } from "flxtheme";

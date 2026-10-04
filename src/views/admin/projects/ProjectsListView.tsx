@@ -2,7 +2,6 @@
 
 import { useProjects } from "@/src/features/admin/project/hooks";
 import { useProjectContext } from "@/src/features/admin/project/ProjectContext";
-import { LuPen, LuExternalLink, LuPlus, LuTrash2 } from "flxtheme/icons/lu";
 import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/navigation";

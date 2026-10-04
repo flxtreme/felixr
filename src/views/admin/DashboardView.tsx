@@ -10,11 +10,11 @@ import {
   LuFileText,
   LuFolderKanban,
   LuLayoutPanelLeft,
-  LuPlus,
 } from "flxtheme/icons/lu";
 import { useAnalytics } from "@/src/lib/analytics/useAnalytics";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { formatDate } from "@/src/utils/date";
 
 export default function DashboardView() {
   const router = useRouter();
@@ -112,7 +112,7 @@ export default function DashboardView() {
                     {post.title}
                   </p>
                   <p className="text-xs font-mono font-medium text-foreground/40">
-                    {post.status} · {post.publishedAt ?? post.createdAt}
+                    {post.status} · {formatDate(post.publishedAt ?? post.createdAt)}
                   </p>
                 </div>
                 <Button

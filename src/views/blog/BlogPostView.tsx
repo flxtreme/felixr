@@ -1,40 +1,26 @@
-import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Post } from "@/src/features/admin/posts/types";
 import PostRender from "@/src/components/PostRenderer";
 import { Breadcrumb, BreadcrumbItem } from "@/src/components/FlxBreadcrumb";
-import * as service from "@/src/features/public/posts/services";
+import * as service from "@/src/features/public/posts/serverServices";
 import parseMetadata from "@/src/utils/parseMetadata";
 import { PageViews } from "@/src/lib/analytics/useViews";
+import { RESERVED_SLUGS } from "@/src/common/reservedSlugs";
+import { PageHeader } from "@/src/components/PageHeader";
+import { SectionDivider } from "@/src/components/SectionDivider";
+import { PageNotFound } from "@/src/components/PageNotFound";
+import { formatDate } from "@/src/utils/date";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-async function getPost(slug: string): Promise<Post | null> {
-  try {
-    const res = await fetch(`${API_URL}/api/public/post/${slug}`, {
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      return null;
-    }
-
-    const post: Post = await res.json();
-
-    if (post.postType !== "POST") {
-      return null;
-    }
-
-    return post;
-  } catch {
+async function getPost(slug: string) {
+  if (RESERVED_SLUGS.includes(slug)) {
     return null;
   }
+  const post = await service.getPublicPostBySlug(slug);
+  return post?.postType === "POST" ? post : null;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -42,8 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const [post, metadata, content] = await Promise.all([
     getPost(slug),
-    service.getPostMetadataBySlug(slug),
-    service.getPostContentBySlug(slug),
+    service.getPublicPostMetadataBySlug(slug),
+    service.getPublicPostContentBySlug(slug),
   ]);
 
   if (!post) {
@@ -56,40 +42,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
 
-  const [post, content] = await Promise.all([getPost(slug), service.getPostContentBySlug(slug)]);
+  const [post, content] = await Promise.all([getPost(slug), service.getPublicPostContentBySlug(slug)]);
 
   if (!post) {
-    notFound();
+    return <PageNotFound slug={slug} />;
   }
 
   return (
     <main className="overflow-hidden">
-      <section className="hero-dot-grid">
-        <div className="mx-auto max-w-6xl px-6 py-8 lg:py-10">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 text-sm font-bold text-primary transition-transform hover:-translate-x-1"
-          >
-            <ArrowLeft className="size-4" /> Back to posts
-          </Link>
-          <div className="mt-5 flex items-center gap-3 text-xs text-foreground/45">
+      <PageHeader
+        titleSize="2xl"
+        eyebrow="blog"
+        title={
+          <div className="flex items-center gap-3 text-xs text-foreground/45">
             <span className="font-mono uppercase tracking-widest">
-              {post.publishedAt ?? post.createdAt ?? "-"}
+              {formatDate(post.publishedAt ?? post.createdAt) || "-"}
             </span>
             <span aria-hidden="true">*</span>
             <PageViews path={["blog", post.slug]} className="text-foreground/45" />
           </div>
-          <div className="mt-3">
-            <Breadcrumb>
-              <BreadcrumbItem href="/blog">posts</BreadcrumbItem>
-              <BreadcrumbItem>{(post.title || post.slug).toLowerCase()}</BreadcrumbItem>
-            </Breadcrumb>
-          </div>
+        }
+      >
+        <div className="flex flex-col gap-3">
+          <Breadcrumb>
+            <BreadcrumbItem href="/">home</BreadcrumbItem>
+            <BreadcrumbItem href="/blog">blog</BreadcrumbItem>
+            <BreadcrumbItem>{(post.title || post.slug).toLowerCase()}</BreadcrumbItem>
+          </Breadcrumb>
         </div>
-      </section>
-
-      <section className="bg-surface/45">
-        <article className="mx-auto max-w-6xl px-6 py-16 lg:py-24">
+      </PageHeader>
+      <SectionDivider />
+      <section>
+        <article id="content" className="mx-auto max-w-3xl px-6 py-12">
           <PostRender content={content} />
           {post.tags && post.tags.length > 0 && (
             <div className="mt-16 flex flex-wrap items-center gap-2 border-t border-border pt-6">

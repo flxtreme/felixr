@@ -47,7 +47,7 @@ function parseTable(block: string): ParsedTable {
 
 function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
   const pattern =
-    /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)|\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)|\[\^(\w+)\]|\*\*\*([^*]+)\*\*\*|\*\*([^*]+)\*\*|\*([^*\n]+)\*|~~([^~]+)~~|==([^=]+)==|\^([^^]+)\^|~([^~]+)~|\+\+([^+]+)\+\+|`([^`]+)`/g;
+    /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)|\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)|\[\^(\w+)\]|\*\*\*([^*]+)\*\*\*|\*\*([^*]+)\*\*|\*([^*\n]+)\*|~~([^~]+)~~|==([^=]+)==|\^([^^]+)\^|~([^~]+)~|\+\+([^+]+)\+\+|`([^`]+)`|((?:https?:\/\/|www\.)[^\s<]+)/g;
 
   const nodes: ReactNode[] = [];
   let last = 0;
@@ -106,6 +106,23 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
           {m[16]}
         </code>
       );
+    } else if (m[17] !== undefined) {
+      const url = m[17].replace(/[.,!?;:]+$/, "");
+      const trailingPunctuation = m[17].slice(url.length);
+      const href = url.startsWith("www.") ? `https://${url}` : url;
+
+      nodes.push(
+        <a
+          key={k}
+          href={href}
+          className="pr-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {url}
+        </a>
+      );
+      if (trailingPunctuation) nodes.push(trailingPunctuation);
     }
 
     last = pattern.lastIndex;
@@ -601,7 +618,7 @@ const styles = `
 }
 
 .pr-root {
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+  font-family: var(--font-fira-code), monospace;
   font-size: 16px;
   line-height: 1.75;
   color: var(--color-foreground);
@@ -654,11 +671,11 @@ const styles = `
   overflow-x: auto; margin: 1.1rem 0;
 }
 .pr-code {
-  font-family: var(--font-mono, 'Fira Code', 'Cascadia Code', Consolas, monospace);
+  font-family: var(--font-fira-code), monospace;
   font-size: 13.5px; line-height: 1.65; color: var(--foreground);
 }
 .pr-inline-code {
-  font-family: var(--font-mono, 'Fira Code', 'Cascadia Code', Consolas, monospace);
+  font-family: var(--font-fira-code), monospace;
   font-size: .855em;
   background: var(--pr-muted-bg);
   border: 1px solid color-mix(in srgb, var(--color-foreground) 22%, var(--color-background));

@@ -3,11 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Edit2, Trash2, Plus, EyeOff } from "lucide-react";
+import { Plus, EyeOff } from "lucide-react";
 import { Pagination, Button } from "flxtheme";
 import { useTagsContext } from "@/src/features/admin/tags/TagsContext";
 import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
 import { Tag } from "@/src/features/admin/tags/types";
+import { formatDate } from "@/src/utils/date";
 
 export default function TagsListView({
   searchParams,
@@ -60,11 +61,7 @@ export default function TagsListView({
       skeletonWidth: "w-24",
       cell: (tag) => (
         <span className="text-xs font-mono font-medium text-foreground/40">
-          {new Date(tag.createdAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}
+          {formatDate(tag.createdAt)}
         </span>
       ),
     },
