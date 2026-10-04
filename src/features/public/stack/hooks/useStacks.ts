@@ -1,8 +1,8 @@
 import useSWR from "swr";
 import { getStacks } from "@/src/features/public/stack/services";
-import type { GetStacksQuery } from "@/src/features/public/stack/types";
+import type { GetStacksQuery, Stack } from "@/src/features/public/stack/types";
 
-const EMPTY_STACKS = [];
+const EMPTY_STACKS: Stack[] = [];
 
 const useStacks = (params?: GetStacksQuery) => {
   const swr = useSWR(["stacks", params], () => getStacks(params));
