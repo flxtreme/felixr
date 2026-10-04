@@ -62,9 +62,9 @@ export default function HomeView() {
   return (
     <main className="overflow-hidden">
       <section id="home" className="relative overflow-hidden text-foreground">
-        <div className="mx-auto max-w-3xl px-6 pb-10 pt-20 gap-12 grid grid-cols-2">
+        <div className="mx-auto max-w-3xl px-6 pb-10 pt-20 gap-6 sm:gap-10 grid grid-cols-1 sm:grid-cols-2">
           <div>
-            <div className="relative mb-4 size-full shrink-0 overflow-hidden flex items-start justify-center bg-surface/45">
+            <div className="relative mb-4 aspect-square w-full shrink-0 overflow-hidden flex items-cemter justify-center bg-surface/45">
               <Image
                 src="/hero-image.png"
                 alt="Felix Ruz"
