@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "flxtheme";
 import { useDashboard } from "@/src/features/admin/DashboardContext";
 import { usePosts } from "@/src/features/admin/posts/hooks";
 import { useProjectContext } from "@/src/features/admin/project/ProjectContext";
@@ -9,6 +8,7 @@ import { Edit2, ExternalLink, Loader2, Plus, RefreshCw, Trash2 } from "lucide-re
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+import { AdminButton } from "@/src/features/admin/components/AdminButton";
 
 export default function ProjectCreateView() {
   const router = useRouter();
@@ -80,7 +80,7 @@ export default function ProjectCreateView() {
     }
   };
 
-  const previewUrl = pageSlug ? `/projects/${pageSlug}` : null;
+  const previewUrl = pageSlug ? `/projects/${pageSlug.toLowerCase()}` : null;
 
   return (
     <div className="h-full flex flex-col">
@@ -177,14 +177,14 @@ export default function ProjectCreateView() {
                             type="button"
                             onClick={() => {
                               setPageId(page.id);
-                              setPageSlug(page.slug);
+                              setPageSlug(page.slug.toLowerCase());
                               setPageSearch(page.title || page.slug);
                               setShowSuggestions(false);
                             }}
                             className="w-full text-left px-3 py-1.5 text-xs font-mono hover:bg-primary/5 hover:text-primary transition-colors flex flex-col"
                           >
                             <span>{page.title || page.slug}</span>
-                            <span className="text-[8px] opacity-40">/{page.slug}</span>
+                            <span className="text-[8px] opacity-40">/{page.slug.toLowerCase()}</span>
                           </button>
                         ))
                       ) : (
@@ -201,13 +201,14 @@ export default function ProjectCreateView() {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-border pb-2">
                 <h2 className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1">External Links</h2>
-                <button
+                <AdminButton
                   type="button"
                   onClick={handleAddLink}
-                  className="text-[10px] font-mono font-bold text-primary hover:underline flex items-center gap-1"
+                  variant="ghost"
+                  className="gap-1 text-[10px] font-bold text-primary"
                 >
                   <Plus className="w-3 h-3" /> ADD LINK
-                </button>
+                </AdminButton>
               </div>
 
               <div className="space-y-3">
@@ -231,13 +232,15 @@ export default function ProjectCreateView() {
                         placeholder="URL (https://...)"
                       />
                     </div>
-                    <button
+                    <AdminButton
                       type="button"
                       onClick={() => handleRemoveLink(index)}
-                      className="h-9 w-9 flex items-center justify-center border border-border rounded text-foreground/20 hover:text-red-500 transition-colors"
+                      variant="destructive"
+                      aria-label="Remove link"
+                      className="size-9 p-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    </AdminButton>
                   </div>
                 ))}
                 {links.length === 0 && (
@@ -253,15 +256,15 @@ export default function ProjectCreateView() {
             <Link
               href="/admin/projects"
             >
-              <Button
+              <AdminButton
                 variant="outline"
               >
                 Cancel
-              </Button>
+              </AdminButton>
             </Link>
-            <Button type="submit" disabled={isSubmitting} variant="primary">
+            <AdminButton type="submit" disabled={isSubmitting} variant="primary">
               {isSubmitting ? "Updating..." : "Update"}
-            </Button>
+            </AdminButton>
           </div>
         </form>
 
@@ -272,14 +275,15 @@ export default function ProjectCreateView() {
             <div className="flex items-center gap-3">
               {previewUrl && (
                 <>
-                  <button
+                  <AdminButton
                     type="button"
                     onClick={() => setPreviewKey((k) => k + 1)}
-                    className="text-foreground/40 hover:text-primary transition-colors"
+                    variant="ghost"
+                    aria-label="Refresh preview"
                     title="Refresh preview"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                  </button>
+                  </AdminButton>
                   <Link href={previewUrl} target="_blank" className="text-foreground/40 hover:text-primary transition-colors" title="Open in new tab">
                     <ExternalLink className="w-3.5 h-3.5" />
                   </Link>

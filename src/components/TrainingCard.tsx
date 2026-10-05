@@ -1,14 +1,16 @@
+import type { ReactNode } from "react";
 import { GraduationCap } from "lucide-react";
 import type { Training } from "@/src/features/public/trainings/types";
 import { cln } from "@/src/utils/cln";
 import { formatShortDate } from "@/src/utils/date";
 
-export function TrainingCard({ training }: { training: Training }) {
+export function TrainingCard({ training, actions }: { training: Training; actions?: ReactNode }) {
   return (
     <li id={training.id} className={cln("mb-6 break-inside-avoid")}>
       <article className={cln("border border-foreground/10")}>
-        <div className={cln("flex min-h-36 items-center border-b border-foreground/10 bg-foreground/[0.03] p-5")}>
+        <div className={cln("flex min-h-36 items-center justify-between border-b border-foreground/10 bg-foreground/[0.03] p-5")}>
           <GraduationCap aria-hidden="true" className={cln("size-12 text-primary/75")} strokeWidth={1.25} />
+          {actions}
         </div>
         <div className={cln("p-4")}>
           <p className={cln("font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/45")}>
@@ -33,3 +35,4 @@ export function TrainingCard({ training }: { training: Training }) {
     </li>
   );
 }
+import type { ReactNode } from "react";

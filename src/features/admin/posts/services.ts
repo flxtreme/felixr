@@ -8,6 +8,7 @@ import {
 } from "@/src/features/admin/posts/types";
 import { PaginatedResponse } from "@/src/common/types";
 import { Metadata } from "next";
+import { trackAdminMutation } from "@/src/lib/analytics/trackAdminMutation";
 
 const API_PREFIX = "/admin/post";
 
@@ -66,22 +67,22 @@ export const getPostBySlug = async (slug: string): Promise<Post> => {
 };
 
 export const createPost = async (payload: CreatePostPayload): Promise<Post> => {
-  return fetcher(API_PREFIX, {
+  return trackAdminMutation({ action: "insert", path: (post) => ["admin", "post", post.id], mutate: () => fetcher<Post>(API_PREFIX, {
     method: "POST",
     body: JSON.stringify(payload),
-  });
+  }) });
 };
 
 export const updatePost = async (id: string, payload: UpdatePostPayload): Promise<Post> => {
-  return fetcher(`${API_PREFIX}/${id}`, {
+  return trackAdminMutation({ action: "update", path: ["admin", "post", id], getPrevious: () => getPostById(id), mutate: () => fetcher<Post>(`${API_PREFIX}/${id}`, {
     method: "PUT",
     body: JSON.stringify(payload),
-  });
+  }) });
 };
 
 export const deletePost = async (id: string, payload: DeletePostPayload): Promise<Post> => {
-  return fetcher(`${API_PREFIX}/${id}`, {
+  return trackAdminMutation({ action: payload.isPermanent ? "delete" : "soft_delete", path: ["admin", "post", id], getPrevious: () => getPostById(id), mutate: () => fetcher<Post>(`${API_PREFIX}/${id}`, {
     method: "DELETE",
     body: JSON.stringify(payload),
-  });
+  }) });
 };

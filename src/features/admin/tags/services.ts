@@ -8,6 +8,7 @@ import type {
   UpdateTagPayload,
 } from "@/src/features/admin/tags/types";
 import { PaginatedResponse } from "@/src/common/types";
+import { trackAdminMutation } from "@/src/lib/analytics/trackAdminMutation";
 
 const API_PREFIX = "admin/tag";
 
@@ -50,24 +51,24 @@ export const getTagById = async (id: string): Promise<Tag> => {
 };
 
 export const createTag = async (payload: CreateTagPayload): Promise<Tag> => {
-  return fetcher(`${API_PREFIX}`, {
+  return trackAdminMutation({ action: "insert", path: (tag) => ["admin", "tag", tag.id], mutate: () => fetcher<Tag>(`${API_PREFIX}`, {
     method: "POST",
     body: JSON.stringify(payload),
-  });
+  }) });
 };
 
 export const updateTag = async (id: string, payload: UpdateTagPayload): Promise<Tag> => {
-  return fetcher(`${API_PREFIX}/${id}`, {
+  return trackAdminMutation({ action: "update", path: ["admin", "tag", id], getPrevious: () => getTagById(id), mutate: () => fetcher<Tag>(`${API_PREFIX}/${id}`, {
     method: "PUT",
     body: JSON.stringify(payload),
-  });
+  }) });
 };
 
 export const deleteTag = async (id: string, payload: DeleteTagPayload): Promise<Tag> => {
-  return fetcher(`${API_PREFIX}/${id}`, {
+  return trackAdminMutation({ action: payload.isPermanent ? "delete" : "soft_delete", path: ["admin", "tag", id], getPrevious: () => getTagById(id), mutate: () => fetcher<Tag>(`${API_PREFIX}/${id}`, {
     method: "DELETE",
     body: JSON.stringify(payload),
-  });
+  }) });
 };
 
 export const searchTags = async (query: string): Promise<Tag[]> => {

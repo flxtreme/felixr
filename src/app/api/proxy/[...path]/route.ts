@@ -5,17 +5,20 @@ const API_KEY = process.env.API_KEY || "";
 
 async function handleProxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
+  const hasBody = req.method !== "GET" && req.method !== "HEAD" && req.body !== null;
 
   // Extract the target path after /api
   const targetPath = pathname.replace(/^\/api\/proxy/, "/api");
   const targetUrl = `${API_URL}${targetPath}${search}`;
 
   const headers = new Headers(req.headers);
+  const isMultipart = headers.get("content-type")?.toLowerCase().startsWith("multipart/form-data") ?? false;
 
   // Ensure standard content type
-  if (!headers.has("content-type")) {
+  if (hasBody && !headers.has("content-type")) {
     headers.set("content-type", "application/json");
   }
+  if (!hasBody) headers.delete("content-type");
 
   // Robust check for Authorization header.
   // Use API Key fallback if header is missing or contains an invalid "undefined" value.
@@ -27,12 +30,19 @@ async function handleProxy(req: NextRequest) {
   // Clean up headers that can cause proxy issues
   headers.delete("host");
   headers.delete("content-length");
+  if (isMultipart) headers.delete("content-type");
 
   try {
+    const body: BodyInit | undefined = !hasBody
+      ? undefined
+      : isMultipart
+        ? await req.formData()
+        : await req.blob();
+
     const response = await fetch(targetUrl, {
       method: req.method,
       headers: headers,
-      body: req.method !== "GET" && req.method !== "HEAD" ? await req.blob() : undefined,
+      body,
       cache: "no-store",
     });
 

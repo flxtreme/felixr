@@ -7,6 +7,7 @@ import type {
   Project,
   UpdateProjectPayload,
 } from "@/src/features/admin/project/types";
+import { trackAdminMutation } from "@/src/lib/analytics/trackAdminMutation";
 
 const API_PREFIX = "admin/project";
 
@@ -29,22 +30,22 @@ export const getProjectById = async (id: string): Promise<Project> => {
 };
 
 export const createProject = async (payload: CreateProjectPayload): Promise<Project> => {
-  return fetcher(API_PREFIX, {
+  return trackAdminMutation({ action: "insert", path: (project) => ["admin", "project", project.id], mutate: () => fetcher<Project>(API_PREFIX, {
     method: "POST",
     body: JSON.stringify(payload),
-  });
+  }) });
 };
 
 export const updateProject = async (id: string, payload: UpdateProjectPayload): Promise<Project> => {
-  return fetcher(`${API_PREFIX}/${id}`, {
+  return trackAdminMutation({ action: "update", path: ["admin", "project", id], getPrevious: () => getProjectById(id), mutate: () => fetcher<Project>(`${API_PREFIX}/${id}`, {
     method: "PUT",
     body: JSON.stringify(payload),
-  });
+  }) });
 };
 
 export const deleteProject = async (id: string, payload: DeleteProjectPayload): Promise<Project> => {
-  return fetcher(`${API_PREFIX}/${id}`, {
+  return trackAdminMutation({ action: payload.isPermanent ? "delete" : "soft_delete", path: ["admin", "project", id], getPrevious: () => getProjectById(id), mutate: () => fetcher<Project>(`${API_PREFIX}/${id}`, {
     method: "DELETE",
     body: JSON.stringify(payload),
-  });
+  }) });
 };

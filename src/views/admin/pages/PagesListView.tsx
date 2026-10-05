@@ -1,31 +1,48 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Tag } from "lucide-react";
-import { Pagination, Button } from "flxtheme";
+import { Plus } from "lucide-react";
+import { Pagination, Tabs, TabsList, TabsTrigger } from "flxtheme";
 import { usePosts } from "@/src/features/admin/posts/hooks";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
-import { Post } from "@/src/features/admin/posts/types";
-import { AdminTable, Column } from "@/src/features/admin/components/AdminTable";
+import type { Post } from "@/src/features/admin/posts/types";
+import { AdminList, type AdminListColumn } from "@/src/features/admin/components/AdminList";
+import { AdminButton } from "@/src/features/admin/components/AdminButton";
+import { AdminPageHeader } from "@/src/features/admin/components/AdminPageHeader";
+import { AdminRowActions } from "@/src/features/admin/components/AdminRowActions";
+import { AdminSearchInput } from "@/src/features/admin/components/AdminSearchInput";
 
 export default function PagesListView({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{ page?: string; status?: string; search?: string }>;
 }) {
   const router = useRouter();
   const { removePage } = usePagesContext();
   const resolvedParams = React.use(searchParams);
 
-  const [currentStatus, setCurrentStatus] = React.useState(
+  const [currentStatus, setCurrentStatus] = useState(
     (resolvedParams?.status ?? "published").toUpperCase()
   );
-  const [currentPage, setCurrentPage] = React.useState(
+  const [currentPage, setCurrentPage] = useState(
     Math.max(1, Number(resolvedParams?.page) || 1)
   );
+  const [search, setSearch] = useState(resolvedParams?.search ?? "");
+  const [debouncedSearch, setDebouncedSearch] = useState(search.trim());
   const pageSize = 10;
+
+  useEffect(() => {
+    setSearch(resolvedParams?.search ?? "");
+    setCurrentStatus((resolvedParams?.status ?? "published").toUpperCase());
+    setCurrentPage(Math.max(1, Number(resolvedParams?.page) || 1));
+  }, [resolvedParams?.page, resolvedParams?.status, resolvedParams?.search]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setDebouncedSearch(search.trim()), 250);
+    return () => window.clearTimeout(timeout);
+  }, [search]);
 
   const {
     posts: paginatedPages,
@@ -34,50 +51,24 @@ export default function PagesListView({
   } = usePosts({
     postType: "PAGE",
     status: currentStatus as Post["status"] | undefined,
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
     offset: (currentPage - 1) * pageSize,
     limit: pageSize,
   });
 
-  const columns: Column<Post>[] = [
+  const columns: AdminListColumn<Post>[] = [
     {
       header: "Title",
       skeletonWidth: "w-48",
       cell: (page) => (
-        <div className="space-y-1">
+        <div className="flex flex-col items-start gap-1">
           <Link
             href={`/admin/pages/${page.id}`}
-            className="text-sm font-bold text-foreground hover:text-primary transition-colors block"
+            className="text-sm font-bold text-foreground transition-colors hover:text-primary"
           >
             {page.title || page.slug.replace(/-/g, " ")}
           </Link>
-          <div className="text-[10px] font-mono text-foreground/40 uppercase">/{page.slug}</div>
-        </div>
-      ),
-    },
-    {
-      header: "Status",
-      skeletonWidth: "w-20",
-      cell: (page) => (
-        <span
-          className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-[2px] border uppercase ${
-            page.status === "PUBLISHED"
-              ? "border-green-500/20 bg-green-500/5 text-green-500/60"
-              : page.status === "DRAFT"
-                ? "border-blue-500/20 bg-blue-500/5 text-blue-500/60"
-                : "border-red-500/20 bg-red-500/5 text-red-500/60"
-          }`}
-        >
-          {page.status}
-        </span>
-      ),
-    },
-    {
-      header: "Tags",
-      skeletonWidth: "w-32",
-      cell: (page) => (
-        <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-foreground/40 uppercase">
-          <Tag className="w-3 h-3 text-foreground/20" />
-          <span>{((page?.tags ?? page.metadata?.tags) as string[])?.join(", ") || "NO TAGS"}</span>
+          <span className="font-mono text-xs lowercase text-foreground/45">/{page.slug.toLowerCase()}</span>
         </div>
       ),
     },
@@ -86,84 +77,78 @@ export default function PagesListView({
       className: "text-right",
       skeletonWidth: "w-16",
       cell: (page) => (
-        <div className="flex items-center justify-end gap-2 text-xs font-mono font-medium text-foreground/40">
-          <Link
-            href={`/admin/pages/${page.id}`}
-            className="hover:text-primary hover:underline transition-colors"
-          >
-            Edit
-          </Link>
-          <span className="text-foreground/20">|</span>
-          <button
-            onClick={() => {
-              if (window.confirm("Delete this page?")) removePage(page.id);
-            }}
-            className="hover:text-red-500 hover:underline transition-colors"
-          >
-            Remove
-          </button>
-        </div>
+        <AdminRowActions
+          editHref={`/admin/pages/${page.id}`}
+          onDelete={(isPermanent) => removePage(page.id, isPermanent)}
+          isDeleted={page.isDeleted || page.status === "TRASHED"}
+          deleteMessage={page.isDeleted || page.status === "TRASHED"
+            ? `Permanently delete page “${page.title}”?`
+            : `Move page “${page.title}” to trash?`}
+        />
       ),
     },
   ];
 
   return (
     <div className="p-6 space-y-6">
-      <header className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold">Pages</h1>
-          <p className="text-sm font-mono font-medium text-foreground/40">
-            Manage your static pages
-          </p>
-        </div>
-        <Link
-          href="/admin/pages/new"
-        >
-          <Button
-            variant="primary"
-            size="sm"
-          >
-            <span>Create Page</span>
-            <Plus className="size-4 ml-2" />
-          </Button>
-        </Link>
-      </header>
+      <AdminPageHeader
+        title="pages"
+        description="Manage your static pages"
+        actions={(
+          <Link href="/admin/pages/new">
+            <AdminButton variant="primary" className="gap-2">
+              <Plus aria-hidden="true" className="size-4" />
+              <span>New</span>
+            </AdminButton>
+          </Link>
+        )}
+      />
 
-      <div className="flex items-center gap-6 border-b border-border">
-        {["PUBLISHED", "DRAFT", "TRASHED"].map((s) => (
-          <button
-            key={s}
-            onClick={() => {
-              setCurrentStatus(s);
-              setCurrentPage(1);
-            }}
-            className={`pb-4 text-xs font-mono font-bold uppercase tracking-wider transition-colors border-b-2 -mb-px ${
-              currentStatus === s
-                ? "border-primary text-primary"
-                : "border-transparent text-foreground/40 hover:text-foreground"
-            }`}
-          >
-            {s}
-          </button>
-        ))}
+      <div className="mx-auto w-full max-w-3xl">
+        <AdminSearchInput
+          value={search}
+          onChange={(value) => { setSearch(value); setCurrentPage(1); }}
+          label="Search pages"
+          placeholder="Search pages..."
+          className="w-full"
+        />
       </div>
 
-      <AdminTable
+      <Tabs
+        value={currentStatus.toLowerCase()}
+        onValueChange={(value) => {
+          setCurrentStatus(value.toUpperCase());
+          setCurrentPage(1);
+        }}
+      >
+        <TabsList className="mx-auto w-full max-w-3xl justify-start text-left">
+          <TabsTrigger className="pl-0 text-left" value="published">Published</TabsTrigger>
+          <TabsTrigger className="text-left" value="draft">Draft</TabsTrigger>
+          <TabsTrigger className="text-left" value="trashed">Trashed</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <AdminList
         columns={columns}
         data={paginatedPages}
         isLoading={isLoading}
         emptyMessage="No pages found."
       />
 
-      <div className="pt-8">
-        <Pagination 
-          current={currentPage} 
-          total={meta?.total || 0} 
-          pageSize={pageSize} 
+      <div className="mx-auto w-full max-w-3xl pt-8">
+        <Pagination
+          current={currentPage}
+          total={meta?.total || 0}
+          pageSize={pageSize}
           onPageChange={(page) => {
             setCurrentPage(page);
-            router.push(`/admin/pages?status=${currentStatus.toLowerCase()}&page=${page}`);
-          }} 
+            const query = new URLSearchParams({
+              status: currentStatus.toLowerCase(),
+              page: String(page),
+            });
+            if (search.trim()) query.set("search", search.trim());
+            router.push(`/admin/pages?${query.toString()}`);
+          }}
         />
       </div>
     </div>

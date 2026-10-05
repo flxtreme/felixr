@@ -16,11 +16,6 @@ h6 {
   font-family: var(--font-fira-sans), sans-serif;
 }
 
-select {
-  background: var(--surface);
-  color: var(--foreground);
-}
-
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--primary) transparent;

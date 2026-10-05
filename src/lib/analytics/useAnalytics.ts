@@ -14,6 +14,16 @@ function getOrCreateVisitorId(): string {
   return id;
 }
 
+function isLocalhost(hostname: string) {
+  return (
+    hostname === "localhost" ||
+    hostname.endsWith(".localhost") ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1" ||
+    hostname === "[::1]"
+  );
+}
+
 async function getLocation(): Promise<{
   enabled: boolean;
   latitude?: number;
@@ -58,6 +68,14 @@ export function useAnalytics() {
   const previousUrlRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
+    if (
+      pathname === "/admin" ||
+      pathname.startsWith("/admin/") ||
+      isLocalhost(window.location.hostname)
+    ) {
+      return;
+    }
+
     const trackView = async () => {
       try {
         const visitorId = getOrCreateVisitorId();

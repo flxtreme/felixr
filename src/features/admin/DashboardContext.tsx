@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
+import type { ReactNode } from "react";
 
 interface DashboardContextType {
   user: { name: string; email: string } | null;
@@ -8,6 +9,8 @@ interface DashboardContextType {
   setGoBackUrl: (url?: string) => void;
   title?: string;
   setDashboardTitle: (title?: string) => void;
+  rightPanel: ReactNode;
+  setRightPanel: (content: ReactNode) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -17,9 +20,18 @@ export const DashboardContextProvider = ({ children }: { children: React.ReactNo
 
   const [goBackUrl, setGoBackUrl] = useState<string | undefined>(undefined);
   const [title, setDashboardTitle] = useState<string | undefined>(undefined);
+  const [rightPanel, setRightPanel] = useState<ReactNode>(null);
 
   return (
-    <DashboardContext.Provider value={{ user, goBackUrl, setGoBackUrl, title, setDashboardTitle }}>
+    <DashboardContext.Provider value={{
+      user,
+      goBackUrl,
+      setGoBackUrl,
+      title,
+      setDashboardTitle,
+      rightPanel,
+      setRightPanel,
+    }}>
       {children}
     </DashboardContext.Provider>
   );

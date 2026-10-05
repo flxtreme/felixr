@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
 import { SOCIAL_ICONS } from "@/src/common/icons";
 import { cln } from "@/src/utils/cln";
+import { getSession } from "@/src/utils/session";
 
 type LinkItem = {
   label: string;
@@ -41,6 +43,11 @@ export function NavigationSidebar({ mobileOpen = false, onMobileNavigate }: {
   onMobileNavigate?: () => void;
 } = {}) {
   const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(Boolean(getSession("accessToken")));
+  }, [pathname]);
 
   const renderLink = ({ label, href }: LinkItem) => {
     const isActive = pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
@@ -81,6 +88,7 @@ export function NavigationSidebar({ mobileOpen = false, onMobileNavigate }: {
         </div>
         <div className="border-t border-border" /> */}
         <div className="gap-1 px-6 xl:px-8">
+          {isLoggedIn && renderLink({ label: "Admin", href: "/admin" })}
           {portfolioLinks.map(renderLink)}
         </div>
         <div aria-hidden="true" className="my-6 border-t border-foreground/10 w-full" />

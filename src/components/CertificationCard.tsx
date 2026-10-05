@@ -1,14 +1,16 @@
+import type { ReactNode } from "react";
 import { Award, ArrowUpRight } from "lucide-react";
 import type { Certification } from "@/src/features/public/certifications/types";
 import { cln } from "@/src/utils/cln";
 import { formatShortDate } from "@/src/utils/date";
 
-export function CertificationCard({ certification }: { certification: Certification }) {
+export function CertificationCard({ certification, actions }: { certification: Certification; actions?: ReactNode }) {
   return (
     <li id={certification.id} className="mb-6 break-inside-avoid">
       <article className="border border-foreground/10">
         <div className={cln("flex min-h-36 items-center justify-between border-b border-foreground/10 bg-foreground/[0.03] p-5")}>
           <Award aria-hidden="true" className="size-12 text-primary/75" strokeWidth={1.25} />
+          {actions}
         </div>
         <div className={cln("p-4")}>
           <p className={cln("font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/45")}>
@@ -51,3 +53,4 @@ export function CertificationCard({ certification }: { certification: Certificat
     </li>
   );
 }
+import type { ReactNode } from "react";

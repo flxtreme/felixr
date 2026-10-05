@@ -16,7 +16,9 @@ export const fetcher = async <T = unknown>(
 ): Promise<T> => {
   const headers = new Headers(options?.headers);
 
-  if (!headers.has("Content-Type")) {
+  const isFormData = typeof FormData !== "undefined" && options?.body instanceof FormData;
+
+  if (options?.body != null && !headers.has("Content-Type") && !isFormData) {
     headers.set("Content-Type", "application/json");
   }
 

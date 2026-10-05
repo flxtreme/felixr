@@ -8,8 +8,8 @@ import { useProject } from "@/src/features/admin/project/hooks";
 import { Plus, Trash2, Loader2, Edit2, ExternalLink, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { ProjectLink, UpdateProjectPayload } from "@/src/features/admin/project/types";
-import { Button } from "flxtheme";
 import { useDashboard } from "@/src/features/admin/DashboardContext";
+import { AdminButton } from "@/src/features/admin/components/AdminButton";
 
 export default function ProjectEditView() {
   const router = useRouter();
@@ -125,7 +125,7 @@ export default function ProjectEditView() {
     );
   }
 
-  const previewSlug = linkedPage && linkedPage.id === projectData.pageId ? linkedPage.slug : null;
+  const previewSlug = linkedPage && linkedPage.id === projectData.pageId ? linkedPage.slug.toLowerCase() : null;
   const previewUrl = previewSlug ? `/projects/${previewSlug}` : null;
 
   return (
@@ -225,7 +225,7 @@ export default function ProjectEditView() {
                             className="w-full text-left px-3 py-1.5 text-xs font-mono hover:bg-primary/5 hover:text-primary transition-colors flex flex-col"
                           >
                             <span>{page.title || page.slug}</span>
-                            <span className="text-[8px] opacity-40">/{page.slug}</span>
+                            <span className="text-[8px] opacity-40">/{page.slug.toLowerCase()}</span>
                           </button>
                         ))
                       ) : (
@@ -241,13 +241,14 @@ export default function ProjectEditView() {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-border pb-2">
                 <h2 className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1">External Links</h2>
-                <button
+                <AdminButton
                   type="button"
                   onClick={handleAddLink}
-                  className="text-[10px] font-mono font-bold text-primary hover:underline flex items-center gap-1"
+                  variant="ghost"
+                  className="gap-1 text-[10px] font-bold text-primary"
                 >
                   <Plus className="w-3 h-3" /> ADD LINK
-                </button>
+                </AdminButton>
               </div>
 
               <div className="space-y-3">
@@ -271,13 +272,15 @@ export default function ProjectEditView() {
                         placeholder="URL (https://...)"
                       />
                     </div>
-                    <button
+                    <AdminButton
                       type="button"
                       onClick={() => handleRemoveLink(index)}
-                      className="h-9 w-9 flex items-center justify-center border border-border rounded text-foreground/20 hover:text-red-500 transition-colors"
+                      variant="destructive"
+                      aria-label="Remove link"
+                      className="size-9 p-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    </AdminButton>
                   </div>
                 ))}
                 {(projectData.links || []).length === 0 && (
@@ -291,15 +294,15 @@ export default function ProjectEditView() {
             <Link
               href="/admin/projects"
             >
-              <Button
+              <AdminButton
                 variant="outline"
               >
                 Cancel
-              </Button>
+              </AdminButton>
             </Link>
-            <Button type="submit" disabled={isSubmitting} variant="primary">
+            <AdminButton type="submit" disabled={isSubmitting} variant="primary">
               {isSubmitting ? "Updating..." : "Update"}
-            </Button>
+            </AdminButton>
           </div>
         </form>
 
@@ -310,14 +313,15 @@ export default function ProjectEditView() {
             <div className="flex items-center gap-3">
               {previewUrl && (
                 <>
-                  <button
+                  <AdminButton
                     type="button"
                     onClick={() => setPreviewKey((k) => k + 1)}
-                    className="text-foreground/40 hover:text-primary transition-colors"
+                    variant="ghost"
+                    aria-label="Refresh preview"
                     title="Refresh preview"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                  </button>
+                  </AdminButton>
                   <Link href={previewUrl} target="_blank" className="text-foreground/40 hover:text-primary transition-colors" title="Open in new tab">
                     <ExternalLink className="w-3.5 h-3.5" />
                   </Link>

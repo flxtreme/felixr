@@ -1,4 +1,5 @@
 export interface GetProjectsQuery {
+  status?: string;
   offset: number;
   limit: number;
   search: string | null;
@@ -20,6 +21,7 @@ export interface Project {
   updatedAt: string;
   deletedAt: string | null;
   createdBy: string | null;
+  status?: string;
   page: any;
 }
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ReactNode } from "react";
 import Shimmer from "@/src/components/shimmer/Shimmer";
 import { EditorShimmer, SidebarShimmer } from "@/src/components/shimmer/EditorShimmer";
-import { Button } from "flxtheme";
+import { AdminButton } from "@/src/features/admin/components/AdminButton";
 
 interface ManagePostLayoutProps {
   pageTitle: string;
@@ -36,21 +36,21 @@ export function ManagePostLayout({
         )}
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        <main className="w-[70%] border-r border-border overflow-y-auto flex flex-col">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
+        <main className="flex min-h-[50vh] w-full flex-col overflow-y-auto border-b border-border md:min-h-0 md:w-[70%] md:border-b-0 md:border-r">
           {isLoading ? <EditorShimmer /> : editor}
         </main>
 
-        <aside className="w-[30%] flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-5">
+        <aside className="flex max-h-[45vh] w-full shrink-0 flex-col overflow-hidden md:max-h-none md:w-[30%]">
+          <div className="min-h-0 flex-1 overflow-y-auto p-5">
             {isLoading ? <SidebarShimmer /> : sidebar}
           </div>
 
           <div className="shrink-0 border-t border-border px-5 py-3 flex items-center gap-3 bg-background">
             <Link href={backHref}>
-              <Button variant="ghost" size="sm">Cancel</Button>
+              <AdminButton variant="ghost">Cancel</AdminButton>
             </Link>
-            <Button
+            <AdminButton
               variant="primary"
               size="sm"
               onClick={onSave}
@@ -59,7 +59,7 @@ export function ManagePostLayout({
             >
               <Save className="w-3.5 h-3.5" />
               {saveLabel}
-            </Button>
+            </AdminButton>
           </div>
         </aside>
       </div>

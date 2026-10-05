@@ -1,75 +1,65 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useDashboard } from "@/src/features/admin/DashboardContext";
 import { useAuthActions } from "@/src/features/auth/hooks";
-import {
-  Sidebar, Header, Menu, MenuItem, Button, IconButton, Dropdown, DropdownItem, DropdownDivider,
-  Tooltip, Accordion, useFlxTheme,
-} from "flxtheme";
-import {
-  LogOut,
-  Sun,
-  Moon,
-  LayoutDashboard,
-  BarChart2,
-  LayoutPanelLeft,
-  FileText,
-  Tag,
-  Globe2,
-  Sparkles,
-  Users,
-  Settings,
-  ArrowLeft,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { ThemeModeToggle } from "@/src/components/ThemeModeToggle";
+import { AdminSearchProvider, AdminSearchTrigger } from "@/src/layouts/parts/AdminSearch";
+import { AdminMobileHeader } from "@/src/layouts/parts/AdminMobileHeader";
+import { AdminMobilePanel } from "@/src/layouts/parts/AdminMobilePanel";
+import { cln } from "@/src/utils/cln";
 
 const NAV_GROUPS = [
   {
-    title: "Dashboard",
-    expand: true,
     items: [
-      { id: "overview", href: "/admin", label: "Overview", icon: <LayoutDashboard />, exact: true },
-      { id: "analytics", href: "/admin/analytics", label: "Analytics", icon: <BarChart2 /> },
+      { id: "overview", href: "/admin", label: "Overview", exact: true },
+      { id: "analytics", href: "/admin/analytics", label: "Analytics" },
     ],
   },
   {
-    title: "Blogging",
-    expand: true,
     items: [
-      { id: "pages", href: "/admin/pages", label: "Pages", icon: <LayoutPanelLeft /> },
-      { id: "posts", href: "/admin/posts", label: "Posts", icon: <FileText /> },
-      { id: "tags", href: "/admin/tags", label: "Tags", icon: <Tag /> },
+      { id: "pages", href: "/admin/pages", label: "Pages" },
+      { id: "posts", href: "/admin/posts", label: "Posts" },
+      { id: "tags", href: "/admin/tags", label: "Tags" },
     ],
   },
   {
-    title: "Portfolio",
-    expand: false,
     items: [
-      { id: "projects", href: "/admin/projects", label: "Projects", icon: <Globe2 /> },
-      { id: "skills", href: "/admin/skills", label: "Skills", icon: <Sparkles /> },
+      { id: "projects", href: "/admin/projects", label: "Projects" },
+      { id: "shop", href: "/admin/shop", label: "Shop" },
+      { id: "uploads", href: "/admin/uploads", label: "Uploads" },
+      { id: "stacks", href: "/admin/stacks", label: "Stacks" },
+      { id: "gigs", href: "/admin/gigs", label: "Gigs" },
+      { id: "certifications", href: "/admin/certifications", label: "Certifications" },
+      { id: "trainings", href: "/admin/trainings", label: "Trainings" },
     ],
   },
   {
-    title: "Settings",
-    expand: false,
     items: [
-      { id: "users", href: "/admin/users", label: "Users", icon: <Users /> },
-      { id: "configs", href: "/admin/configs", label: "Configs", icon: <Settings /> },
+      { id: "users", href: "/admin/users", label: "Users" },
     ],
   },
 ];
 
-const NAV_ITEMS = NAV_GROUPS.flatMap((g) => g.items);
-
-export const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const { user, goBackUrl, setGoBackUrl, title } = useDashboard();
-  const { mode: theme, toggleMode: toggleTheme } = useFlxTheme();
+const DashboardLayoutContent = ({ children }: { children: React.ReactNode }) => {
+  const { goBackUrl, setGoBackUrl, rightPanel } = useDashboard();
   const { signOut } = useAuthActions();
-  const [navCollapsed, setNavCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const mainRef = useRef<HTMLElement>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const main = mainRef.current;
+    if (!main) return;
+    const updateScrollState = () => setIsScrolled(main.scrollTop > 0);
+    updateScrollState();
+    main.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => main.removeEventListener("scroll", updateScrollState);
+  }, []);
 
   const isFullScreen =
     pathname.includes("/posts/new") ||
@@ -88,187 +78,72 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
     exact ? pathname === href : pathname.startsWith(href);
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="relative flex h-screen overflow-hidden bg-background">
+      <div aria-hidden="true" className="hero-dot-grid pointer-events-none absolute inset-0" />
+      {!isFullScreen && <AdminMobileHeader navGroups={NAV_GROUPS} onSignOut={signOut} isScrolled={isScrolled} />}
       {!isFullScreen && (
-        <Sidebar
-          collapsed={navCollapsed}
-          onCollapsedChange={setNavCollapsed}
-          title={
-            <h3 className="text-2xl">felixr</h3>
-          }
-          className="h-full shrink-0 shadow flex flex-col"
-        >
-          <AnimatePresence mode="wait">
-            {navCollapsed ? (
-              <motion.div
-                key="collapsed"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {NAV_GROUPS.map((group, gi) => (
-                  <div key={group.title}>
-                    <div className="relative h-11 flex items-center">
-                      <div className="h-0.5 w-full bg-border rounded-full" />
-                    </div>
-                    <Menu orientation="vertical">
-                      {group.items.map((s) => (
-                        <Tooltip key={s.id} content={s.label} side="right">
-                          <MenuItem
-                            icon={s.icon}
-                            active={isActive(s.href, s.exact)}
-                            onClick={() => router.push(s.href)}
-                            aria-label={s.label}
-                            className="py-1"
-                          />
-                        </Tooltip>
-                      ))}
-                    </Menu>
-                  </div>
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="expanded"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Accordion
-                  bordered={false}
-                  type="multiple"
-                  defaultOpen={NAV_GROUPS.filter((g) => g.expand).map((g) => g.title)}
-                  items={NAV_GROUPS.map((group) => ({
-                    id: group.title,
-                    title: group.title,
-                    content: (
-                      <Menu orientation="vertical">
-                        {group.items.map((s) => (
-                          <MenuItem
-                            key={s.id}
-                            icon={s.icon}
-                            active={isActive(s.href, s.exact)}
-                            onClick={() => router.push(s.href)}
-                            aria-label={s.label}
-                            className="py-1"
-                          >
-                            <span>{s.label}</span>
-                          </MenuItem>
-                        ))}
-                      </Menu>
-                    ),
-                  }))}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="flex-1" />
-
-          <AnimatePresence mode="wait">
-            {navCollapsed ? (
-              <motion.div key="logout-collapsed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <Menu orientation="vertical">
-                  <Tooltip content="Logout" side="right">
-                    <MenuItem
-                      icon={<LogOut />}
-                      onClick={signOut}
-                      aria-label="Logout"
-                      className="py-1"
-                    />
-                  </Tooltip>
-                </Menu>
-              </motion.div>
-            ) : (
-              <motion.div key="logout-expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <Menu orientation="vertical">
-                  <MenuItem
-                    icon={<LogOut />}
-                    onClick={signOut}
-                    aria-label="Logout"
-                    className="py-1"
-                  >
-                    <span>Logout</span>
-                  </MenuItem>
-                </Menu>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </Sidebar>
+        <aside className="relative z-10 hidden h-full w-72 shrink-0 flex-col gap-10 overflow-y-auto border-r border-dashed border-foreground/10 bg-transparent xl:flex">
+          <div className="flex items-center justify-between gap-3 px-6 pt-10 xl:px-8">
+            <Link href="/" className="text-lg font-bold text-primary">
+              felixr
+            </Link>
+          </div>
+          <nav aria-label="Admin navigation" className="flex w-full flex-1 flex-col pt-4 xl:pt-0">
+            {NAV_GROUPS.map((group, index) => (
+              <React.Fragment key={group.items[0].id}>
+                {index > 0 && <div aria-hidden="true" className="my-6 w-full border-t border-foreground/10" />}
+                <div className="flex flex-col gap-1 px-6 xl:px-8">
+                  {group.items.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      aria-current={isActive(item.href, item.exact) ? "page" : undefined}
+                      className={`flex min-h-8 items-center justify-start gap-3 text-sm lowercase underline underline-offset-3 transition-colors hover:text-primary ${isActive(item.href, item.exact) ? "text-primary" : "text-foreground/65"}`}
+                    >
+                      <span>{item.label}</span>
+                      {isActive(item.href, item.exact) && <ArrowLeft aria-hidden="true" className="size-4 shrink-0" />}
+                    </Link>
+                  ))}
+                </div>
+              </React.Fragment>
+            ))}
+          </nav>
+          <button
+            type="button"
+            onClick={signOut}
+            className="mt-auto flex min-h-8 items-center justify-start gap-3 px-6 pb-8 text-sm lowercase text-foreground/65 underline underline-offset-3 transition-colors hover:text-primary xl:px-8"
+          >
+            logout
+          </button>
+        </aside>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header
-          sticky={false}
-          logo={
-            <div className="flex items-center gap-2 relative">
-              {navCollapsed && (
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key="header-title"
-                    className="overflow-hidden"
-                    initial={{ width: "0px", opacity: 0 }}
-                    animate={{ width: "100px", opacity: 1 }}
-                    exit={{ width: "0px", opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <h3 className="text-2xl">felixr</h3>
-                  </motion.div>
-                </AnimatePresence>
-              )}
-              <AnimatePresence mode="wait">
-                {goBackUrl && (
-                  <motion.div
-                    key="back"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <IconButton icon={<ArrowLeft className="size-6" />} className="rounded-full" onClick={handleGoBack} aria-label="Go back" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <Dropdown
-                trigger={
-                  <Button>
-                    New
-                  </Button>
-                }
-              >
-                <DropdownItem className="font-medium" onClick={() => router.push("/admin/posts/new")}>Post</DropdownItem>
-                <DropdownItem className="font-medium" onClick={() => router.push("/admin/projects/new")}>Project</DropdownItem>
-                <DropdownItem className="font-medium" onClick={() => router.push("/admin/pages/new")}>Page</DropdownItem>
-                <DropdownDivider />
-                <DropdownItem className="font-medium" onClick={() => router.push("/admin/tags/new")}>Tag</DropdownItem>
-              </Dropdown>
-            </div>
-          }
-          actions={
-            <>
-              <span className="text-sm font-mono font-medium text-foreground/50">{user?.name}</span>
-              <Tooltip content={`Switch to ${theme === "light" ? "dark" : "light"} mode`} side="bottom">
-                <IconButton
-                  variant="ghost"
-                  onClick={toggleTheme}
-                  aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-                  icon={theme === "light" ? <Moon className="size-5" /> : <Sun className="size-5" />}
-                />
-              </Tooltip>
-            </>
-          }
-          className="shadow"
-        />
-        <div className="h-12 flex items-center justify-start px-6 w-full bg-surface border-b border-border/50">
-          <span className="font-medium">{title}</span>
-        </div>
+      <main ref={mainRef} className={cln(
+        "relative z-10 flex min-w-0 flex-1 flex-col overflow-y-auto bg-transparent",
+        !isFullScreen && "pt-20 xl:pt-0",
+        "pb-20 xl:pb-0",
+      )}>
+        {children}
+      </main>
 
-        <main className="flex-1 overflow-y-auto bg-background">{children}</main>
-      </div>
+      {!isFullScreen && (
+        <aside aria-label="Admin side panel" className="relative z-10 hidden h-full w-72 shrink-0 flex-col overflow-y-auto border-l border-dashed border-foreground/10 bg-transparent xl:flex">
+          <div className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-dashed border-foreground/10 pr-6 pl-4">
+            <AdminSearchTrigger />
+            <ThemeModeToggle />
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">{rightPanel}</div>
+        </aside>
+      )}
+      <AdminMobilePanel>{rightPanel}</AdminMobilePanel>
     </div>
   );
 };
+
+export const DashboardLayout = ({ children }: { children: React.ReactNode }) => (
+  <AdminSearchProvider>
+    <DashboardLayoutContent>{children}</DashboardLayoutContent>
+  </AdminSearchProvider>
+);
 
 export default DashboardLayout;

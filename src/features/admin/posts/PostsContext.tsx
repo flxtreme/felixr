@@ -15,7 +15,7 @@ interface PostContextType {
   isSearching: boolean;
   createPost: (payload: CreatePostPayload) => Promise<any>;
   updatePost: (id: string, payload: UpdatePostPayload) => Promise<any>;
-  removePost: (id: string) => Promise<any>;
+  removePost: (id: string, isPermanent?: boolean) => Promise<any>;
 }
 
 const PostContext = createContext<PostContextType | undefined>(undefined);
@@ -50,7 +50,7 @@ export const PostProvider = ({ children }: { children: React.ReactNode }) => {
         isSearching,
         createPost: create,
         updatePost: update,
-        removePost: (id: string) => remove(id, {}),
+        removePost: (id: string, isPermanent = false) => remove(id, { isPermanent }),
       }}
     >
       {children}

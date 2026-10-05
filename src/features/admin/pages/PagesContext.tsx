@@ -15,7 +15,7 @@ interface PagesContextType {
   isSearching: boolean;
   createPage: (payload: CreatePostPayload) => Promise<any>;
   updatePage: (id: string, payload: UpdatePostPayload) => Promise<any>;
-  removePage: (id: string) => Promise<any>;
+  removePage: (id: string, isPermanent?: boolean) => Promise<any>;
 }
 
 const PagesContext = createContext<PagesContextType | undefined>(undefined);
@@ -48,7 +48,7 @@ export const PagesProvider = ({ children }: { children: React.ReactNode }) => {
         isSearching,
         createPage: create,
         updatePage: update,
-        removePage: (id: string) => remove(id, {}),
+        removePage: (id: string, isPermanent = false) => remove(id, { isPermanent }),
       }}
     >
       {children}

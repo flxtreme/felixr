@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import type { Metadata } from "next";
 import { ReferrerEnum } from "next/dist/lib/metadata/types/metadata-types";
+import { Select } from "@/src/components/Select";
 
 interface MetadataConfig {
   title: string;
@@ -343,20 +344,6 @@ function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
       {...props}
       className="w-full bg-transparent border-b border-border py-2 text-sm font-mono font-medium focus:outline-none focus:border-primary transition-colors placeholder:text-foreground/10 resize-none"
     />
-  );
-}
-
-function Select({
-  children,
-  ...props
-}: React.SelectHTMLAttributes<HTMLSelectElement> & { children: React.ReactNode }) {
-  return (
-    <select
-      {...props}
-      className="w-full bg-transparent border-b border-border py-2 text-sm font-mono font-medium focus:outline-none focus:border-primary transition-colors appearance-none"
-    >
-      {children}
-    </select>
   );
 }
 

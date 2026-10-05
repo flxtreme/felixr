@@ -86,7 +86,7 @@ export default function HomeView() {
               I'm a full-stack engineer with nearly 8 years of experience building web and mobile apps.
               <br />
               <br />
-              Right now I'm building cloud-native, microservices-based systems for airlines, and exploring how agentic workflows change the way software gets made.
+              Right now I'm building cloud-native, microservices-based systems and applications for airlines, and exploring how agentic workflows change the way software gets made.
             </p>
             <div className="mt-8 flex flex-wrap items-start justify-start gap-x-5 gap-y-3 font-mono text-sm text-foreground/45">
               <Link
@@ -307,14 +307,24 @@ export default function HomeView() {
                 I&apos;m available for work. Let&apos;s build something useful together.
               </p>
             </div>
-            <a
-              href="https://mail.google.com/mail/?view=cm&fs=1&to=flxrzjr%40gmail.com&su=Project%20collaboration&body=Hi%20Felix%2C%0A%0AI%27d%20like%20to%20discuss%20having%20you%20help%20with%20my%20project.%0A%0AProject%20details%3A%0A"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-primary underline underline-offset-4 transition-[gap] hover:gap-3"
-            >
-              Hire me <ArrowRight className="size-4" />
-            </a>
+            <div className="flex shrink-0 flex-wrap items-center gap-5">
+              <a
+                href="/felix-ruz-resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-bold text-primary underline underline-offset-4 transition-[gap] hover:gap-3"
+              >
+                View resume <ArrowUpRight className="size-4" />
+              </a>
+              <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=flxrzjr%40gmail.com&su=Project%20collaboration&body=Hi%20Felix%2C%0A%0AI%27d%20like%20to%20discuss%20having%20you%20help%20with%20my%20project.%0A%0AProject%20details%3A%0A"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-bold text-primary underline underline-offset-4 transition-[gap] hover:gap-3"
+              >
+                Hire me <ArrowRight className="size-4" />
+              </a>
+            </div>
           </div>
         </div>
       </section>
