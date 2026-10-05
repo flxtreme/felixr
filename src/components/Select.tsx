@@ -20,8 +20,7 @@ export function Select({
   id,
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
-  ...props
-}: Omit<SelectHTMLAttributes<HTMLSelectElement>, "onChange" | "children"> & {
+}: Pick<SelectHTMLAttributes<HTMLSelectElement>, "value" | "className" | "disabled" | "required" | "name" | "id" | "aria-label" | "aria-labelledby"> & {
   onChange?: (event: SelectChangeEvent) => void;
   children: ReactNode;
   containerClassName?: string;
@@ -87,7 +86,6 @@ export function Select({
     <div ref={rootRef} className={cln("relative w-full", containerClassName)}>
       {name && <input type="hidden" name={name} value={value} required={required} disabled={disabled} />}
       <button
-        {...props}
         ref={triggerRef}
         id={id}
         type="button"

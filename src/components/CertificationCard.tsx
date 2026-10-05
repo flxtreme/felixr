@@ -53,4 +53,3 @@ export function CertificationCard({ certification, actions }: { certification: C
     </li>
   );
 }
-import type { ReactNode } from "react";

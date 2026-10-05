@@ -35,4 +35,3 @@ export function TrainingCard({ training, actions }: { training: Training; action
     </li>
   );
 }
-import type { ReactNode } from "react";
