@@ -13,6 +13,8 @@ import { AdminButton } from "@/src/features/admin/components/AdminButton";
 import { AdminPageHeader } from "@/src/features/admin/components/AdminPageHeader";
 import { AdminRowActions } from "@/src/features/admin/components/AdminRowActions";
 import { AdminSearchInput } from "@/src/features/admin/components/AdminSearchInput";
+import { useDashboard } from "@/src/features/admin/DashboardContext";
+import { WidgetRegistry } from "@/src/features/admin/components/WidgetRegistry";
 
 export default function PagesListView({
   searchParams,
@@ -20,6 +22,7 @@ export default function PagesListView({
   searchParams: Promise<{ page?: string; status?: string; search?: string }>;
 }) {
   const router = useRouter();
+  const { setRightPanel } = useDashboard();
   const { removePage } = usePagesContext();
   const resolvedParams = React.use(searchParams);
 
@@ -88,6 +91,15 @@ export default function PagesListView({
       ),
     },
   ];
+
+  useEffect(() => {
+    setRightPanel(
+      <WidgetRegistry includes={[
+        "quick-create"
+      ]} />
+    )
+    return () => setRightPanel(null)
+  }, [])
 
   return (
     <div className="p-6 space-y-6">

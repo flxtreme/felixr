@@ -12,6 +12,8 @@ import { AdminList, type AdminListColumn } from "@/src/features/admin/components
 import { AdminPageHeader } from "@/src/features/admin/components/AdminPageHeader";
 import { AdminRowActions } from "@/src/features/admin/components/AdminRowActions";
 import { AdminSearchInput } from "@/src/features/admin/components/AdminSearchInput";
+import { useDashboard } from "@/src/features/admin/DashboardContext";
+import { WidgetRegistry } from "@/src/features/admin/components/WidgetRegistry";
 
 export default function PostsListView({
   searchParams,
@@ -19,6 +21,7 @@ export default function PostsListView({
   searchParams: Promise<{ page?: string; status?: string; search?: string }>;
 }) {
   const { removePost } = usePostContext();
+  const { setRightPanel } = useDashboard();
   const resolvedParams = React.use(searchParams);
 
   const [currentStatus, setCurrentStatus] = useState(
@@ -88,6 +91,15 @@ export default function PostsListView({
       ),
     },
   ];
+
+  useEffect(() => {
+    setRightPanel(
+      <WidgetRegistry includes={[
+        "quick-create"
+      ]} />
+    )
+    return () => setRightPanel(null)
+  }, [])
 
   return (
     <div className="p-6 space-y-6">

@@ -59,7 +59,7 @@ export const PostTagsInput = ({
   };
 
   return (
-    <div className="space-y-4 flex-1 min-w-[300px]">
+    <div className="flex flex-col gap-2">
       <label className="text-sm font-mono font-medium text-foreground/40 flex items-center gap-2">
         <TagIcon className="w-3 h-3" /> Tags
       </label>

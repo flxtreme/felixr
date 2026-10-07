@@ -11,6 +11,7 @@ import { AdminPageHeader } from "@/src/features/admin/components/AdminPageHeader
 import { AdminButton } from "@/src/features/admin/components/AdminButton";
 import { Select } from "@/src/components/Select";
 import { Trash2 } from "lucide-react";
+import { WidgetQuickCreate } from "@/src/features/admin/components/WidgetQuickCreate";
 
 type AnalyticsFilters = {
   search: string;
@@ -61,7 +62,7 @@ function AnalyticsFilterPanel({
         onApply(draft);
       }}
     >
-      <h2 className="font-mono text-[10px] uppercase tracking-[0.18em] text-foreground/40">
+      <h2 className="font-mono text-sm uppercase tracking-[0.18em] text-foreground/40">
         Filter analytics
       </h2>
       {([
@@ -94,6 +95,8 @@ function AnalyticsFilterPanel({
           <option value="update" className="bg-background">Update</option>
           <option value="soft_delete" className="bg-background">Soft delete</option>
           <option value="delete" className="bg-background">Delete</option>
+          <option value="download" className="bg-background">Download</option>
+          <option value="redirect" className="bg-background">Redirect</option>
         </Select>
       </label>
       <div className="grid grid-cols-1 gap-3">
@@ -135,7 +138,7 @@ function AnalyticsFilterPanel({
 type TrackRecord = {
   id: string;
   visitorId: string;
-  action: "view" | "insert" | "update" | "soft_delete" | "delete";
+  action: "view" | "insert" | "update" | "soft_delete" | "delete" | "download" | "redirect";
   path: string[];
   currentUrl: string;
   parameters: unknown | null;
@@ -154,6 +157,8 @@ const actionStyles: Record<TrackRecord["action"], string> = {
   update: "bg-amber-500/10 text-amber-600",
   soft_delete: "bg-red-500/10 text-red-500",
   delete: "bg-red-500/10 text-red-500",
+  download: "bg-purple-500/10 text-purple-500",
+  redirect: "bg-cyan-500/10 text-cyan-500",
 };
 type TrackListResponse = {
   data: TrackRecord[];

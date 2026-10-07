@@ -83,10 +83,10 @@ export default function HomeView() {
               Full-Stack | Agentic
             </p>
             <p className="mt-4 max-w-md text-sm leading-6 text-foreground/55">
-              I'm a full-stack engineer with nearly 8 years of experience building web and mobile apps.
+              I&apos;m a full-stack engineer with nearly 8 years of experience building web and mobile apps.
               <br />
               <br />
-              Right now I'm building cloud-native, microservices-based systems and applications for airlines, and exploring how agentic workflows change the way software gets made.
+              Right now I&apos;m building cloud-native, microservices-based systems and applications for airlines, and exploring how agentic workflows change the way software gets made.
             </p>
             <div className="mt-8 flex flex-wrap items-start justify-start gap-x-5 gap-y-3 font-mono text-sm text-foreground/45">
               <Link
@@ -158,15 +158,32 @@ export default function HomeView() {
                 const publishedAt = page?.publishedAt ?? page?.createdAt ?? page?.updatedAt;
 
                 return (
-                  <PostCard
-                    key={project.id}
-                    href={`/projects/${page?.slug}`}
-                    title={page?.title || project.title}
-                    excerpt={cleanExcerpt(page?.excerpt || project.description)}
-                    dateLabel={formatShortDate(publishedAt) || "Recent"}
-                    variant="compact"
-                    excerptSize="sm"
-                  />
+                  <div key={project.id}>
+                    <PostCard
+                      href={`/projects/${page?.slug}`}
+                      title={page?.title || project.title}
+                      excerpt={cleanExcerpt(page?.excerpt || project.description)}
+                      dateLabel={formatShortDate(publishedAt) || "Recent"}
+                      variant="compact"
+                      excerptSize="sm"
+                    />
+                    {project.links && project.links.length > 0 && (
+                      <ul className="flex flex-wrap gap-x-4 gap-y-2 pb-4">
+                        {project.links.map((link) => (
+                          <li key={`${link.label}-${link.href}`}>
+                            <a
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-foreground/55 underline underline-offset-4 transition-colors hover:text-primary"
+                            >
+                              {link.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 );
               })}
             </div>

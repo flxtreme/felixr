@@ -8,17 +8,12 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
 
-  // Prettier plugin setup
   {
-    plugins: {
-      prettier: prettierPlugin,
-    },
+    plugins: { prettier: prettierPlugin },
     rules: {
-      // Indentation: 2 spaces
       indent: ["error", 2, { SwitchCase: 1 }],
-      "@typescript-eslint/indent": "off", // let Prettier handle it
+      "@typescript-eslint/indent": "off",
       "@typescript-eslint/no-explicit-any": "warn",
-      // Prettier formatting as errors
       "prettier/prettier": [
         "error",
         {
@@ -32,13 +27,12 @@ const eslintConfig = defineConfig([
           bracketSpacing: true,
           bracketSameLine: false,
           arrowParens: "always",
-          endOfLine: "lf",
+          endOfLine: "auto",
         },
       ],
     },
   },
 
-  // Disable ESLint rules that conflict with Prettier
   prettierConfig,
 
   // Override default ignores of eslint-config-next.

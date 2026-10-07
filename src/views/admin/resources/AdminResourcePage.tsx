@@ -5,177 +5,24 @@ import { useSearchParams } from "next/navigation";
 import { Pagination } from "flxtheme";
 import { AdminList, type AdminListColumn } from "@/src/features/admin/components/AdminList";
 import { AdminResourceList } from "@/src/features/admin/components/AdminResourceList";
-import { AdminResourceForm, type AdminResourceField } from "@/src/features/admin/components/AdminResourceForm";
+import { AdminResourceForm } from "@/src/features/admin/components/AdminResourceForm";
 import { AdminRowActions } from "@/src/features/admin/components/AdminRowActions";
 import { formatDate } from "@/src/utils/date";
 import { cln } from "@/src/utils/cln";
 import { useDashboard } from "@/src/features/admin/DashboardContext";
 import { useAdminResources } from "@/src/features/admin/resources/hooks/useAdminResources";
 import { useAdminResourceActions } from "@/src/features/admin/resources/hooks/useAdminResourceActions";
-import type { AdminResourceEndpoint, AdminResourceRecord } from "@/src/features/admin/resources/types";
 import { CertificationCard } from "@/src/components/CertificationCard";
 import { TrainingCard } from "@/src/components/TrainingCard";
 import type { Certification } from "@/src/features/public/certifications/types";
 import type { Training } from "@/src/features/public/trainings/types";
-
-type ResourceKey = "users" | "gigs" | "experience" | "trainings" | "certifications" | "stacks" | "tags";
-type ResourceRecord = AdminResourceRecord;
-type ResourceConfig = {
-  title: string;
-  singular: string;
-  description: string;
-  endpoint: AdminResourceEndpoint;
-  fields: AdminResourceField[];
-  columns: { label: string; key: string; format?: (value: unknown, record: ResourceRecord) => ReactNode }[];
-};
-
-const configs: Record<ResourceKey, ResourceConfig> = {
-  users: {
-    title: "users",
-    singular: "user",
-    description: "Manage admin accounts and access roles.",
-    endpoint: "user",
-    fields: [
-      { name: "email", label: "Email", type: "email", required: true },
-      { name: "username", label: "Username", required: true },
-      { name: "password", label: "Password", type: "password", requiredOnCreate: true },
-      { name: "name", label: "Name" },
-      { name: "phone", label: "Phone" },
-      { name: "avatar", label: "Avatar URL", type: "url" },
-      { name: "roles", label: "Roles", type: "list", placeholder: "One role per line" },
-    ],
-    columns: [
-      {
-        label: "Name",
-        key: "name",
-        format: (_, record) => (
-          <div className="flex min-w-0 flex-col gap-1">
-            <span className="text-sm font-bold text-foreground/80">{displayCell(record.name)}</span>
-            <span className="truncate text-xs text-foreground/45">
-              {displayCell(record.username)} <span aria-hidden="true">|</span> {displayCell(record.email)}
-            </span>
-          </div>
-        ),
-      },
-      { label: "Roles", key: "roles", format: (value) => Array.isArray(value) ? value.join(", ") || "—" : "—" },
-    ],
-  },
-  gigs: {
-    title: "gigs",
-    singular: "gig",
-    description: "Manage services and their public calls to action.",
-    endpoint: "gig",
-    fields: [
-      { name: "title", label: "Title", required: true },
-      { name: "description", label: "Description", type: "textarea", required: true },
-      { name: "details", label: "Details", type: "list" },
-      { name: "link", label: "Link", type: "url", required: true },
-      { name: "linkLabel", label: "Link label", required: true },
-      { name: "external", label: "External link", type: "boolean" },
-    ],
-    columns: [
-      { label: "Title", key: "title" },
-    ],
-  },
-  experience: {
-    title: "experience",
-    singular: "experience",
-    description: "Manage roles, companies, and responsibilities.",
-    endpoint: "experience",
-    fields: [
-      { name: "role", label: "Role", required: true },
-      { name: "company", label: "Company", required: true },
-      { name: "start", label: "Start", required: true },
-      { name: "end", label: "End", required: true },
-      { name: "responsibilities", label: "Responsibilities", type: "list" },
-    ],
-    columns: [
-      { label: "Role", key: "role" },
-      { label: "Company", key: "company" },
-      { label: "Start", key: "start" },
-      { label: "End", key: "end" },
-    ],
-  },
-  trainings: {
-    title: "trainings",
-    singular: "training",
-    description: "Manage courses, providers, and completion details.",
-    endpoint: "training",
-    fields: [
-      { name: "title", label: "Title", required: true },
-      { name: "provider", label: "Provider", required: true },
-      { name: "completedAt", label: "Completed at", required: true },
-      { name: "description", label: "Description", type: "textarea", required: true },
-    ],
-    columns: [
-      { label: "Title", key: "title" },
-      { label: "Provider", key: "provider" },
-      { label: "Completed", key: "completedAt" },
-      { label: "Description", key: "description" },
-    ],
-  },
-  certifications: {
-    title: "certifications",
-    singular: "certification",
-    description: "Manage certificates and optional credential links.",
-    endpoint: "certification",
-    fields: [
-      { name: "title", label: "Title", required: true },
-      { name: "issuer", label: "Issuer", required: true },
-      { name: "issuedAt", label: "Issued at", required: true },
-      { name: "description", label: "Description", type: "textarea", required: true },
-      { name: "credentialId", label: "Credential ID" },
-      { name: "credentialUrl", label: "Credential URL", type: "url" },
-    ],
-    columns: [
-      { label: "Title", key: "title" },
-      { label: "Issuer", key: "issuer" },
-      { label: "Issued", key: "issuedAt" },
-      { label: "Credential ID", key: "credentialId" },
-    ],
-  },
-  stacks: {
-    title: "stacks",
-    singular: "stack",
-    description: "Manage the technologies and tools shown on your public profile.",
-    endpoint: "stack",
-    fields: [
-      { name: "label", label: "Label", required: true },
-      { name: "key", label: "Key", required: true },
-      { name: "color", label: "Color", required: true },
-      { name: "category", label: "Category", required: true },
-    ],
-    columns: [
-      { label: "Category", key: "category" },
-    ],
-  },
-  tags: {
-    title: "tags",
-    singular: "tag",
-    description: "Manage content classification and keywords.",
-    endpoint: "tag",
-    fields: [
-      { name: "name", label: "Name", required: true },
-      { name: "slug", label: "Slug", required: true },
-      { name: "excludeFromPages", label: "Exclude from pages", type: "boolean" },
-    ],
-    columns: [
-      { label: "Name", key: "name" },
-    ],
-  },
-};
+import { configs, type ResourceKey, type ResourceRecord, displayCell } from "@/src/features/admin/resources/configs"
 
 const pageSize = 10;
 
-function displayCell(value: unknown) {
-  if (value === null || value === undefined || value === "") return "—";
-  if (Array.isArray(value)) return value.join(", ") || "—";
-  return String(value);
-}
-
 export default function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const config = configs[resource];
-  const { setDashboardTitle } = useDashboard();
+  const { setDashboardTitle, setRightPanel } = useDashboard();
   const searchParams = useSearchParams();
   const searchFromUrl = searchParams.get("search");
   const statusFromUrl = searchParams.get("status");
@@ -190,7 +37,8 @@ export default function AdminResourcePage({ resource }: { resource: ResourceKey 
 
   useEffect(() => {
     setDashboardTitle(config.title);
-  }, [config.title, setDashboardTitle]);
+    setRightPanel(config.rightPanel ?? null);
+  }, [config.title, setDashboardTitle, config.rightPanel, setRightPanel]);
 
   useEffect(() => {
     if (createFromUrl === "1") {
@@ -199,6 +47,8 @@ export default function AdminResourcePage({ resource }: { resource: ResourceKey 
       setFormOpen(true);
     }
   }, [createFromUrl]);
+
+
 
   useEffect(() => {
     if (searchFromUrl === null) return;
@@ -248,25 +98,25 @@ export default function AdminResourcePage({ resource }: { resource: ResourceKey 
     ...(resource === "users" || resource === "gigs" || resource === "stacks" || resource === "tags"
       ? []
       : [
-          {
-            header: "Status",
-            skeletonWidth: "w-16",
-            cell: (record: ResourceRecord) => (
-              <span className={cln("text-xs", record.isDeleted ? "text-foreground/35" : "text-emerald-500/70")}>
-                {record.isDeleted ? "deleted" : "active"}
-              </span>
-            ),
-          },
-          {
-            header: "Updated",
-            skeletonWidth: "w-24",
-            cell: (record: ResourceRecord) => (
-              <span className="text-xs font-mono text-foreground/45">
-                {formatDate(record.updatedAt as string)}
-              </span>
-            ),
-          },
-        ]),
+        {
+          header: "Status",
+          skeletonWidth: "w-16",
+          cell: (record: ResourceRecord) => (
+            <span className={cln("text-xs", record.isDeleted ? "text-foreground/35" : "text-emerald-500/70")}>
+              {record.isDeleted ? "deleted" : "active"}
+            </span>
+          ),
+        },
+        {
+          header: "Updated",
+          skeletonWidth: "w-24",
+          cell: (record: ResourceRecord) => (
+            <span className="text-xs font-mono text-foreground/45">
+              {formatDate(record.updatedAt as string)}
+            </span>
+          ),
+        },
+      ]),
     {
       header: "Actions",
       className: "text-right",

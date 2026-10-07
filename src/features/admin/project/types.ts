@@ -34,9 +34,6 @@ export interface PaginatedResponse<T> {
   };
 }
 
-export interface Metadata {
-}
-
 export interface CreateProjectPayload {
   title: string;
   description: string | null;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import type { Metadata } from "next";
 import { ReferrerEnum } from "next/dist/lib/metadata/types/metadata-types";
 import { Select } from "@/src/components/Select";
@@ -98,15 +98,7 @@ const defaultConfig: MetadataConfig = {
   formatDetection: "",
 };
 
-type TabId = "basic" | "og" | "twitter" | "robots" | "advanced";
-
-const TABS: { id: TabId; label: string }[] = [
-  { id: "basic", label: "Basic" },
-  { id: "og", label: "Open Graph" },
-  { id: "twitter", label: "Twitter" },
-  { id: "robots", label: "Robots" },
-  { id: "advanced", label: "Advanced" },
-];
+type SectionId = "basic" | "og" | "twitter" | "robots" | "advanced";
 
 function generateMetadata(c: MetadataConfig): Metadata {
   const meta: Metadata = {};
@@ -309,7 +301,7 @@ function parseMetadata(meta?: Metadata): MetadataConfig {
   return c;
 }
 
-// ── Shared field styles (matching PostTagsInput) ──────────────────────────────
+// ── Shared field styles ───────────────────────────────────────────────────────
 
 function Field({
   label,
@@ -321,10 +313,10 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-mono font-medium text-foreground/40">{label}</label>
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-mono font-bold text-foreground/30 uppercase px-1">{label}</label>
       {children}
-      {hint && <p className="text-xs font-mono text-foreground/30">{hint}</p>}
+      {hint && <p className="text-[10px] font-mono text-foreground/20 px-1">{hint}</p>}
     </div>
   );
 }
@@ -333,7 +325,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="w-full bg-transparent border-b border-border py-2 text-sm font-mono font-medium focus:outline-none focus:border-primary transition-colors placeholder:text-foreground/10"
+      className="w-full h-10 bg-transparent border border-border px-3 rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm font-mono transition-shadow"
     />
   );
 }
@@ -342,13 +334,48 @@ function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className="w-full bg-transparent border-b border-border py-2 text-sm font-mono font-medium focus:outline-none focus:border-primary transition-colors placeholder:text-foreground/10 resize-none"
+      className="w-full min-h-[120px] bg-transparent border border-border p-3 rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm font-mono transition-shadow resize-none"
     />
   );
 }
 
 function Row({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-1 md:grid-cols-2 gap-8">{children}</div>;
+  return <div className="space-y-2">{children}</div>;
+}
+
+function AccordionItem({
+  label,
+  open,
+  onToggle,
+  children,
+}: {
+  label: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-b border-border">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between py-3 text-left"
+      >
+        <span
+          className={`text-sm font-mono font-bold transition-colors ${open ? "text-foreground" : "text-foreground/40 hover:text-foreground/70"
+            }`}
+        >
+          {label}
+        </span>
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-foreground/40 transition-transform ${open ? "rotate-180" : ""
+            }`}
+        />
+      </button>
+      {open && <div className="pt-2 pb-8">{children}</div>}
+    </div>
+  );
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
@@ -360,7 +387,7 @@ export default function MetadataBuilder({
   onChange?: (metadata: Metadata) => void;
   metadata?: Metadata;
 }) {
-  const [activeTab, setActiveTab] = useState<TabId>("basic");
+  const [openSection, setOpenSection] = useState<SectionId | null>("basic");
   const [config, setConfig] = useState<MetadataConfig>(() => parseMetadata(metadata));
   const [keywordInput, setKeywordInput] = useState("");
 
@@ -392,6 +419,8 @@ export default function MetadataBuilder({
   const set = (key: keyof MetadataConfig, value: string | boolean | string[]) =>
     setConfig((prev) => ({ ...prev, [key]: value }));
 
+  const toggle = (id: SectionId) => setOpenSection((cur) => (cur === id ? null : id));
+
   const addKeyword = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter") return;
     e.preventDefault();
@@ -408,26 +437,13 @@ export default function MetadataBuilder({
     );
 
   return (
-    <section className="space-y-8">
-      <div className="flex gap-6 border-b border-border">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`pb-2 text-sm font-mono font-medium transition-colors border-b-2 -mb-px ${
-              activeTab === tab.id
-                ? "border-primary text-foreground"
-                : "border-transparent text-foreground/40 hover:text-foreground/70"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <section className="">
+      <div className="text-sm font-mono font-medium text-foreground/40 mb-2">
+        SEO Metadata
       </div>
-
       {/* Basic */}
-      {activeTab === "basic" && (
-        <div className="space-y-8">
+      <AccordionItem label="Basic" open={openSection === "basic"} onToggle={() => toggle("basic")}>
+        <div className="space-y-2">
           <Field label="Title">
             <Input
               value={config.title}
@@ -461,16 +477,17 @@ export default function MetadataBuilder({
           </Field>
           <Field label="Keywords" hint="Press Enter to add.">
             <div
-              className="flex flex-wrap gap-2 py-2 border-b border-border cursor-text min-h-[38px]"
+              className="flex flex-wrap items-center gap-2 px-3 py-2 border border-border rounded cursor-text min-h-[40px] focus-within:ring-1 focus-within:ring-primary transition-shadow"
               onClick={() => document.getElementById("kw-input")?.focus()}
             >
               {config.keywords.map((kw) => (
                 <span
                   key={kw}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-primary/5 text-primary text-xs font-mono font-medium border border-primary/10 rounded"
+                  className="inline-flex items-center gap-1 px-2 py-1 text-primary text-xs font-mono font-medium border border-primary/10 rounded"
                 >
                   {kw}
                   <button
+                    type="button"
                     onClick={() => removeKeyword(kw)}
                     className="hover:text-red-500 transition-colors"
                   >
@@ -484,7 +501,7 @@ export default function MetadataBuilder({
                 onChange={(e) => setKeywordInput(e.target.value)}
                 onKeyDown={addKeyword}
                 placeholder={config.keywords.length === 0 ? "Add keyword..." : ""}
-                className="bg-transparent text-sm font-mono font-medium placeholder:text-foreground/10 outline-none min-w-[80px]"
+                className="bg-transparent text-sm font-mono outline-none min-w-[80px]"
               />
             </div>
           </Field>
@@ -534,11 +551,11 @@ export default function MetadataBuilder({
             </Select>
           </Field>
         </div>
-      )}
+      </AccordionItem>
 
       {/* Open Graph */}
-      {activeTab === "og" && (
-        <div className="space-y-8">
+      <AccordionItem label="Open Graph" open={openSection === "og"} onToggle={() => toggle("og")}>
+        <div className="space-y-2">
           <Field label="og:type">
             <Select value={config.ogType} onChange={(e) => set("ogType", e.target.value)}>
               <option>website</option>
@@ -618,11 +635,15 @@ export default function MetadataBuilder({
             />
           </Field>
         </div>
-      )}
+      </AccordionItem>
 
       {/* Twitter */}
-      {activeTab === "twitter" && (
-        <div className="space-y-8">
+      <AccordionItem
+        label="Twitter"
+        open={openSection === "twitter"}
+        onToggle={() => toggle("twitter")}
+      >
+        <div className="space-y-2">
           <Field label="twitter:card">
             <Select value={config.twitterCard} onChange={(e) => set("twitterCard", e.target.value)}>
               <option>summary</option>
@@ -677,11 +698,15 @@ export default function MetadataBuilder({
             />
           </Field>
         </div>
-      )}
+      </AccordionItem>
 
       {/* Robots */}
-      {activeTab === "robots" && (
-        <div className="space-y-8">
+      <AccordionItem
+        label="Robots"
+        open={openSection === "robots"}
+        onToggle={() => toggle("robots")}
+      >
+        <div className="space-y-2">
           <Row>
             <Field label="index">
               <Select
@@ -755,11 +780,15 @@ export default function MetadataBuilder({
             />
           </Field>
         </div>
-      )}
+      </AccordionItem>
 
       {/* Advanced */}
-      {activeTab === "advanced" && (
-        <div className="space-y-8">
+      <AccordionItem
+        label="Advanced"
+        open={openSection === "advanced"}
+        onToggle={() => toggle("advanced")}
+      >
+        <div className="space-y-2">
           <Field label="Canonical URL">
             <Input
               value={config.canonical}
@@ -834,7 +863,7 @@ export default function MetadataBuilder({
             </Select>
           </Field>
         </div>
-      )}
+      </AccordionItem>
     </section>
   );
 }

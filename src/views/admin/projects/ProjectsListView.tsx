@@ -21,30 +21,27 @@ export default function ProjectsListView({
 }) {
   const router = useRouter();
   const { removeProject } = useProjectContext();
-  const resolvedParams = React.use(searchParams);
+  const resolvedParams = searchParams ? React.use(searchParams) : undefined;
 
-  const [currentStatus, setCurrentStatus] = useState(
-    (resolvedParams?.status ?? "published").toUpperCase()
-  );
-  const [currentPage, setCurrentPage] = useState(
-    Math.max(1, Number(resolvedParams?.page) || 1)
-  );
+  const currentStatus = (resolvedParams?.status ?? "published").toUpperCase();
+  const currentPage = Math.max(1, Number(resolvedParams?.page) || 1);
   const [search, setSearch] = useState(resolvedParams?.search ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState(search.trim());
   const pageSize = 10;
 
   useEffect(() => {
-    setSearch(resolvedParams?.search ?? "");
-    setCurrentStatus((resolvedParams?.status ?? "published").toUpperCase());
-    setCurrentPage(Math.max(1, Number(resolvedParams?.page) || 1));
-  }, [resolvedParams?.page, resolvedParams?.status, resolvedParams?.search]);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setDebouncedSearch(search.trim()), 250);
+    const timeout = window.setTimeout(() => {
+      const trimmed = search.trim();
+      setDebouncedSearch(trimmed);
+      const query = new URLSearchParams();
+      if (currentStatus) query.set("status", currentStatus.toLowerCase());
+      if (trimmed) query.set("search", trimmed);
+      router.push(`/admin/projects?${query.toString()}`);
+    }, 300);
     return () => window.clearTimeout(timeout);
-  }, [search]);
+  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { projects, isLoading, meta } = useProjects({
+  const { projects, isLoading, error, meta } = useProjects({
     status: currentStatus as Project["status"] | undefined,
     offset: (currentPage - 1) * pageSize,
     limit: pageSize,
@@ -69,7 +66,7 @@ export default function ProjectsListView({
       <div className="mx-auto w-full max-w-3xl">
         <AdminSearchInput
           value={search}
-          onChange={(value) => { setSearch(value); setCurrentPage(1); }}
+          onChange={(value) => setSearch(value)}
           label="Search projects"
           placeholder="Search projects..."
           className="w-full"
@@ -79,8 +76,12 @@ export default function ProjectsListView({
       <Tabs
         value={currentStatus.toLowerCase()}
         onValueChange={(value) => {
-          setCurrentStatus(value.toUpperCase());
-          setCurrentPage(1);
+          const query = new URLSearchParams({
+            status: value,
+            page: "1",
+          });
+          if (search.trim()) query.set("search", search.trim());
+          router.push(`/admin/projects?${query.toString()}`);
         }}
       >
         <TabsList className="mx-auto w-full max-w-3xl justify-start text-left">
@@ -102,6 +103,10 @@ export default function ProjectsListView({
             </li>
           ))}
         </ul>
+      ) : error ? (
+        <p className="py-12 text-center text-sm text-foreground/55">
+          Projects couldn&apos;t be loaded. Please try refreshing or checking server connection.
+        </p>
       ) : projects.length === 0 ? (
         <p className="py-12 text-center text-sm text-foreground/45">No projects found.</p>
       ) : (
@@ -174,7 +179,6 @@ export default function ProjectsListView({
           total={meta?.total || 0}
           pageSize={pageSize}
           onPageChange={(page) => {
-            setCurrentPage(page);
             const query = new URLSearchParams({
               status: currentStatus.toLowerCase(),
               page: String(page),

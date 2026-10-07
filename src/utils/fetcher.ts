@@ -50,11 +50,12 @@ export const fetcher = async <T = unknown>(
           data = errorJson.data ?? null;
 
           if (
-            response.status === 403 &&
-            errorJson?.message === "Your session has expired. Please log in again."
+            response.status === 401 ||
+            (response.status === 403 &&
+              errorJson?.message === "Your session has expired. Please log in again.")
           ) {
             removeSession("accessToken");
-            if (typeof window !== "undefined") {
+            if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
               window.location.href = "/login";
             }
           }

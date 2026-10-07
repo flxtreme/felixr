@@ -13,6 +13,7 @@ import { PageHeader } from "@/src/components/PageHeader";
 import { Breadcrumb, BreadcrumbItem } from "@/src/components/FlxBreadcrumb";
 import { SectionDivider } from "@/src/components/SectionDivider";
 import { useProducts } from "@/src/features/public/products/hooks/useProducts";
+import { trackUserAction } from "@/src/lib/analytics/trackUserAction";
 
 const PAGE_SIZE = 8;
 
@@ -210,6 +211,17 @@ export default function ShopView() {
                             {...(isDownload
                               ? { download: true }
                               : { target: "_blank", rel: "noopener noreferrer" })}
+                            onClick={() => {
+                              trackUserAction({
+                                action: isDownload ? "download" : "redirect",
+                                path: ["shop", product.id],
+                                parameters: {
+                                  title: product.title,
+                                  category: product.category,
+                                  link: product.link,
+                                },
+                              });
+                            }}
                             className="group inline-flex items-center gap-2 text-sm font-bold text-primary transition-[gap] hover:gap-3"
                           >
                             {product.actionLabel}

@@ -227,7 +227,7 @@ export default function AdminUploadsView({ searchParams }: { searchParams: Promi
     {isLoading ? <p className="py-16 text-center text-sm text-foreground/50">Loading uploads...</p>
       : error ? <p role="alert" className="py-16 text-center text-sm text-red-500">Uploads couldn&apos;t be loaded. Please try again.</p>
         : uploads.length === 0 ? <p className="py-16 text-center text-sm text-foreground/50">No uploads found.</p>
-          : <ul className="mx-auto w-full max-w-6xl columns-1 gap-6 sm:columns-2 lg:columns-4">
+          : <ul className="mx-auto w-full max-w-6xl grid grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
             {uploads.map((upload) => <li key={upload.id} className="mb-6 break-inside-avoid">
               <article className="border border-foreground/10">
                 <div className="flex items-center justify-end border-b border-foreground/10 px-2 py-1">

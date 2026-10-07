@@ -14,6 +14,7 @@ const useProjects = (params?: GetProjectsQuery) => {
     projects: swr.data?.data ?? [],
     meta: swr.data?.meta,
     isLoading: swr.isLoading,
+    error: swr.error,
   };
 };
 

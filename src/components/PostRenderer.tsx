@@ -44,10 +44,9 @@ function parseTable(block: string): ParsedTable {
 }
 
 // ─── Inline renderer ──────────────────────────────────────────────────────────
-
 function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
   const pattern =
-    /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)|\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)|\[\^(\w+)\]|\*\*\*([^*]+)\*\*\*|\*\*([^*]+)\*\*|\*([^*\n]+)\*|~~([^~]+)~~|==([^=]+)==|\^([^^]+)\^|~([^~]+)~|\+\+([^+]+)\+\+|`([^`]+)`|((?:https?:\/\/|www\.)[^\s<]+)/g;
+    /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)|\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)|\[\^(\w+)\]|\*\*\*([^*]+)\*\*\*|\*\*([^*]+)\*\*|\*([^*\n]+)\*|~~([^~]+)~~|==([^=]+)==|\^([^^]+)\^|~([^~]+)~|\+\+([^+]+)\+\+|`([^`]+)`|((?:https?:\/\/|www\.)[^\s<]+)|(?<!\w)_([^_\n]+)_(?!\w)/g;
 
   const nodes: ReactNode[] = [];
   let last = 0;
@@ -87,11 +86,11 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
         </strong>
       );
     } else if (m[9] !== undefined) {
-      nodes.push(<strong key={k}>{m[9]}</strong>);
+      nodes.push(<strong key={k}>{parseInline(m[9], k)}</strong>);
     } else if (m[10] !== undefined) {
       nodes.push(<em key={k}>{m[10]}</em>);
     } else if (m[11] !== undefined) {
-      nodes.push(<del key={k}>{m[11]}</del>);
+      nodes.push(<del key={k}>{parseInline(m[11], k)}</del>);
     } else if (m[12] !== undefined) {
       nodes.push(<mark key={k}>{m[12]}</mark>);
     } else if (m[13] !== undefined) {
@@ -123,6 +122,8 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
         </a>
       );
       if (trailingPunctuation) nodes.push(trailingPunctuation);
+    } else if (m[18] !== undefined) {
+      nodes.push(<em key={k}>{parseInline(m[18], k)}</em>);
     }
 
     last = pattern.lastIndex;
@@ -131,7 +132,6 @@ function parseInline(text: string, keyPrefix: string = ""): ReactNode[] {
   if (last < text.length) nodes.push(text.slice(last));
   return nodes;
 }
-
 // ─── Unordered list renderer ──────────────────────────────────────────────────
 
 function renderUL(lines: string[], baseIndent: number, keyBase: string): JSX.Element {
@@ -573,12 +573,13 @@ function renderBlocks(markdown: string): ReactNode[] {
       continue;
     }
 
-    const paraLines: string[] = [];
+    const paraLines: string[] = [lines[i]];
+    i++;
     while (
       i < lines.length &&
       lines[i].trim() !== "" &&
-      !/^(#{1,6} |>|```|\||[-*+] |\d+\. |---|\*\*\*|___)/.test(lines[i]) &&
-      !/^\[\^/.test(lines[i])
+      !/^(#{1,6} |>|```|\||[-*+] |\d+\. |(---|\*\*\*|___)\s*$)/.test(lines[i]) &&
+      !/^\[\^\w+\]:/.test(lines[i])
     ) {
       paraLines.push(lines[i]);
       i++;

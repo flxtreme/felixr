@@ -30,15 +30,18 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     console.log("useEffect fired");
     verify();
 
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") verify();
+    };
+
     window.addEventListener("pageshow", verify);
     window.addEventListener("focus", verify);
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") verify();
-    });
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       window.removeEventListener("pageshow", verify);
       window.removeEventListener("focus", verify);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [router]);
 

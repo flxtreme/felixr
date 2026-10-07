@@ -1,27 +1,31 @@
 "use client";
 
-import { ManagePostLayout } from "@/src/layouts/ManagePostLayout";
-import {
-  PostContentEditor,
-  PostMetaFields,
-  PostStatusSelector,
-  PostTagsInput,
-} from "@/src/features/admin/components/post";
-import PostMetaEditor from "@/src/features/admin/components/post/PostMetadataEditor";
+import { useDashboard } from "@/src/features/admin/DashboardContext";
+import { AdminButton } from "@/src/features/admin/components/AdminButton";
+import { PostContentEditor } from "@/src/features/admin/components/post/PostContentEditor";
+import PostMetadataEditor from "@/src/features/admin/components/post/PostMetadataEditor";
+import { PostStatusSelector } from "@/src/features/admin/components/post/PostStatusSelector";
+import { PostTagsInput } from "@/src/features/admin/components/post/PostTagsInput";
 import { usePost, usePostContent, usePostMetadata } from "@/src/features/admin/posts/hooks";
 import { usePagesContext } from "@/src/features/admin/pages/PagesContext";
 import { UpdatePostPayload, Post } from "@/src/features/admin/posts/types";
+import { Loader2 } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useMemo, useEffect, useRef } from "react";
-import { useDashboard } from "@/src/features/admin/DashboardContext";
+import React, { useState, useMemo, useRef, useEffect } from "react";
+
+const labelClass = "text-sm font-mono font-medium text-foreground/40";
+const inputClass =
+  "w-full h-10 bg-transparent border border-border px-3 rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm font-mono transition-shadow";
+const textareaClass =
+  "w-full min-h-[120px] bg-transparent border border-border p-3 rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm font-mono transition-shadow resize-none";
 
 export default function PageEditView() {
   const { id } = useParams();
   const router = useRouter();
-  const { setGoBackUrl } = useDashboard();
-  const prevBaseRef = useRef<Partial<Post>>({}); 
-
+  const prevBaseRef = useRef<Partial<Post>>({});
+  const { setGoBackUrl, setRightPanel } = useDashboard();
   const {
     updatePage,
     tagInput,
@@ -32,47 +36,41 @@ export default function PageEditView() {
     isSearching,
   } = usePagesContext();
 
-  const { post: fetchedPage, isLoading: isFetchingPage } = usePost(id as string);
+  const { post: fetchedPost, isLoading: isFetchingPost } = usePost(id as string);
   const { content: fetchedContent } = usePostContent(id as string);
   const { metadata: fetchedMetadata } = usePostMetadata(id as string);
 
-  const basePage = useMemo<Partial<Post>>(
+  const basePost = useMemo<Partial<Post>>(
     () => ({
       title: "",
       slug: "",
       content: "",
       status: "DRAFT",
       postType: "PAGE",
+      excerpt: "",
       metadata: { tags: [] },
-      ...(fetchedPage ?? {}),
+      ...(fetchedPost ?? {}),
       ...(typeof fetchedContent !== "undefined" ? { content: fetchedContent } : {}),
       ...(fetchedMetadata
         ? {
-            metadata: {
-              ...(fetchedPage?.metadata ?? {}),
-              ...(fetchedMetadata as Record<string, unknown>),
-            },
-          }
+          metadata: {
+            ...(fetchedPost?.metadata ?? {}),
+            ...(fetchedMetadata as Record<string, unknown>),
+          },
+        }
         : {}),
     }),
-    [fetchedPage, fetchedContent, fetchedMetadata]
+    [fetchedPost, fetchedContent, fetchedMetadata]
   );
 
   const [overrides, setOverrides] = useState<Partial<Post>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const pageData = useMemo(() => ({ ...basePage, ...overrides }), [basePage, overrides]);
+  const page = useMemo(() => ({ ...basePost, ...overrides }), [basePost, overrides]);
 
-  const setPageData = (updater: (prev: Partial<Post>) => Partial<Post>) => {
-    setOverrides((prev) => updater({ ...basePage, ...prev }));
-  };
-
-  const savePage = async () => {
-    try {
-      await updatePage(id as string, pageData as UpdatePostPayload);
-      router.push("/admin/pages");
-    } catch (error) {
-      console.error(error);
-    }
+  const setPage = (updater: (prev: Partial<Post>) => Partial<Post>) => {
+    setOverrides((prev) => updater({ ...basePost, ...prev }));
   };
 
   useEffect(() => {
@@ -80,134 +78,180 @@ export default function PageEditView() {
   }, []);
 
   useEffect(() => {
-    if (JSON.stringify(prevBaseRef.current) !== JSON.stringify(basePage)) {
-      prevBaseRef.current = basePage;
+    if (JSON.stringify(prevBaseRef.current) !== JSON.stringify(basePost)) {
+      prevBaseRef.current = basePost;
       setOverrides({});
     }
-  }, [basePage]);
+  }, [basePost]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await updatePage(id as string, page as UpdatePostPayload);
+      router.push("/admin/pages");
+    } catch (err: any) {
+      setError(err.message || "Failed to save page. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    setRightPanel(
+      <div className="flex flex-col gap-6 px-4 pb-4 pt-8 w-full">
+        <PostMetadataEditor
+          key={`${id}-${JSON.stringify(basePost.metadata?.seo ?? {})}`}
+          metadata={page.metadata?.seo as Metadata}
+          onChange={(seo) =>
+            setPage((p) =>
+              JSON.stringify(p.metadata?.seo) === JSON.stringify(seo)
+                ? p
+                : { ...p, metadata: { ...(p.metadata || {}), seo } }
+            )
+          }
+        />
+      </div>
+    );
+    return () => setRightPanel(null);
+  }, [page.metadata, basePost]);
+
+  if (isFetchingPost) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Loader2 className="w-5 h-5 animate-spin text-foreground/40" />
+      </div>
+    );
+  }
 
   return (
-    <ManagePostLayout
-      isLoading={isFetchingPage}
-      pageTitle={pageData.title || pageData.slug || "Edit Page"}
-      backHref="/admin/pages"
-      saveLabel="Save Changes"
-      onSave={savePage}
-      editor={
-        <PostContentEditor
-          content={pageData.content || ""}
-          onContentChange={(value) =>
-            setPageData((prev) => ({
-              ...prev,
-              content: value,
-            }))
-          }
-          onFileUpload={(file) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              setPageData((prev) => ({
-                ...prev,
-                content: e.target?.result as string,
-              }));
-            };
-            reader.readAsText(file);
-          }}
-        />
-      }
-      sidebar={
-        <div className="space-y-7">
-          <section className="space-y-4">
-            <h2 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-foreground/30">
-              Page Details
-            </h2>
+    <div className="flex flex-col min-h-0 h-full pt-10">
+      <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+        <header className="px-8 pb-6 pt-10 border-b border-border shrink-0">
+          <div className="max-w-3xl mx-auto space-y-1">
+            <h1 className="text-2xl font-bold">Edit Page</h1>
+            <p className="text-sm font-mono font-medium text-foreground/40">
+              {page.title || page.slug || "Update your content"}
+            </p>
+          </div>
+        </header>
 
-            <PostMetaFields
-              title={pageData.title || ""}
-              onTitleChange={(value) =>
-                setPageData((prev) => ({
-                  ...prev,
-                  title: value,
-                }))
-              }
-              slug={pageData.slug || ""}
-              onSlugChange={(value) =>
-                setPageData((prev) => ({
-                  ...prev,
-                  slug: value,
-                }))
-              }
-              excerpt={pageData.excerpt || ""}
-              onExcerptChange={(value) =>
-                setPageData((prev) => ({
-                  ...prev,
-                  excerpt: value,
-                }))
-              }
-            />
+        {error && (
+          <div className="px-8 pt-4">
+            <div className="max-w-3xl mx-auto p-3 bg-red-500/10 border border-red-500/20 rounded text-[11px] font-mono text-red-500 uppercase">
+              {error}
+            </div>
+          </div>
+        )}
 
-            <PostStatusSelector
-              status={pageData.status || "DRAFT"}
-              onStatusChange={(value) =>
-                setPageData((prev) => ({
-                  ...prev,
-                  status: value,
-                }))
-              }
-            />
+        <div className="flex-1">
+          <div className="h-full grid grid-cols-1 xl:grid-cols-5 gap-6 max-w-7xl mx-auto px-6">
+            <div className="py-6 h-full xl:col-span-3 xl:border-r xl:border-dashed xl:border-foreground/20 pr-6">
+              <div className="h-full flex flex-col">
+                <PostContentEditor
+                  content={page.content || ""}
+                  onContentChange={(value) => setPage((p) => ({ ...p, content: value }))}
+                  onFileUpload={(file) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) =>
+                      setPage((p) => ({ ...p, content: (e.target?.result as string) || "" }));
+                    reader.readAsText(file);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="space-y-4 py-6 h-full xl:col-span-2">
+              <div className="space-y-1.5">
+                <label className={labelClass} htmlFor="edit-title">
+                  Page Title
+                </label>
+                <input
+                  id="edit-title"
+                  type="text"
+                  required
+                  value={page.title || ""}
+                  onChange={(e) => setPage((p) => ({ ...p, title: e.target.value }))}
+                  className={inputClass}
+                  placeholder="e.g. About Us"
+                />
+              </div>
 
-            <PostTagsInput
-              tags={(pageData.metadata?.tags as string[]) || []}
-              onAddTag={(tag) =>
-                setPageData((prev) => {
-                  const tags = (prev.metadata?.tags as string[]) || [];
-                  if (tags.includes(tag)) return prev;
-                  return {
-                    ...prev,
-                    metadata: {
-                      ...(prev.metadata || {}),
-                      tags: [...tags, tag],
-                    },
-                  };
-                })
-              }
-              onRemoveTag={(tag) =>
-                setPageData((prev) => ({
-                  ...prev,
-                  metadata: {
-                    ...(prev.metadata || {}),
-                    tags: ((prev.metadata?.tags as string[]) || []).filter((t) => t !== tag),
-                  },
-                }))
-              }
-              tagInput={tagInput}
-              setTagInput={setTagInput}
-              showSuggestions={showSuggestions}
-              setShowSuggestions={setShowSuggestions}
-              searchResults={searchResults}
-              isSearching={isSearching}
-            />
-          </section>
+              <div className="space-y-1.5">
+                <label className={labelClass} htmlFor="edit-slug">
+                  Slug
+                </label>
+                <input
+                  id="edit-slug"
+                  type="text"
+                  value={page.slug || ""}
+                  onChange={(e) => setPage((p) => ({ ...p, slug: e.target.value }))}
+                  className={inputClass}
+                  placeholder="about-us"
+                />
+              </div>
 
-          <section className="space-y-4">
-            <h2 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-foreground/30">
-              SEO Metadata
-            </h2>
+              <div className="space-y-1.5">
+                <label className={labelClass} htmlFor="edit-excerpt">
+                  Excerpt
+                </label>
+                <textarea
+                  id="edit-excerpt"
+                  value={page.excerpt || ""}
+                  onChange={(e) => setPage((p) => ({ ...p, excerpt: e.target.value }))}
+                  className={textareaClass}
+                  placeholder="Briefly summarize the page..."
+                />
+              </div>
 
-            <PostMetaEditor
-              metadata={pageData.metadata?.seo as Metadata}
-              onChange={(seo) =>
-                setPageData((prev) => ({
-                  ...prev,
-                  metadata: {
-                    ...(prev.metadata || {}),
-                    seo,
-                  },
-                }))
-              }
-            />
-          </section>
+              <div className="space-y-1.5">
+                <PostStatusSelector
+                  status={page.status || "DRAFT"}
+                  onStatusChange={(value) => setPage((p) => ({ ...p, status: value }))}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <PostTagsInput
+                  tags={(page.metadata?.tags as string[]) || []}
+                  onAddTag={(tag) =>
+                    setPage((p) => {
+                      const meta = p.metadata || {};
+                      const tags = (meta.tags as string[]) || [];
+                      if (tags.includes(tag)) return p;
+                      return { ...p, metadata: { ...meta, tags: [...tags, tag] } };
+                    })
+                  }
+                  onRemoveTag={(tag) =>
+                    setPage((p) => {
+                      const meta = p.metadata || {};
+                      const tags = (meta.tags as string[]) || [];
+                      return { ...p, metadata: { ...meta, tags: tags.filter((t) => t !== tag) } };
+                    })
+                  }
+                  tagInput={tagInput}
+                  setTagInput={setTagInput}
+                  showSuggestions={showSuggestions}
+                  setShowSuggestions={setShowSuggestions}
+                  searchResults={searchResults}
+                  isSearching={isSearching}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      }
-    />
+
+        <div className="px-8 py-4 border-t border-foreground/5 shrink-0">
+          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
+            <Link href="/admin/pages">
+              <AdminButton variant="outline">Cancel</AdminButton>
+            </Link>
+            <AdminButton type="submit" disabled={isSubmitting} variant="primary">
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </AdminButton>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 }
