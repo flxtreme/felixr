@@ -10,8 +10,9 @@ import { Edit2, Loader2, Plus, Trash2, X } from "lucide-react";
 import { useModal } from "flxtheme";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AdminButton } from "@/src/features/admin/components/AdminButton";
+import { Post } from "@/src/features/admin/posts/types";
 
 const IMAGE_PICKER_MODAL_ID = "admin-project-create-image-picker";
 
@@ -29,7 +30,6 @@ export default function ProjectCreateView() {
   const [links, setLinks] = useState<ProjectLink[]>([]);
   const [featureImages, setFeatureImages] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,15 +39,23 @@ export default function ProjectCreateView() {
     limit: 50,
   });
 
+  // Stable key: `pages` is a new array reference on every render
+  const pagesKey = pages.map((p) => p.id).join(",");
+
   useEffect(() => {
     setGoBackUrl("/admin/projects");
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (!(e.target as HTMLElement).closest("[data-page-picker]")) {
         setShowSuggestions(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Clear the right panel only when leaving the page
+  useEffect(() => {
+    return () => setRightPanel(null);
   }, []);
 
   const handleAddLink = () => setLinks([...links, { label: "", href: "" }]);
@@ -83,6 +91,15 @@ export default function ProjectCreateView() {
 
   // Right panel content — re-rendered whenever deps change
   useEffect(() => {
+    const selectPage = (e: React.MouseEvent<HTMLButtonElement>, page: Post) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setPageId(page.id);
+      setPageSlug(page.slug.toLowerCase());
+      setPageSearch(page.title || page.slug);
+      setShowSuggestions(false);
+    };
+
     setRightPanel(
       <div className="flex flex-col gap-8 p-4">
         {/* Linked Page */}
@@ -101,7 +118,7 @@ export default function ProjectCreateView() {
               </Link>
             )}
           </div>
-          <div className="relative" ref={containerRef}>
+          <div className="relative" data-page-picker>
             <input
               type="text"
               value={pageSearch}
@@ -124,12 +141,7 @@ export default function ProjectCreateView() {
                     <button
                       key={page.id}
                       type="button"
-                      onClick={() => {
-                        setPageId(page.id);
-                        setPageSlug(page.slug.toLowerCase());
-                        setPageSearch(page.title || page.slug);
-                        setShowSuggestions(false);
-                      }}
+                      onMouseDown={(e) => selectPage(e, page)}
                       className="w-full text-left px-3 py-1.5 text-xs font-mono hover:bg-primary/5 hover:text-primary transition-colors flex flex-col"
                     >
                       <span>{page.title || page.slug}</span>
@@ -232,8 +244,8 @@ export default function ProjectCreateView() {
         </div>
       </div>
     );
-    return () => setRightPanel(null);
-  }, [pageId, pageSearch, pages, isLoadingPages, showSuggestions, links, featureImages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageId, pageSearch, pagesKey, isLoadingPages, showSuggestions, links, featureImages]);
 
   return (
     <>

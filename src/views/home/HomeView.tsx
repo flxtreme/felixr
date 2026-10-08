@@ -121,7 +121,7 @@ export default function HomeView() {
         <div className="pb-4 pt-12">
           <div className="max-w-3xl px-6 mx-auto flex items-center justify-between mb-6">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/65">
-              01 - Tools & practices
+              Tools & practices
             </p>
             <Link
               href="/stack"
@@ -138,7 +138,7 @@ export default function HomeView() {
         <div className="mx-auto max-w-3xl px-6 py-12">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/65">
-              02 - Projects
+              Projects
             </h2>
             <Link
               href="/projects"
@@ -206,7 +206,7 @@ export default function HomeView() {
         <div className="mx-auto max-w-3xl px-6 py-12">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/65">
-              03 - Experience
+              Experience
             </h2>
             <Link
               href="/experience"
@@ -239,7 +239,7 @@ export default function HomeView() {
         <div className="mx-auto max-w-3xl px-6 py-12">
           <div className="mb-6 flex items-center justify-between">
             <h2 className={cln("font-mono text-xs uppercase tracking-[0.2em] text-foreground/65")}>
-              04 - Certifications
+              Certifications
             </h2>
             <Link
               href="/certifications"
@@ -275,7 +275,7 @@ export default function HomeView() {
         <div className="mx-auto max-w-3xl px-6 py-12">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/65">
-              05 - Blogs
+              Blogs
             </h2>
             <Link
               href="/blog"
