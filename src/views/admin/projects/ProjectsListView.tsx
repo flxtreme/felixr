@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Pagination, Skeleton, Tabs, TabsList, TabsTrigger } from "flxtheme";
 import { FiPlus } from "flxtheme/icons/fi";
 import { useProjects } from "@/src/features/admin/project/hooks";
@@ -19,34 +18,56 @@ export default function ProjectsListView({
 }: {
   searchParams: Promise<{ page?: string; status?: string; search?: string }>;
 }) {
-  const router = useRouter();
   const { removeProject } = useProjectContext();
   const resolvedParams = searchParams ? React.use(searchParams) : undefined;
 
-  const currentStatus = (resolvedParams?.status ?? "published").toUpperCase();
-  const currentPage = Math.max(1, Number(resolvedParams?.page) || 1);
+  const [status, setStatus] = useState(
+    (resolvedParams?.status ?? "published").toLowerCase(),
+  );
+  const [page, setPage] = useState(Math.max(1, Number(resolvedParams?.page) || 1));
   const [search, setSearch] = useState(resolvedParams?.search ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState(search.trim());
+  const [removedIds, setRemovedIds] = useState<Set<Project["id"]>>(new Set());
   const pageSize = 10;
+  const currentStatus = status.toUpperCase();
+  const currentPage = page;
 
+  // Debounce search input
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const trimmed = search.trim();
-      setDebouncedSearch(trimmed);
-      const query = new URLSearchParams();
-      if (currentStatus) query.set("status", currentStatus.toLowerCase());
-      if (trimmed) query.set("search", trimmed);
-      router.push(`/admin/projects?${query.toString()}`);
+      setDebouncedSearch((prev) => {
+        if (prev !== trimmed) setPage(1);
+        return trimmed;
+      });
     }, 300);
     return () => window.clearTimeout(timeout);
-  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [search]);
 
-  const { projects, isLoading, error, meta } = useProjects({
+  // Keep URL in sync without a server round-trip
+  useEffect(() => {
+    const query = new URLSearchParams({ status, page: String(page) });
+    if (debouncedSearch) query.set("search", debouncedSearch);
+    window.history.replaceState(null, "", `/admin/projects?${query.toString()}`);
+    setRemovedIds(new Set());
+  }, [status, page, debouncedSearch]);
+
+  const {
+    projects: fetched,
+    isLoading,
+    error,
+    meta,
+    mutate,
+  } = useProjects({
     status: currentStatus as Project["status"] | undefined,
     offset: (currentPage - 1) * pageSize,
     limit: pageSize,
     search: debouncedSearch || null,
   });
+
+  const projects: Project[] = (fetched ?? []).filter(
+    (p: Project) => !removedIds.has(p.id),
+  );
 
   return (
     <div className="space-y-6 p-6">
@@ -74,14 +95,10 @@ export default function ProjectsListView({
       </div>
 
       <Tabs
-        value={currentStatus.toLowerCase()}
+        value={status}
         onValueChange={(value) => {
-          const query = new URLSearchParams({
-            status: value,
-            page: "1",
-          });
-          if (search.trim()) query.set("search", search.trim());
-          router.push(`/admin/projects?${query.toString()}`);
+          setStatus(value);
+          setPage(1);
         }}
       >
         <TabsList className="mx-auto w-full max-w-3xl justify-start text-left">
@@ -111,65 +128,77 @@ export default function ProjectsListView({
         <p className="py-12 text-center text-sm text-foreground/45">No projects found.</p>
       ) : (
         <ul className="mx-auto w-full max-w-5xl columns-1 gap-6 sm:columns-2 2xl:columns-3">
-          {projects.map((project: Project) => (
-            <li key={project.id} className="mb-6 break-inside-avoid">
-              <article className="border border-foreground/10">
-                <div className="flex items-start justify-between gap-4 p-4">
-                  <div className="min-w-0">
-                    <p className="font-mono text-[10px] lowercase text-foreground/45">
-                      {project.page?.slug ? `/${project.page.slug.toLowerCase()}` : "project"}
-                    </p>
-                    <h2 className="mt-2 text-sm font-bold leading-tight text-foreground/80">
-                      <Link href={`/admin/projects/${project.id}`} className="transition-colors hover:text-primary">
-                        {project.title}
-                      </Link>
-                    </h2>
+          {projects.map((project: Project) => {
+            const isTrashed = project.isDeleted || project.status === "TRASHED";
+            return (
+              <li key={project.id} className="mb-6 break-inside-avoid">
+                <article className="border border-foreground/10">
+                  <div className="flex items-start justify-between gap-4 p-4">
+                    <div className="min-w-0">
+                      <p className="font-mono text-[10px] lowercase text-foreground/45">
+                        {project.page?.slug ? `/${project.page.slug.toLowerCase()}` : "project"}
+                      </p>
+                      <h2 className="mt-2 text-sm font-bold leading-tight text-foreground/80">
+                        <Link
+                          href={`/admin/projects/${project.id}`}
+                          className="transition-colors hover:text-primary"
+                        >
+                          {project.title}
+                        </Link>
+                      </h2>
+                    </div>
+                    <AdminRowActions
+                      editHref={`/admin/projects/${project.id}`}
+                      onDelete={async (isPermanent) => {
+                        await removeProject(project.id, isPermanent);
+                        setRemovedIds((prev) => new Set(prev).add(project.id));
+                        mutate();
+                      }}
+                      isDeleted={isTrashed}
+                      deleteMessage={
+                        isTrashed
+                          ? `Permanently delete project “${project.title}”?`
+                          : `Move project “${project.title}” to trash?`
+                      }
+                    />
                   </div>
-                  <AdminRowActions
-                    editHref={`/admin/projects/${project.id}`}
-                    onDelete={(isPermanent) => removeProject(project.id, isPermanent)}
-                    isDeleted={project.isDeleted || project.status === "TRASHED"}
-                    deleteMessage={project.isDeleted || project.status === "TRASHED"
-                      ? `Permanently delete project “${project.title}”?`
-                      : `Move project “${project.title}” to trash?`}
-                  />
-                </div>
 
-                <div className="space-y-4 px-4 pb-4">
-                  <p className="text-xs leading-5 text-foreground/55">
-                    {project.description || "No description provided."}
-                  </p>
-                  {project.page?.slug && (
-                    <Link
-                      href={`/projects/${project.page.slug.toLowerCase()}`}
-                      className="inline-flex text-xs font-bold text-primary transition-colors hover:text-foreground"
-                    >
-                      View project <span aria-hidden="true" className="ml-1">↗</span>
-                    </Link>
-                  )}
-                  {project.links?.length > 0 && (
-                    <ul className="flex flex-wrap gap-x-4 gap-y-2 border-t border-foreground/10 pt-3">
-                      {project.links.map((link) => (
-                        <li key={`${link.label}-${link.href}`}>
-                          <a
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-foreground/55 underline underline-offset-4 transition-colors hover:text-primary"
-                          >
-                            {link.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  <p className="border-t border-foreground/10 pt-3 text-[10px] font-mono text-foreground/40">
-                    Updated {formatDate(project.updatedAt)}
-                  </p>
-                </div>
-              </article>
-            </li>
-          ))}
+                  <div className="space-y-4 px-4 pb-4">
+                    <p className="text-xs leading-5 text-foreground/55">
+                      {project.description || "No description provided."}
+                    </p>
+                    {project.page?.slug && (
+                      <Link
+                        href={`/projects/${project.page.slug.toLowerCase()}`}
+                        className="inline-flex text-xs font-bold text-primary transition-colors hover:text-foreground"
+                      >
+                        View project <span aria-hidden="true" className="ml-1">↗</span>
+                      </Link>
+                    )}
+                    {project.links?.length > 0 && (
+                      <ul className="flex flex-wrap gap-x-4 gap-y-2 border-t border-foreground/10 pt-3">
+                        {project.links.map((link) => (
+                          <li key={`${link.label}-${link.href}`}>
+                            <a
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-foreground/55 underline underline-offset-4 transition-colors hover:text-primary"
+                            >
+                              {link.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <p className="border-t border-foreground/10 pt-3 text-[10px] font-mono text-foreground/40">
+                      Updated {formatDate(project.updatedAt)}
+                    </p>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -178,14 +207,7 @@ export default function ProjectsListView({
           current={currentPage}
           total={meta?.total || 0}
           pageSize={pageSize}
-          onPageChange={(page) => {
-            const query = new URLSearchParams({
-              status: currentStatus.toLowerCase(),
-              page: String(page),
-            });
-            if (search.trim()) query.set("search", search.trim());
-            router.push(`/admin/projects?${query.toString()}`);
-          }}
+          onPageChange={(p) => setPage(p)}
           showTotal
         />
       </div>
