@@ -36,6 +36,7 @@ import {
   SiPostman,
   SiClaude,
   SiGithubcopilot,
+  SiMongodb,
 } from "react-icons/si";
 import { Cable, FileCode2, Workflow, Cpu, Sparkles, Wand2 } from "lucide-react";
 
@@ -72,6 +73,7 @@ export const SOCIAL_ICONS: Record<string, React.ElementType> = {
   bigquery: SiGooglebigquery,
   rest: Cable,
   soap: FileCode2,
+  mongodb: SiMongodb,
 
   // Cloud & DevOps
   googlecloud: SiGooglecloud,

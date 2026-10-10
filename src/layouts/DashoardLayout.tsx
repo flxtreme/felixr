@@ -28,6 +28,12 @@ const NAV_GROUPS = [
   },
   {
     items: [
+      { id: "forms", href: "/admin/forms", label: "Forms" },
+      { id: "submissions", href: "/admin/submissions", label: "Submissions" },
+    ],
+  },
+  {
+    items: [
       { id: "projects", href: "/admin/projects", label: "Projects" },
       { id: "stacks", href: "/admin/stacks", label: "Stacks" },
       { id: "gigs", href: "/admin/gigs", label: "Gigs" },
